@@ -1,0 +1,302 @@
+=============================================================================
+WALLDECORATOR E-COMMERCE - OPTIMIZED DATABASE SCHEMA
+=============================================================================
+
+SCHEMA DESIGN PRINCIPLES:
+-------------------------
+✓ Normalized database structure
+✓ Scalable for future growth
+✓ Material-specific pricing and inventory
+✓ Hierarchical categories with unlimited nesting
+✓ Proper indexing for performance
+✓ Row Level Security (RLS) enabled
+✓ Audit trails with created_at/updated_at
+✓ Soft deletes where appropriate
+
+=============================================================================
+CORE TABLES
+=============================================================================
+
+1. MATERIALS
+   - Scalable materials catalog (database table, not enum!)
+   - Can be managed via admin panel without code changes
+   - Properties: name, slug, description
+   - Pricing: base_price_multiplier for calculations
+   - Physical: density for weight calculations
+   - Display: display_order, color_hex, image_url
+   - Availability: is_active flag
+   - Examples: Acrylic, Steel, Iron, Wood, Brass, Copper, Aluminum
+
+2. CATEGORIES
+   - Hierarchical structure (parent_id for sub-categories)
+   - Unlimited category nesting support
+   - Display order for custom sorting
+   - SEO fields (meta_title, meta_description)
+   - Active/inactive status
+   - Can be updated/expanded without code changes
+
+3. PRODUCTS
+   - Core product information
+   - No material-specific data (normalized)
+   - Marketing flags (featured, new arrival, best seller)
+   - SEO optimization fields
+   - View count for analytics
+   - Flexible status (active, inactive, archived, draft)
+
+4. PRODUCT_MATERIALS
+   - Junction table linking products to materials
+   - Material variants with individual pricing
+   - Separate inventory per material
+   - Cost tracking (cost_price for profit analysis)
+   - Compare at price (for showing discounts)
+   - Material-specific finish options
+   - Weight adjustments per material
+   - Low stock alerts per variant
+
+5. PRODUCT_IMAGES
+   - Multiple images per product
+   - Primary image designation
+   - Custom display order
+   - Alt text for SEO
+   - Supports unlimited product images
+
+6. CUSTOMERS
+   - Linked to Supabase Auth (auth.users)
+   - Customer analytics (total_orders, total_spent)
+   - Marketing preferences
+   - Auto-updated stats via triggers
+
+7. ADDRESSES
+   - Flexible address types (shipping, billing, both)
+   - Multiple addresses per customer
+   - Default address support
+   - International support (country codes)
+
+8. ORDERS
+   - Complete order information
+   - Status tracking (7 statuses)
+   - Separate shipping/billing addresses
+   - Auto-generated order numbers
+   - Payment tracking
+   - Customer and admin notes
+
+9. ORDER_ITEMS
+   - Linked to orders
+   - Snapshot data (preserves product info if deleted)
+   - Stores material_name as snapshot
+   - Links to specific material variants
+   - Auto-decreases inventory on creation
+
+10. CUSTOMIZATION_REQUESTS
+    - Custom order submissions from website
+    - References materials table via material_id
+    - Status workflow (6 statuses)
+    - File attachments support
+    - Admin response fields
+    - Can be converted to orders
+
+11. REVIEWS
+    - Product ratings and reviews
+    - Verified purchase tracking
+    - Moderation support (approval workflow)
+    - Helpful votes
+    - Rating distribution via views
+
+=============================================================================
+STORAGE BUCKETS
+=============================================================================
+
+1. PRODUCT-IMAGES
+   - Public access
+   - 5MB file size limit
+   - Image formats only
+   - For product photos
+
+2. CUSTOMIZATION-FILES
+   - Private access (user-specific)
+   - 10MB file size limit
+   - Images, PDFs, and documents
+   - For custom order submissions
+
+=============================================================================
+HELPER VIEWS
+=============================================================================
+
+1. PRODUCT_CATALOG
+   - Complete product listing with pricing
+   - Min/max price across materials
+   - Stock availability
+   - Review stats
+   - Category information
+   - Optimized for product listing pages
+
+2. PRODUCT_DETAILS
+   - Complete product information
+   - All materials with pricing
+   - All images
+   - Review statistics
+   - Rating distribution
+   - Optimized for product detail pages
+
+3. LOW_STOCK_PRODUCTS
+   - Products below stock threshold
+   - Per material variant
+   - For inventory management
+
+4. ORDER_SUMMARY
+   - Complete order information
+   - Customer details
+   - Order items aggregated
+   - For order management
+
+=============================================================================
+HELPER FUNCTIONS
+=============================================================================
+
+1. get_product_price_range(product_id)
+   - Returns min and max price for a product
+
+2. check_product_availability(product_id, material, quantity)
+   - Checks if sufficient inventory exists
+
+3. increment_view_count(product_id)
+   - Tracks product views for analytics
+
+4. generate_order_number()
+   - Auto-generates unique order numbers (format: WD20250101-0001)
+
+5. update_customer_stats() [TRIGGER]
+   - Auto-updates customer total_orders and total_spent
+
+6. decrease_inventory() [TRIGGER]
+   - Auto-decreases inventory when order item created
+
+=============================================================================
+SCALABILITY FEATURES
+=============================================================================
+
+1. MATERIALS (Database Table)
+   - ✅ NEW! Materials are now in the database, not an enum
+   - Add new materials via admin panel (no migrations needed!)
+   - Each material has its own properties and pricing multipliers
+   - Can include images, descriptions, and display customization
+   - Future-proof: Can add new fields without code changes
+
+2. CATEGORIES
+   - Unlimited nesting (sub-categories)
+   - Easy to add new categories via admin panel
+   - No code changes needed for new categories
+
+3. MATERIAL VARIANTS
+   - Each product-material combo has independent pricing
+   - Supports seasonal pricing strategies
+   - Inventory tracked per material per product
+
+4. PRICING
+   - Compare at price for sales/promotions
+   - Cost price for profit margin tracking
+   - Per-material pricing flexibility
+
+5. INVENTORY
+   - Per-material inventory tracking
+   - Low stock alerts per variant
+   - Auto-decrease on order
+
+6. EXTENSIBILITY
+   - Easy to add product attributes table
+   - Can add product collections table
+   - Can add discount codes table
+   - Can add wishlists table
+   - Can add gift cards table
+
+=============================================================================
+PERFORMANCE OPTIMIZATIONS
+=============================================================================
+
+1. INDEXES
+   - All foreign keys indexed
+   - Slug fields indexed for SEO URLs
+   - Status fields with partial indexes
+   - Full-text search on products
+   - Low stock queries optimized
+
+2. VIEWS
+   - Pre-aggregated data for common queries
+   - Reduces complex JOINs in application code
+
+3. TRIGGERS
+   - Auto-update timestamps
+   - Auto-update customer stats
+   - Auto-decrease inventory
+
+=============================================================================
+SECURITY
+=============================================================================
+
+⚠️ DEVELOPMENT MODE - OPEN PERMISSIONS
+Currently, all tables have open permissions (anyone can SELECT, INSERT, UPDATE, DELETE).
+This is for development purposes only. Replace with proper authentication before production!
+
+1. ROW LEVEL SECURITY (RLS)
+   - ✅ Enabled on all tables (materials, categories, products, etc.)
+   - 🔓 TEMPORARY: All operations allowed for everyone
+   - TODO: Implement proper authentication-based policies:
+     * Users should only access their own data (customers, addresses, orders)
+     * Public should only view active products/categories/materials
+     * Admin role should have full access to all data
+   
+2. STORAGE POLICIES
+   - Product images: public read, authenticated write
+   - Customization files: user-specific access
+
+=============================================================================
+MIGRATION FILES
+=============================================================================
+
+1. 20250101000001_init_schema.sql
+   - All enums (order_status, customization_status, product_status, address_type)
+   - Materials table (NEW! Database table for scalable materials)
+   - All core tables (categories, products, product_materials, etc.)
+   - All indexes for performance
+   - RLS policies (currently open for development)
+   - Audit triggers (updated_at)
+
+2. 20250101000002_storage_and_views.sql
+   - Storage buckets (product-images, customization-files)
+   - Storage policies
+   - Helper views (product_catalog, product_details, low_stock_products, order_summary)
+   - Helper functions (price_range, availability check, customer stats)
+
+3. 20250101000003_seed_data.sql
+   - Initial materials (Acrylic, Steel, Iron, Wood, Brass, Copper, Aluminum)
+   - Initial categories (hierarchical structure)
+   - Sample products with material variants (can be removed for production)
+
+=============================================================================
+TO APPLY MIGRATIONS
+=============================================================================
+
+Run in terminal:
+  cd walldecorator
+  npx supabase db push
+
+Or for local development:
+  npx supabase db reset
+
+=============================================================================
+FUTURE ENHANCEMENTS (Easy to Add)
+=============================================================================
+
+1. Product Variants (size, color) - Add product_variants table
+2. Discount Codes - Add discount_codes table
+3. Wishlists - Add wishlists table
+4. Gift Cards - Add gift_cards table
+5. Product Collections - Add collections and product_collections tables
+6. Shipping Zones - Add shipping_zones table
+7. Tax Rates - Add tax_rates table
+8. Inventory History - Add inventory_transactions table
+9. Price History - Add price_history table
+10. Product Recommendations - Add product_relations table
+
+=============================================================================
+
