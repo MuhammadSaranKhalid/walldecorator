@@ -1,11 +1,12 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Facebook, Twitter, Instagram } from "lucide-react";
+import { Facebook, Twitter, Instagram, MessageCircle } from "lucide-react";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProductImageGallery } from "@/components/product/product-image-gallery";
 import { ProductActions } from "@/components/product/product-actions";
+import { ProductShare } from "@/components/product/product-share";
 
 interface PageProps {
   params: Promise<{
@@ -114,16 +115,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         },
       ] : [],
       type: "website",
+      siteName: "WallDecorator",
+      locale: "en_US",
     },
     twitter: {
       card: "summary_large_image",
       title: product.name,
       description: product.description || `Buy ${product.name}`,
       images: primaryImage ? [primaryImage.large_url || primaryImage.original_url] : [],
+      site: "@walldecorator",
+      creator: "@walldecorator",
     },
     other: {
       "product:price:amount": price?.toString() || "0",
       "product:price:currency": "USD",
+      "og:availability": product.product_materials?.some(m => m.inventory_quantity > 0) ? "in stock" : "out of stock",
     },
   };
 }
@@ -152,6 +158,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
   // Get primary image for cart
   const primaryImage = productImages.find((img) => img.is_primary) || productImages[0];
   const currentImageUrl = primaryImage?.thumbnail_url || primaryImage?.original_url || "";
+
+  // Get the lowest price for sharing
+  const minPrice = materials.length > 0 ? Math.min(...materials.map((m) => m.price)) : undefined;
 
   return (
     <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -184,36 +193,11 @@ export default async function ProductDetailPage({ params }: PageProps) {
           />
 
           {/* Share */}
-          <div className="flex items-center gap-4 border-t pt-6">
-            <span className="text-sm font-bold">Share:</span>
-            <div className="flex gap-3">
-              <a
-                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
-                aria-label="Share on Facebook"
-              >
-                <Facebook className="h-6 w-6" />
-              </a>
-              <a
-                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&text=${encodeURIComponent(product.name)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
-                aria-label="Share on Twitter"
-              >
-                <Twitter className="h-6 w-6" />
-              </a>
-              <a
-                href="#"
-                className="text-muted-foreground hover:text-primary transition-colors"
-                aria-label="Share on Instagram"
-              >
-                <Instagram className="h-6 w-6" />
-              </a>
-            </div>
-          </div>
+          <ProductShare
+            productName={product.name}
+            productDescription={product.description}
+            price={minPrice}
+          />
         </div>
       </div>
 
