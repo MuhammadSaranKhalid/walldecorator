@@ -94,7 +94,7 @@ export const OrderConfirmationEmail = ({
                     <Section style={messageSection}>
                         <Heading style={h2}>Order Confirmed!</Heading>
                         <Text style={text}>
-                            Hi {customerName}, thank you for your order. We've received your
+                            Hi {customerName}, thank you for your order. We&apos;ve received your
                             order and will send you another email when it ships.
                         </Text>
                     </Section>
