@@ -1,37 +1,17 @@
-"use client";
-
-import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { useOne } from "@refinedev/core";
+import { Metadata } from "next";
 import Link from "next/link";
-import {
-  Minus,
-  Plus,
-  Facebook,
-  Twitter,
-  Instagram,
-  Loader2,
-  AlertCircle,
-} from "lucide-react";
-
-// Types
-import type { Product, ProductImage } from "@/types/product";
-
-// Components
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { notFound } from "next/navigation";
+import { Facebook, Twitter, Instagram } from "lucide-react";
+import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BlurhashImage } from "@/components/ui/blurhash-image";
+import { ProductImageGallery } from "@/components/product/product-image-gallery";
+import { ProductActions } from "@/components/product/product-actions";
 
-// Stores
-import { useCartStore } from "@/stores/cart-store";
-
-// Utils
-import { toast } from "sonner";
-
-// Helpers
-import { getPrimaryImage } from "@/lib/product-helpers";
-import { usePrice } from "@hooks/use-price";
+interface PageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
 
 interface Category {
   id: string;
@@ -39,302 +19,187 @@ interface Category {
   slug: string;
 }
 
-interface ExtendedProduct extends Product {
-  categories?: Category;
+interface Material {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface ProductMaterial {
+  id: string;
+  material_id: string;
+  price: number;
+  inventory_quantity: number;
+  finish?: string;
+  materials?: Material;
+}
+
+interface ProductImage {
+  id: string;
+  product_id: string;
+  original_url: string;
+  alt_text?: string;
+  is_primary: boolean;
+  display_order: number;
+  thumbnail_url?: string;
+  medium_url?: string;
+  large_url?: string;
+  blurhash?: string;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  sku?: string;
   dimensions_width?: number;
   dimensions_height?: number;
   dimensions_depth?: number;
   weight?: number;
+  categories?: Category;
+  product_materials?: ProductMaterial[];
+  product_images?: ProductImage[];
 }
 
-export default function ProductDetailPage() {
-  const params = useParams();
-  const router = useRouter();
-  const productId = params.id as string;
-  const [selectedMaterialIndex, setSelectedMaterialIndex] = useState(0);
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [quantity, setQuantity] = useState(1);
-  const addItem = useCartStore((state) => state.addItem);
-  const { formatPrice } = usePrice();
+async function getProduct(slug: string): Promise<Product | null> {
+  const supabase = await createSupabaseServerClient();
 
+  const { data, error } = await supabase
+    .from("products")
+    .select(
+      `
+      *,
+      product_materials(id, material_id, price, inventory_quantity, finish, materials(id, name, slug)),
+      product_images(id, product_id, original_url, alt_text, is_primary, display_order, thumbnail_url, medium_url, large_url, blurhash),
+      categories(id, name, slug)
+    `
+    )
+    .eq("id", slug)
+    .single();
 
-  // Fetch product from database
-  const {
-    result: product = null,
-    query: { isLoading, isError },
-  } = useOne<ExtendedProduct>({
-    resource: "products",
-    id: productId,
-    meta: {
-      select:
-        "*, product_materials(id, material_id, price, inventory_quantity, finish, materials(id, name, slug)), product_images(id, product_id, original_url, alt_text, is_primary, display_order, thumbnail_url, medium_url, large_url, blurhash), categories(id, name, slug)",
+  if (error || !data) {
+    return null;
+  }
+
+  return data as Product;
+}
+
+// Generate dynamic metadata for SEO
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getProduct(id);
+
+  if (!product) {
+    return {
+      title: "Product Not Found",
+    };
+  }
+
+  const primaryImage = product.product_images?.find((img) => img.is_primary) || product.product_images?.[0];
+  const price = product.product_materials?.[0]?.price;
+
+  return {
+    title: `${product.name} | WallDecorator`,
+    description: product.description || `Buy ${product.name} - Premium wall decor from WallDecorator`,
+    openGraph: {
+      title: product.name,
+      description: product.description || `Buy ${product.name} - Premium wall decor`,
+      images: primaryImage ? [
+        {
+          url: primaryImage.large_url || primaryImage.original_url,
+          width: 1200,
+          height: 1200,
+          alt: primaryImage.alt_text || product.name,
+        },
+      ] : [],
+      type: "website",
     },
-  });
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: product.description || `Buy ${product.name}`,
+      images: primaryImage ? [primaryImage.large_url || primaryImage.original_url] : [],
+    },
+    other: {
+      "product:price:amount": price?.toString() || "0",
+      "product:price:currency": "USD",
+    },
+  };
+}
 
-  // Transform data for UI
-  const productData = product as unknown as ExtendedProduct;
+export default async function ProductDetailPage({ params }: PageProps) {
+  const { id } = await params;
+  const product = await getProduct(id);
+
+  if (!product) {
+    notFound();
+  }
 
   // Get sorted images with all variants
-  const productImages = productData?.product_images
-    ? [...productData.product_images].sort(
-      (a, b) => a.display_order - b.display_order
-    )
-    : [];
-
-  // Get current selected image data
-  const currentImageData = productImages[selectedImage];
+  const productImages = product.product_images || [];
 
   // Get materials with prices
   const materials =
-    productData?.product_materials?.map((pm) => ({
+    product.product_materials?.map((pm) => ({
       id: pm.id,
       material_id: pm.material_id,
       name: pm.materials?.name || "Unknown",
       price: pm.price,
       inventory: pm.inventory_quantity,
-      // finish: pm.finish,
     })) || [];
 
-  // Current selections
-  const currentMaterial = materials[selectedMaterialIndex];
-  const currentPrice = currentMaterial?.price || 0;
-  const currentMaterialName = currentMaterial?.name || "";
-
-  const handleQuantityChange = (delta: number) => {
-    setQuantity(Math.max(1, quantity + delta));
-  };
-
-  const handleAddToCart = () => {
-    if (!productData || !currentMaterial) return;
-
-    const imageUrl =
-      currentImageData?.thumbnail_url ||
-      currentImageData?.original_url ||
-      "";
-
-    addItem({
-      product_id: productData.id,
-      product_material_id: currentMaterial.id,
-      name: productData.name,
-      material: currentMaterialName,
-      price: currentPrice,
-      quantity: quantity,
-      image_url: imageUrl,
-      sku: productData.sku,
-    });
-    toast.success(`Added ${quantity} item(s) to cart`);
-  };
-
-  const handlePlaceOrder = () => {
-    if (!productData || !currentMaterial) return;
-
-    const imageUrl =
-      currentImageData?.thumbnail_url ||
-      currentImageData?.original_url ||
-      "";
-
-    addItem({
-      product_id: productData.id,
-      product_material_id: currentMaterial.id,
-      name: productData.name,
-      material: currentMaterialName,
-      price: currentPrice,
-      quantity: quantity,
-      image_url: imageUrl,
-      sku: productData.sku,
-    });
-
-    router.push("/checkout");
-  };
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        <div className="flex flex-col items-center justify-center py-24">
-          <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-          <p className="text-muted-foreground">Loading product details...</p>
-        </div>
-      </main>
-    );
-  }
-
-  // Error state
-  if (isError || !productData) {
-    return (
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        <div className="flex flex-col items-center justify-center py-24 text-center">
-          <AlertCircle className="h-12 w-12 text-destructive mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Product Not Found</h2>
-          <p className="text-muted-foreground mb-6">
-            The product you&apos;re looking for doesn&apos;t exist or has been removed.
-          </p>
-          <Button asChild>
-            <Link href="/products">Back to Products</Link>
-          </Button>
-        </div>
-      </main>
-    );
-  }
+  // Get primary image for cart
+  const primaryImage = productImages.find((img) => img.is_primary) || productImages[0];
+  const currentImageUrl = primaryImage?.thumbnail_url || primaryImage?.original_url || "";
 
   return (
     <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
       {/* Product Details Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
         {/* Image Gallery */}
-        <div className="flex flex-col gap-4">
-          {/* Main Image */}
-          <div className="relative w-full aspect-square rounded-xl overflow-hidden shadow-sm">
-            <BlurhashImage
-              src={
-                currentImageData?.large_url ||
-                currentImageData?.original_url ||
-                ""
-              }
-              alt={currentImageData?.alt_text || productData.name}
-              blurhash={currentImageData?.blurhash || undefined}
-              fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              priority
-              objectFit="cover"
-            />
-          </div>
-
-          {/* Thumbnail Gallery */}
-          {productImages.length > 1 && (
-            <div className="flex overflow-x-auto gap-3 pb-2">
-              {productImages.map((image, index) => (
-                <button
-                  key={image.id}
-                  onClick={() => setSelectedImage(index)}
-                  className={`relative shrink-0 w-24 aspect-square rounded-lg overflow-hidden border-2 transition-colors ${selectedImage === index
-                    ? "border-primary"
-                    : "border-transparent hover:border-primary/50"
-                    }`}
-                >
-                  <BlurhashImage
-                    src={image.thumbnail_url || image.original_url}
-                    alt={
-                      image.alt_text || `${productData.name} view ${index + 1}`
-                    }
-                    blurhash={image.blurhash || undefined}
-                    fill
-                    sizes="96px"
-                    objectFit="cover"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        <ProductImageGallery images={productImages} productName={product.name} />
 
         {/* Product Info */}
         <div className="flex flex-col gap-6">
           {/* Title */}
           <div>
             <h1 className="text-3xl md:text-4xl font-black leading-tight tracking-tighter">
-              {productData.name}
+              {product.name}
             </h1>
-            {productData.sku && (
+            {product.sku && (
               <p className="text-muted-foreground text-sm font-mono mt-2">
-                SKU: {productData.sku}
+                SKU: {product.sku}
               </p>
             )}
           </div>
 
-          {/* Material Selector */}
-          {materials.length > 0 && (
-            <div>
-              <label className="text-sm font-bold mb-2 block">
-                Select Material
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {materials.map((material, index) => (
-                  <button
-                    key={material.id}
-                    onClick={() => setSelectedMaterialIndex(index)}
-                    className={`flex flex-col items-center justify-center p-3 text-sm font-semibold rounded-lg border-2 transition-colors ${selectedMaterialIndex === index
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-input hover:border-primary bg-card"
-                      }`}
-                  >
-                    <span>{material.name}</span>
-                    <span className="text-xs font-normal opacity-80 mt-1">
-                      {formatPrice(material.price)}
-                    </span>
-                  </button>
-                ))}
-              </div>
-              {currentMaterial && currentMaterial.inventory > 0 && (
-                <p className="text-sm text-muted-foreground mt-2">
-                  {currentMaterial.inventory} in stock
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Price */}
-          <div className="text-4xl font-bold text-primary">
-            ${currentPrice.toFixed(2)}
-          </div>
-
-          {/* Quantity and Add to Cart */}
-          <div className="flex flex-col gap-4">
-            {/* Quantity Selector */}
-            <div className="flex items-center border rounded-lg w-fit">
-              <button
-                onClick={() => handleQuantityChange(-1)}
-                className="p-3 text-muted-foreground hover:text-primary transition-colors"
-              >
-                <Minus className="h-5 w-5" />
-              </button>
-              <Input
-                type="text"
-                value={quantity}
-                readOnly
-                className="w-12 text-center border-0 bg-transparent focus-visible:ring-0"
-              />
-              <button
-                onClick={() => handleQuantityChange(1)}
-                className="p-3 text-muted-foreground hover:text-primary transition-colors"
-              >
-                <Plus className="h-5 w-5" />
-              </button>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button
-                onClick={handleAddToCart}
-                size="lg"
-                variant="outline"
-                className="w-full sm:flex-1 font-bold"
-              >
-                Add to Cart
-              </Button>
-              <Button
-                onClick={handlePlaceOrder}
-                size="lg"
-                className="w-full sm:flex-1 font-bold"
-              >
-                Place Order
-              </Button>
-            </div>
-          </div>
+          {/* Interactive Product Actions */}
+          <ProductActions
+            productId={product.id}
+            productName={product.name}
+            productSku={product.sku}
+            materials={materials}
+            currentImageUrl={currentImageUrl}
+          />
 
           {/* Share */}
           <div className="flex items-center gap-4 border-t pt-6">
             <span className="text-sm font-bold">Share:</span>
             <div className="flex gap-3">
               <a
-                href="#"
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"
                 aria-label="Share on Facebook"
               >
                 <Facebook className="h-6 w-6" />
               </a>
               <a
-                href="#"
+                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&text=${encodeURIComponent(product.name)}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"
                 aria-label="Share on Twitter"
               >
@@ -357,10 +222,10 @@ export default function ProductDetailPage() {
         <Tabs defaultValue="description" className="w-full">
           <TabsList>
             <TabsTrigger value="description">Description</TabsTrigger>
-            {(productData.dimensions_width ||
-              productData.dimensions_height ||
-              productData.dimensions_depth ||
-              productData.weight) && (
+            {(product.dimensions_width ||
+              product.dimensions_height ||
+              product.dimensions_depth ||
+              product.weight) && (
                 <TabsTrigger value="dimensions">Dimensions</TabsTrigger>
               )}
             <TabsTrigger value="care">Care Instructions</TabsTrigger>
@@ -368,45 +233,45 @@ export default function ProductDetailPage() {
 
           <TabsContent value="description" className="py-6">
             <p className="text-muted-foreground text-base leading-relaxed">
-              {productData.description}
+              {product.description}
             </p>
           </TabsContent>
 
-          {(productData.dimensions_width ||
-            productData.dimensions_height ||
-            productData.dimensions_depth ||
-            productData.weight) && (
+          {(product.dimensions_width ||
+            product.dimensions_height ||
+            product.dimensions_depth ||
+            product.weight) && (
               <TabsContent value="dimensions" className="py-6">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {productData.dimensions_width && (
+                  {product.dimensions_width && (
                     <div>
                       <p className="text-sm font-bold mb-1">Width</p>
                       <p className="text-muted-foreground">
-                        {productData.dimensions_width} inches
+                        {product.dimensions_width} inches
                       </p>
                     </div>
                   )}
-                  {productData.dimensions_height && (
+                  {product.dimensions_height && (
                     <div>
                       <p className="text-sm font-bold mb-1">Height</p>
                       <p className="text-muted-foreground">
-                        {productData.dimensions_height} inches
+                        {product.dimensions_height} inches
                       </p>
                     </div>
                   )}
-                  {productData.dimensions_depth && (
+                  {product.dimensions_depth && (
                     <div>
                       <p className="text-sm font-bold mb-1">Depth</p>
                       <p className="text-muted-foreground">
-                        {productData.dimensions_depth} inches
+                        {product.dimensions_depth} inches
                       </p>
                     </div>
                   )}
-                  {productData.weight && (
+                  {product.weight && (
                     <div>
                       <p className="text-sm font-bold mb-1">Weight</p>
                       <p className="text-muted-foreground">
-                        {productData.weight} lbs
+                        {product.weight} lbs
                       </p>
                     </div>
                   )}
@@ -423,6 +288,30 @@ export default function ProductDetailPage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* JSON-LD Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: product.name,
+            description: product.description,
+            sku: product.sku,
+            image: productImages.map((img) => img.large_url || img.original_url),
+            offers: {
+              "@type": "AggregateOffer",
+              priceCurrency: "USD",
+              lowPrice: Math.min(...materials.map((m) => m.price)),
+              highPrice: Math.max(...materials.map((m) => m.price)),
+              availability: materials.some((m) => m.inventory > 0)
+                ? "https://schema.org/InStock"
+                : "https://schema.org/OutOfStock",
+            },
+          }),
+        }}
+      />
     </main>
   );
 }
