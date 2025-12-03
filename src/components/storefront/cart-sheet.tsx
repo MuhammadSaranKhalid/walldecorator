@@ -12,6 +12,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { usePrice } from "@/hooks/use-price";
 
 interface CartSheetProps {
   open: boolean;
@@ -21,6 +22,7 @@ interface CartSheetProps {
 export function CartSheet({ open, onOpenChange }: CartSheetProps) {
   const router = useRouter();
   const { items, updateQuantity, removeItem, getTotalPrice } = useCartStore();
+  const { formatPrice } = usePrice();
 
   const subtotal = getTotalPrice();
 
@@ -119,7 +121,7 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
 
                         {/* Price */}
                         <p className="font-bold text-sm">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          {formatPrice(item.price * item.quantity)}
                         </p>
                       </div>
                     </div>
@@ -132,7 +134,7 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
             <div className="border-t p-6 space-y-4">
               <div className="flex justify-between text-base">
                 <span className="font-medium">Subtotal</span>
-                <span className="font-bold">${subtotal.toFixed(2)}</span>
+                <span className="font-bold">{formatPrice(subtotal)}</span>
               </div>
               <p className="text-xs text-muted-foreground">
                 Shipping and taxes calculated at checkout

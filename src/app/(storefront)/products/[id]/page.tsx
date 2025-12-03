@@ -31,6 +31,7 @@ import { toast } from "sonner";
 
 // Helpers
 import { getPrimaryImage } from "@/lib/product-helpers";
+import { usePrice } from "@hooks/use-price";
 
 interface Category {
   id: string;
@@ -54,6 +55,8 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const addItem = useCartStore((state) => state.addItem);
+  const { formatPrice } = usePrice();
+
 
   // Fetch product from database
   const {
@@ -74,8 +77,8 @@ export default function ProductDetailPage() {
   // Get sorted images with all variants
   const productImages = productData?.product_images
     ? [...productData.product_images].sort(
-        (a, b) => a.display_order - b.display_order
-      )
+      (a, b) => a.display_order - b.display_order
+    )
     : [];
 
   // Get current selected image data
@@ -204,11 +207,10 @@ export default function ProductDetailPage() {
                 <button
                   key={image.id}
                   onClick={() => setSelectedImage(index)}
-                  className={`relative shrink-0 w-24 aspect-square rounded-lg overflow-hidden border-2 transition-colors ${
-                    selectedImage === index
-                      ? "border-primary"
-                      : "border-transparent hover:border-primary/50"
-                  }`}
+                  className={`relative shrink-0 w-24 aspect-square rounded-lg overflow-hidden border-2 transition-colors ${selectedImage === index
+                    ? "border-primary"
+                    : "border-transparent hover:border-primary/50"
+                    }`}
                 >
                   <BlurhashImage
                     src={image.thumbnail_url || image.original_url}
@@ -251,21 +253,15 @@ export default function ProductDetailPage() {
                   <button
                     key={material.id}
                     onClick={() => setSelectedMaterialIndex(index)}
-                    className={`flex flex-col items-center justify-center p-3 text-sm font-semibold rounded-lg border-2 transition-colors ${
-                      selectedMaterialIndex === index
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-input hover:border-primary bg-card"
-                    }`}
+                    className={`flex flex-col items-center justify-center p-3 text-sm font-semibold rounded-lg border-2 transition-colors ${selectedMaterialIndex === index
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-input hover:border-primary bg-card"
+                      }`}
                   >
                     <span>{material.name}</span>
                     <span className="text-xs font-normal opacity-80 mt-1">
-                      ${material.price.toFixed(2)}
+                      {formatPrice(material.price)}
                     </span>
-                    {/* {material.finish && (
-                      <span className="text-xs text-muted-foreground mt-0.5">
-                        {material.finish}
-                      </span>
-                    )} */}
                   </button>
                 ))}
               </div>
@@ -365,8 +361,8 @@ export default function ProductDetailPage() {
               productData.dimensions_height ||
               productData.dimensions_depth ||
               productData.weight) && (
-              <TabsTrigger value="dimensions">Dimensions</TabsTrigger>
-            )}
+                <TabsTrigger value="dimensions">Dimensions</TabsTrigger>
+              )}
             <TabsTrigger value="care">Care Instructions</TabsTrigger>
           </TabsList>
 
@@ -380,43 +376,43 @@ export default function ProductDetailPage() {
             productData.dimensions_height ||
             productData.dimensions_depth ||
             productData.weight) && (
-            <TabsContent value="dimensions" className="py-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {productData.dimensions_width && (
-                  <div>
-                    <p className="text-sm font-bold mb-1">Width</p>
-                    <p className="text-muted-foreground">
-                      {productData.dimensions_width} inches
-                    </p>
-                  </div>
-                )}
-                {productData.dimensions_height && (
-                  <div>
-                    <p className="text-sm font-bold mb-1">Height</p>
-                    <p className="text-muted-foreground">
-                      {productData.dimensions_height} inches
-                    </p>
-                  </div>
-                )}
-                {productData.dimensions_depth && (
-                  <div>
-                    <p className="text-sm font-bold mb-1">Depth</p>
-                    <p className="text-muted-foreground">
-                      {productData.dimensions_depth} inches
-                    </p>
-                  </div>
-                )}
-                {productData.weight && (
-                  <div>
-                    <p className="text-sm font-bold mb-1">Weight</p>
-                    <p className="text-muted-foreground">
-                      {productData.weight} lbs
-                    </p>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-          )}
+              <TabsContent value="dimensions" className="py-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {productData.dimensions_width && (
+                    <div>
+                      <p className="text-sm font-bold mb-1">Width</p>
+                      <p className="text-muted-foreground">
+                        {productData.dimensions_width} inches
+                      </p>
+                    </div>
+                  )}
+                  {productData.dimensions_height && (
+                    <div>
+                      <p className="text-sm font-bold mb-1">Height</p>
+                      <p className="text-muted-foreground">
+                        {productData.dimensions_height} inches
+                      </p>
+                    </div>
+                  )}
+                  {productData.dimensions_depth && (
+                    <div>
+                      <p className="text-sm font-bold mb-1">Depth</p>
+                      <p className="text-muted-foreground">
+                        {productData.dimensions_depth} inches
+                      </p>
+                    </div>
+                  )}
+                  {productData.weight && (
+                    <div>
+                      <p className="text-sm font-bold mb-1">Weight</p>
+                      <p className="text-muted-foreground">
+                        {productData.weight} lbs
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+            )}
 
           <TabsContent value="care" className="py-6">
             <p className="text-muted-foreground text-base leading-relaxed">

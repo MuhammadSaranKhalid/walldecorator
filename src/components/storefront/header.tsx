@@ -15,11 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Tooltip,
   TooltipContent,
@@ -79,7 +75,9 @@ export function Header() {
               href="/"
               className={cn(
                 "text-sm font-medium hover:text-primary transition-colors",
-                isActive("/") && pathname === "/" ? "text-primary font-bold" : ""
+                isActive("/") && pathname === "/"
+                  ? "text-primary font-bold"
+                  : ""
               )}
             >
               Home
@@ -102,6 +100,15 @@ export function Header() {
             >
               About
             </Link>
+            <Link
+              href="/track-order"
+              className={cn(
+                "text-sm font-medium hover:text-primary transition-colors",
+                isActive("/track-order") ? "text-primary font-bold" : ""
+              )}
+            >
+              Track Order
+            </Link>
           </nav>
 
           {/* Right Side Actions */}
@@ -111,7 +118,10 @@ export function Header() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div>
-                    <Select value={currency} onValueChange={(value) => setCurrency(value as any)}>
+                    <Select
+                      value={currency}
+                      onValueChange={(value) => setCurrency(value as any)}
+                    >
                       <SelectTrigger className="w-[100px] border-0 bg-transparent text-sm font-medium hover:text-primary focus:ring-0">
                         <SelectValue />
                       </SelectTrigger>
@@ -229,6 +239,18 @@ export function Header() {
                     >
                       About
                     </Link>
+                    <Link
+                      href="/track-order"
+                      className={cn(
+                        "px-4 py-3.5 text-base font-medium rounded-lg transition-all",
+                        isActive("/track-order")
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "hover:bg-accent/50"
+                      )}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Track Order
+                    </Link>
                   </nav>
 
                   {/* Settings Section */}
@@ -237,7 +259,10 @@ export function Header() {
                       <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                         Currency
                       </label>
-                      <Select value={currency} onValueChange={(value) => setCurrency(value as any)}>
+                      <Select
+                        value={currency}
+                        onValueChange={(value) => setCurrency(value as any)}
+                      >
                         <SelectTrigger className="w-full h-12 bg-background">
                           <SelectValue />
                         </SelectTrigger>
@@ -274,4 +299,3 @@ export function Header() {
     </header>
   );
 }
-

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { BlurhashImage } from "@/components/ui/blurhash-image";
 
+import { usePrice } from "@/hooks/use-price";
+
 interface ProductCardProps {
   id: string;
   name: string;
@@ -24,6 +26,8 @@ export function ProductCard({
   className,
   priority = false,
 }: ProductCardProps) {
+  const { formatPrice } = usePrice();
+
   return (
     <Link href={`/products/${id}`} className={cn("flex flex-col gap-3 group", className)}>
       <div className="relative w-full overflow-hidden rounded-lg aspect-[3/4] bg-muted">
@@ -41,7 +45,7 @@ export function ProductCard({
       <div>
         <p className="text-foreground text-base font-medium leading-normal">{name}</p>
         <p className="text-muted-foreground text-sm font-normal leading-normal">{material}</p>
-        <p className="text-foreground text-sm font-semibold leading-normal">${price.toFixed(2)}</p>
+        <p className="text-foreground text-sm font-semibold leading-normal">{formatPrice(price)}</p>
       </div>
     </Link>
   );
