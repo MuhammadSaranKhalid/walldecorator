@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { BlurhashImage } from "@/components/ui/blurhash-image";
 
 import { getOrderByNumber, type OrderDetails } from "@/actions/order-actions";
+import { usePrice } from "@/hooks/use-price";
 
 const formSchema = z.object({
     orderNumber: z.string().min(1, "Order number is required"),
@@ -33,6 +34,7 @@ export default function TrackOrderPage() {
     const [order, setOrder] = useState<OrderDetails | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { formatPrice } = usePrice();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -238,11 +240,11 @@ export default function TrackOrderPage() {
                                                                 )}
                                                             </h3>
                                                             <p className="text-sm text-muted-foreground mt-1">
-                                                                Qty: {item.quantity} × ${item.unit_price.toFixed(2)}
+                                                                Qty: {item.quantity} × {formatPrice(item.unit_price)}
                                                             </p>
                                                         </div>
                                                         <p className="font-bold">
-                                                            ${item.total_price.toFixed(2)}
+                                                            {formatPrice(item.total_price)}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -252,7 +254,7 @@ export default function TrackOrderPage() {
                                         <div className="space-y-2">
                                             <div className="flex justify-between text-sm">
                                                 <span className="text-muted-foreground">Subtotal</span>
-                                                <span>${order.total.toFixed(2)}</span>
+                                                <span>{formatPrice(order.total)}</span>
                                             </div>
                                             <div className="flex justify-between text-sm">
                                                 <span className="text-muted-foreground">Shipping</span>
@@ -260,7 +262,7 @@ export default function TrackOrderPage() {
                                             </div>
                                             <div className="flex justify-between font-bold text-lg pt-2">
                                                 <span>Total</span>
-                                                <span>${order.total.toFixed(2)}</span>
+                                                <span>{formatPrice(order.total)}</span>
                                             </div>
                                         </div>
                                     </CardContent>

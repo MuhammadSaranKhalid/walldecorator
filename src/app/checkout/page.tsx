@@ -21,6 +21,8 @@ import { useCartStore } from "@/stores/cart-store";
 import { usePreferencesStore } from "@/stores/preferences-store";
 import { toast } from "sonner";
 import { supabaseBrowserClient } from "@/utils/supabase/client";
+import { sendOrderConfirmationEmail } from "@/actions/email-actions";
+import { format } from "date-fns";
 
 const shippingMethods = [
   { id: "standard", name: "Leopard (Standard)", price: 10.00 },
@@ -172,6 +174,43 @@ export default function CheckoutPage() {
       });
 
       await Promise.all(orderItemsPromises);
+
+      // Step 4: Send order confirmation email
+      const trackingUrl = `${window.location.origin}/track-order`;
+      const emailResult = await sendOrderConfirmationEmail({
+        orderNumber: orderNumber,
+        customerEmail: formData.email,
+        customerName: `${formData.firstName} ${formData.lastName}`,
+        orderDate: format(new Date(), "MMMM d, yyyy"),
+        items: items.map(item => ({
+          name: item.name,
+          material: item.material,
+          quantity: item.quantity,
+          unitPrice: item.price,
+          totalPrice: item.price * item.quantity,
+          imageUrl: item.image_url,
+        })),
+        subtotal: subtotal,
+        shippingCost: shippingCost,
+        taxAmount: taxAmount,
+        total: total,
+        shippingAddress: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          addressLine1: formData.address,
+          addressLine2: formData.addressLine2,
+          city: formData.city,
+          state: formData.state,
+          postalCode: formData.postalCode,
+          country: formData.country,
+        },
+        trackingUrl: trackingUrl,
+      });
+
+      // Log email result but don't fail the order if email fails
+      if (!emailResult.success) {
+        console.error("Failed to send confirmation email:", emailResult.error);
+      }
 
       // Success!
       toast.success(`Order ${orderNumber} placed successfully!`);
@@ -349,11 +388,10 @@ export default function CheckoutPage() {
                   {shippingMethods.map((method) => (
                     <label
                       key={method.id}
-                      className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-colors ${
-                        selectedShipping === method.id
+                      className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-colors ${selectedShipping === method.id
                           ? "border-primary ring-2 ring-primary bg-primary/10"
                           : "border-input hover:border-primary"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-4">
                         <RadioGroupItem value={method.id} id={method.id} />
