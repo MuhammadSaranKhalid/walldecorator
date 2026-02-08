@@ -3,6 +3,7 @@ import React, { Suspense } from "react";
 import { Manrope } from "next/font/google";
 import { RefineContext } from "./_refine_context";
 import Script from "next/script";
+import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -45,6 +46,7 @@ export default async function RootLayout({
         <Suspense>
           <RefineContext>{children}</RefineContext>
         </Suspense>
+        <AnalyticsProvider />
       </body>
     </html>
   );
