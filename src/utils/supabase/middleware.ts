@@ -51,7 +51,12 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getUser();
+  // Refresh existing session or sign in anonymously
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    await supabase.auth.signInAnonymously();
+  }
 
   return response;
 }

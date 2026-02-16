@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProductImageGallery } from "@/components/product/product-image-gallery";
 import { ProductActions } from "@/components/product/product-actions";
 import { ProductShare } from "@/components/product/product-share";
+import { ProductAnalyticsWrapper } from "@/components/product/product-analytics-wrapper";
+import { getImageUrl } from "@/lib/image-helpers";
 
 interface PageProps {
   params: Promise<{
@@ -32,6 +34,7 @@ interface ProductMaterial {
   price: number;
   inventory_quantity: number;
   finish?: string;
+  is_available?: boolean;
   materials?: Material;
 }
 
@@ -71,12 +74,15 @@ async function getProduct(slug: string): Promise<Product | null> {
     .select(
       `
       *,
-      product_materials(id, material_id, price, inventory_quantity, finish, materials(id, name, slug)),
-      product_images(id, product_id, original_url, alt_text, is_primary, display_order, thumbnail_url, medium_url, large_url, blurhash),
+      product_materials!inner(id, material_id, price, inventory_quantity, finish, is_available, materials(id, name, slug)),
+      product_images!product_images_product_id_fkey(id, product_id, original_url, alt_text, is_primary, display_order, thumbnail_url, medium_url, large_url, blurhash),
       categories(id, name, slug)
     `
     )
-    .eq("id", slug)
+    .eq("slug", slug)
+    .eq("status", "active")
+    .eq("product_materials.is_available", true)
+    .order("display_order", { foreignTable: "product_images" })
     .single();
 
   if (error || !data) {
@@ -94,24 +100,67 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!product) {
     return {
       title: "Product Not Found",
+      description: "The product you're looking for could not be found.",
+      robots: {
+        index: false,
+        follow: false,
+      },
     };
   }
 
   const primaryImage = product.product_images?.find((img) => img.is_primary) || product.product_images?.[0];
   const price = product.product_materials?.[0]?.price;
+  const minPrice = product.product_materials && product.product_materials.length > 0
+    ? Math.min(...product.product_materials.map((m) => m.price))
+    : price;
+  const maxPrice = product.product_materials && product.product_materials.length > 0
+    ? Math.max(...product.product_materials.map((m) => m.price))
+    : price;
+
+  // Use large variant (1200px) for social media sharing images
+  const shareImageUrl = getImageUrl(primaryImage, 'large');
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const productUrl = `${siteUrl}/products/${product.slug}`;
+
+  // Generate keywords from product data
+  const keywords = [
+    product.name,
+    product.categories?.name,
+    'wall decor',
+    'home decor',
+    ...(product.product_materials?.map(pm => pm.materials?.name).filter(Boolean) || []),
+  ].filter(Boolean);
 
   return {
     title: `${product.name} | WallDecorator`,
-    description: product.description || `Buy ${product.name} - Premium wall decor from WallDecorator`,
+    description: product.description || `Buy ${product.name} - Premium wall decor from WallDecorator. Available in multiple materials and finishes.`,
+    keywords: keywords.join(', '),
+    authors: [{ name: 'WallDecorator' }],
+    creator: 'WallDecorator',
+    publisher: 'WallDecorator',
+    alternates: {
+      canonical: productUrl,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
     openGraph: {
       title: product.name,
       description: product.description || `Buy ${product.name} - Premium wall decor`,
-      images: primaryImage ? [
+      url: productUrl,
+      images: shareImageUrl ? [
         {
-          url: primaryImage.large_url || primaryImage.original_url,
+          url: shareImageUrl,
           width: 1200,
           height: 1200,
-          alt: primaryImage.alt_text || product.name,
+          alt: primaryImage?.alt_text || product.name,
         },
       ] : [],
       type: "website",
@@ -122,14 +171,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: "summary_large_image",
       title: product.name,
       description: product.description || `Buy ${product.name}`,
-      images: primaryImage ? [primaryImage.large_url || primaryImage.original_url] : [],
+      images: shareImageUrl ? [shareImageUrl] : [],
       site: "@walldecorator",
       creator: "@walldecorator",
     },
     other: {
-      "product:price:amount": price?.toString() || "0",
-      "product:price:currency": "USD",
-      "og:availability": product.product_materials?.some(m => m.inventory_quantity > 0) ? "in stock" : "out of stock",
+      "og:type": "product",
+      "product:brand": "WallDecorator",
+      "product:availability": product.product_materials?.some(m => m.inventory_quantity > 0) ? "in stock" : "out of stock",
+      "product:condition": "new",
+      "product:price:amount": minPrice?.toString() || "0",
+      "product:price:currency": "PKR",
+      ...(product.categories?.name && { "product:category": product.categories.name }),
+      ...(product.sku && { "product:retailer_item_id": product.sku }),
     },
   };
 }
@@ -138,11 +192,13 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const { id } = await params;
   const product = await getProduct(id);
 
+  console.log(product);
+
   if (!product) {
     notFound();
   }
 
-  // Get sorted images with all variants
+  // Get sorted images with all variants (ordered by display_order from query)
   const productImages = product.product_images || [];
 
   // Get materials with prices
@@ -155,9 +211,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
       inventory: pm.inventory_quantity,
     })) || [];
 
-  // Get primary image for cart
+  // Get primary image for cart - use thumbnail size (400px) for cart preview
   const primaryImage = productImages.find((img) => img.is_primary) || productImages[0];
-  const currentImageUrl = primaryImage?.thumbnail_url || primaryImage?.original_url || "";
+  const currentImageUrl = getImageUrl(primaryImage, 'thumbnail');
 
   // Get the lowest price for sharing
   const minPrice = materials.length > 0 ? Math.min(...materials.map((m) => m.price)) : undefined;
@@ -200,6 +256,15 @@ export default async function ProductDetailPage({ params }: PageProps) {
           />
         </div>
       </div>
+
+      <ProductAnalyticsWrapper
+        product={{
+          id: product.id,
+          name: product.name,
+          price: minPrice || 0,
+          category: product.categories?.name
+        }}
+      />
 
       {/* Tabs Section */}
       <div className="border-t mt-8 md:mt-12 pt-8">
@@ -283,16 +348,55 @@ export default async function ProductDetailPage({ params }: PageProps) {
             name: product.name,
             description: product.description,
             sku: product.sku,
-            image: productImages.map((img) => img.large_url || img.original_url),
-            offers: {
+            brand: {
+              "@type": "Brand",
+              name: "WallDecorator"
+            },
+            image: productImages.map((img) => getImageUrl(img, 'large')).filter(Boolean),
+            offers: materials.length > 0 ? {
               "@type": "AggregateOffer",
-              priceCurrency: "USD",
+              priceCurrency: "PKR",
               lowPrice: Math.min(...materials.map((m) => m.price)),
               highPrice: Math.max(...materials.map((m) => m.price)),
+              offerCount: materials.length,
               availability: materials.some((m) => m.inventory > 0)
                 ? "https://schema.org/InStock"
                 : "https://schema.org/OutOfStock",
-            },
+              url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/products/${product.slug}`,
+              seller: {
+                "@type": "Organization",
+                name: "WallDecorator"
+              },
+            } : undefined,
+            ...(product.categories?.name && {
+              category: product.categories.name
+            }),
+            ...(product.dimensions_width && product.dimensions_height && {
+              width: {
+                "@type": "QuantitativeValue",
+                value: product.dimensions_width,
+                unitCode: "INH"
+              },
+              height: {
+                "@type": "QuantitativeValue",
+                value: product.dimensions_height,
+                unitCode: "INH"
+              },
+              ...(product.dimensions_depth && {
+                depth: {
+                  "@type": "QuantitativeValue",
+                  value: product.dimensions_depth,
+                  unitCode: "INH"
+                }
+              }),
+            }),
+            ...(product.weight && {
+              weight: {
+                "@type": "QuantitativeValue",
+                value: product.weight,
+                unitCode: "LBR"
+              }
+            }),
           }),
         }}
       />

@@ -4,7 +4,26 @@ import type { AuthProvider } from "@refinedev/core";
 import { supabaseBrowserClient } from "@utils/supabase/client";
 
 export const authProviderClient: AuthProvider = {
-  login: async ({ email, password }) => {
+  login: async ({ email, password, providerName }) => {
+    if (providerName === 'anonymous') {
+      const { data, error } = await supabaseBrowserClient.auth.signInAnonymously();
+
+      if (error) {
+        return {
+          success: false,
+          error,
+        };
+      }
+
+      if (data?.session) {
+        await supabaseBrowserClient.auth.setSession(data.session);
+        return {
+          success: true,
+          redirectTo: "/",
+        };
+      }
+    }
+
     const { data, error } = await supabaseBrowserClient.auth.signInWithPassword(
       {
         email,
@@ -123,6 +142,12 @@ export const authProviderClient: AuthProvider = {
     const { data } = await supabaseBrowserClient.auth.getUser();
 
     if (data?.user) {
+      if (data.user.is_anonymous) {
+        return {
+          ...data.user,
+          name: "Guest",
+        };
+      }
       return {
         ...data.user,
         name: data.user.email,

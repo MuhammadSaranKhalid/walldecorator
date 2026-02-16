@@ -2,10 +2,12 @@ import { ProductCard } from "./product-card";
 
 interface Product {
   id: string;
+  slug: string;
   name: string;
   material: string;
   price: number;
   image_url: string;
+  blurhash?: string;
 }
 
 interface ProductGridProps {

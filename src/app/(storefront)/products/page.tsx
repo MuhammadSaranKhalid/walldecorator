@@ -17,6 +17,8 @@ import {
   getPrimaryImage,
   getProductMaterialNames,
 } from "@/lib/product-helpers";
+import { useEcommerceAnalytics } from "@/lib/analytics-events";
+import { getImageUrl } from "@/lib/image-helpers";
 
 // Components
 import { Button } from "@/components/ui/button";
@@ -173,6 +175,31 @@ export default function ProductsPage() {
     );
   }, [products, totalProducts, productsError, handleProductsFetched]);
 
+  // Get filtered products from store
+  const filteredProducts = getFilteredProducts();
+
+  // Get computed values from store
+  const maxPrice = getMaxPrice();
+  const hasActiveFilters = getHasActiveFilters();
+
+  // Analytics: Track View Item List
+  const { viewItemList } = useEcommerceAnalytics();
+
+  useEffect(() => {
+    if (filteredProducts.length > 0 && !productsLoading) {
+      viewItemList({
+        item_list_id: "all_products",
+        item_list_name: "All Products",
+        items: filteredProducts.slice(0, ITEMS_PER_PAGE).map((p) => ({
+          item_id: p.id,
+          item_name: p.name,
+          price: getMinPrice(p),
+          item_category: "Wall Decor", // Can be dynamic if categories exist
+        })),
+      });
+    }
+  }, [filteredProducts, productsLoading, viewItemList]);
+
   // Update price range max when products load
   useEffect(() => {
     const maxPrice = getMaxPrice();
@@ -196,13 +223,6 @@ export default function ProductsPage() {
   const handleRemoveMaterial = (materialId: string) => {
     toggleMaterial(materialId);
   };
-
-  // Get filtered products from store
-  const filteredProducts = getFilteredProducts();
-
-  // Get computed values from store
-  const maxPrice = getMaxPrice();
-  const hasActiveFilters = getHasActiveFilters();
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -423,13 +443,13 @@ export default function ProductsPage() {
                     <ProductCard
                       key={product.id}
                       id={product.id}
+                      slug={product.slug}
                       name={product.name}
                       material={materialNames}
                       price={minPrice}
                       image_url={
-                        primaryImage?.large_url ||
-                        primaryImage?.thumbnail_url ||
-                        primaryImage?.original_url ||
+                        // Use thumbnail size (400px) for product grid cards
+                        getImageUrl(primaryImage, 'thumbnail') ||
                         product.primary_image_url ||
                         ""
                       }

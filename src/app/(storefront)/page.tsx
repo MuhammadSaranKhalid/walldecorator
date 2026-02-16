@@ -7,6 +7,7 @@ import { CustomOrderForm } from "@/components/storefront/custom-order-form";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import { getImageUrl } from "@/lib/image-helpers";
 
 export default function HomePage() {
   // Fetch new arrivals with their materials using Supabase select syntax
@@ -22,7 +23,7 @@ export default function HomePage() {
     pagination: { pageSize: 4, currentPage: 1 },
     sorters: [{ field: "created_at", order: "desc" }],
     meta: {
-      select: "*, product_materials(id, price, material_id, materials(name))",
+      select: "*, product_materials(id, price, material_id, materials(name)), product_images(id, original_url, thumbnail_url, medium_url, large_url, blurhash, is_primary)",
     },
   });
 
@@ -39,7 +40,7 @@ export default function HomePage() {
     pagination: { pageSize: 4, currentPage: 1 },
     sorters: [{ field: "created_at", order: "desc" }],
     meta: {
-      select: "*, product_materials(id, price, material_id, materials(name))",
+      select: "*, product_materials(id, price, material_id, materials(name)), product_images(id, original_url, thumbnail_url, medium_url, large_url, blurhash, is_primary)",
     },
   });
 
@@ -52,14 +53,21 @@ export default function HomePage() {
         firstMaterial?.materials?.name || "Multiple Materials";
       const price = firstMaterial?.price || 0;
 
+      // Get primary image or first image
+      const primaryImage = product.product_images?.find((img: any) => img.is_primary) || product.product_images?.[0];
+      // Use thumbnail size for grid cards (400px) - optimal for product grid display
+      const imageUrl = getImageUrl(primaryImage, 'thumbnail') ||
+                      product.primary_image_url ||
+                      "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=2070&auto=format&fit=crop";
+
       return {
         id: product.id,
+        slug: product.slug,
         name: product.name,
         material: materialName,
         price: price,
-        image_url:
-          product.primary_image_url ||
-          "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=2070&auto=format&fit=crop",
+        image_url: imageUrl,
+        blurhash: primaryImage?.blurhash,
       };
     });
   };

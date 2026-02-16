@@ -51,7 +51,7 @@
     "@refinedev/react-table": "^6.0.0",
     "@refinedev/simple-rest": "^6.0.0",
     "@refinedev/supabase": "^6.0.0",
-    "@supabase/ssr": "^0.3.0",
+    "@supabase/ssr": "^0.8.0",
     "@tailwindcss/vite": "^4.1.8",
     "@tanstack/react-table": "^8.2.6",
     "@vercel/functions": "^3.4.1",

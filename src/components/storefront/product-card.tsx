@@ -3,9 +3,12 @@ import { cn } from "@/lib/utils";
 import { BlurhashImage } from "@/components/ui/blurhash-image";
 
 import { usePrice } from "@/hooks/use-price";
+import { useEcommerceAnalytics } from "@/lib/analytics-events";
+import { getImageSizes } from "@/lib/image-helpers";
 
 interface ProductCardProps {
   id: string;
+  slug: string;
   name: string;
   material: string;
   price: number;
@@ -18,6 +21,7 @@ interface ProductCardProps {
 
 export function ProductCard({
   id,
+  slug,
   name,
   material,
   price,
@@ -28,14 +32,34 @@ export function ProductCard({
 }: ProductCardProps) {
   const { formatPrice } = usePrice();
 
+  // Analytics
+  const { selectItem } = useEcommerceAnalytics();
+
+  const handleProductClick = () => {
+    selectItem({
+      item_list_id: "all_products",
+      item_list_name: "All Products",
+      items: [{
+        item_id: id,
+        item_name: name,
+        price,
+        item_category: "Wall Decor",
+      }]
+    });
+  };
+
   return (
-    <Link href={`/products/${id}`} className={cn("flex flex-col gap-3 group", className)}>
+    <Link
+      href={`/products/${slug}`}
+      className={cn("flex flex-col gap-3 group", className)}
+      onClick={handleProductClick}
+    >
       <div className="relative w-full overflow-hidden rounded-lg aspect-[3/4] bg-muted">
         <BlurhashImage
           src={image_url}
           alt={name}
           blurhash={blurhash}
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          sizes={getImageSizes('card')}
           fill
           priority={priority}
           className="w-full h-full transition-transform duration-300 group-hover:scale-105"

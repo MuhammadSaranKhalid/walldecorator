@@ -102,7 +102,7 @@ export const useEcommerceAnalytics = () => {
         viewItemList: (params: ViewItemListEvent) => trackEvent('view_item_list', params),
         selectItem: (params: SelectItemEvent) => trackEvent('select_item', params),
         viewItem: (params: ViewItemEvent) => trackEvent('view_item', params),
-        search: (params: SearchEvent) => trackEvent('search', params),
+        search: (params: SearchEvent) => trackEvent('search', params as unknown as Record<string, any>),
 
         // Cart & Checkout
         addToCart: (params: AddToCartEvent) => trackEvent('add_to_cart', params),

@@ -12,7 +12,7 @@ export const usePreferencesStore = create<PreferencesStore>()(
   persist(
     (set) => ({
       language: 'English',
-      currency: 'Dollar',
+      currency: 'Rupees',
       setLanguage: (language) => set({ language }),
       setCurrency: (currency) => set({ currency }),
     }),

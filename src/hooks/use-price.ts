@@ -7,25 +7,25 @@ export const usePrice = () => {
         if (amount === undefined || amount === null) return "";
 
         let convertedAmount = amount;
-        let currencyCode = "USD";
-        let locale = "en-US";
+        let currencyCode = "PKR";
+        let locale = "en-PK";
 
         switch (currency) {
             case "Euro":
-                convertedAmount = amount * 0.95;
+                convertedAmount = amount / 278 * 0.95;
                 currencyCode = "EUR";
                 locale = "de-DE";
                 break;
-            case "Rupees":
-                convertedAmount = amount * 278;
-                currencyCode = "PKR";
-                locale = "en-PK";
-                break;
             case "Dollar":
-            default:
-                convertedAmount = amount;
+                convertedAmount = amount / 278;
                 currencyCode = "USD";
                 locale = "en-US";
+                break;
+            case "Rupees":
+            default:
+                convertedAmount = amount;
+                currencyCode = "PKR";
+                locale = "en-PK";
                 break;
         }
 

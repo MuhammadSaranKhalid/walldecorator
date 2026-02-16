@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useCartStore } from "@/stores/cart-store";
 import { toast } from "sonner";
 import { usePrice } from "@/hooks/use-price";
+import { useEcommerceAnalytics } from "@/lib/analytics-events";
 
 interface Material {
     id: string;
@@ -46,6 +47,9 @@ export function ProductActions({
         setQuantity(Math.max(1, quantity + delta));
     };
 
+    // Analytics
+    const { addToCart } = useEcommerceAnalytics();
+
     const handleAddToCart = () => {
         if (!currentMaterial) return;
 
@@ -59,8 +63,25 @@ export function ProductActions({
             image_url: currentImageUrl,
             sku: productSku,
         });
+
+        // Track Add to Cart
+        addToCart({
+            currency: "PKR",
+            value: currentPrice * quantity,
+            items: [{
+                item_id: productId,
+                item_name: productName,
+                price: currentPrice,
+                quantity: quantity,
+                item_variant: currentMaterialName,
+                item_category: "Wall Decor"
+            }]
+        });
+
         toast.success(`Added ${quantity} item(s) to cart`);
     };
+
+    const [isPending, startTransition] = useTransition();
 
     const handlePlaceOrder = () => {
         if (!currentMaterial) return;
@@ -76,7 +97,9 @@ export function ProductActions({
             sku: productSku,
         });
 
-        router.push("/checkout");
+        startTransition(() => {
+            router.push("/checkout");
+        });
     };
 
     return (

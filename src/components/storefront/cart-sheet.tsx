@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { usePrice } from "@/hooks/use-price";
+import { useEffect } from "react";
+import { useEcommerceAnalytics } from "@/lib/analytics-events";
 
 interface CartSheetProps {
   open: boolean;
@@ -26,8 +28,62 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
 
   const subtotal = getTotalPrice();
 
+  // Analytics
+  const { viewCart, removeFromCart, beginCheckout } = useEcommerceAnalytics();
+
+  // Track View Cart when sheet opens
+  useEffect(() => {
+    if (open && items.length > 0) {
+      viewCart({
+        currency: "PKR",
+        value: subtotal,
+        items: items.map(item => ({
+          item_id: item.product_id,
+          item_name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          item_variant: item.material,
+          item_category: "Wall Decor"
+        }))
+      });
+    }
+  }, [open, items.length, subtotal, viewCart]);
+
+  const handleRemoveItem = (productId: string, productName: string, price: number, quantity: number, material: string) => {
+    removeItem(productId);
+
+    // Track Remove From Cart
+    removeFromCart({
+      currency: "PKR",
+      value: price * quantity,
+      items: [{
+        item_id: productId,
+        item_name: productName,
+        price: price,
+        quantity: quantity,
+        item_variant: material,
+        item_category: "Wall Decor"
+      }]
+    });
+  };
+
   const handleCheckout = () => {
     onOpenChange(false);
+
+    // Track Begin Checkout
+    beginCheckout({
+      currency: "PKR",
+      value: subtotal,
+      items: items.map(item => ({
+        item_id: item.product_id,
+        item_name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        item_variant: item.material,
+        item_category: "Wall Decor"
+      }))
+    });
+
     router.push("/checkout");
   };
 
@@ -61,7 +117,7 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
                     className="flex gap-4 py-4 border-b last:border-0"
                   >
                     {/* Product Image */}
-                    <div className="relative h-24 w-24 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                    <div className="relative h-24 w-24 rounded-lg overflow-hidden bg-muted shrink-0">
                       <Image
                         src={item.image_url}
                         alt={item.name}
@@ -79,8 +135,8 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 flex-shrink-0"
-                          onClick={() => removeItem(item.product_id)}
+                          className="h-8 w-8 shrink-0"
+                          onClick={() => handleRemoveItem(item.product_id, item.name, item.price, item.quantity, item.material)}
                         >
                           <X className="h-4 w-4" />
                         </Button>

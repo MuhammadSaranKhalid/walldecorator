@@ -1,3 +1,2 @@
-export const SUPABASE_URL = "https://lczsonnnnanfhsvbdomd.supabase.co";
-export const SUPABASE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjenNvbm5ubmFuZmhzdmJkb21kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyNjEzNTIsImV4cCI6MjA3MjgzNzM1Mn0._omt-443oKwdQTI0zIrFeDbQW0ZW2S937hQxq24jYvY";
+export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+export const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;

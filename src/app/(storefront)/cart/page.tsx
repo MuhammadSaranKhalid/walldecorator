@@ -1,17 +1,49 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Minus, Plus, Trash2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cart-store";
+import { usePrice } from "@/hooks/use-price";
+import { useEffect } from "react";
 import { toast } from "sonner";
+import { useEcommerceAnalytics } from "@/lib/analytics-events";
 
 export default function CartPage() {
+  const router = useRouter();
   const { items, updateQuantity, removeItem, getTotalPrice, getTotalItems } = useCartStore();
-  
+  const { formatPrice } = usePrice();
+
   const subtotal = getTotalPrice();
   const totalItems = getTotalItems();
+
+  // Analytics
+  const { viewCart, removeFromCart, beginCheckout } = useEcommerceAnalytics();
+
+  // Track View Cart on mount
+  useEffect(() => {
+    if (items.length > 0) {
+      viewCart({
+        currency: "PKR",
+        value: subtotal,
+        items: items.map(item => ({
+          item_id: item.product_id,
+          item_name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          item_variant: item.material,
+          item_category: "Wall Decor"
+        }))
+      });
+    }
+  }, [items.length, subtotal, viewCart]); // Only track initial or significant changes? Actually usually just on mount is standard, but if cart changes while viewing, maybe update? For now, mount is good but items depends on store. Let's start with items.length/mount.
+
+  // Actually standard GA4 view_cart is on page view.
+  // Refine: add empty dep array? No, items might load from localStorage.
+  // Let's use a ref to track if sent, or just `useEffect` on mount + items ready.
+  // Since persistent store, items are ready immediately on client.
 
   const handleQuantityChange = (productId: string, currentQuantity: number, delta: number) => {
     const newQuantity = currentQuantity + delta;
@@ -20,8 +52,23 @@ export default function CartPage() {
     }
   };
 
-  const handleRemoveItem = (productId: string, productName: string) => {
+  const handleRemoveItem = (productId: string, productName: string, price: number, quantity: number, material: string) => {
     removeItem(productId);
+
+    // Track Remove From Cart
+    removeFromCart({
+      currency: "PKR",
+      value: price * quantity,
+      items: [{
+        item_id: productId,
+        item_name: productName,
+        price: price,
+        quantity: quantity,
+        item_variant: material,
+        item_category: "Wall Decor"
+      }]
+    });
+
     toast.success(`${productName} removed from cart`);
   };
 
@@ -83,13 +130,13 @@ export default function CartPage() {
                             Material: {item.material}
                           </p>
                           <p className="text-sm lg:text-base font-semibold mt-1">
-                            ${item.price.toFixed(2)}
+                            {formatPrice(item.price)}
                           </p>
                         </div>
 
                         {/* Delete Button */}
                         <button
-                          onClick={() => handleRemoveItem(item.product_id, item.name)}
+                          onClick={() => handleRemoveItem(item.product_id, item.name, item.price, item.quantity, item.material)}
                           className="text-muted-foreground hover:text-destructive transition-colors p-1"
                         >
                           <Trash2 className="h-4 w-4 lg:h-5 lg:w-5" />
@@ -119,7 +166,7 @@ export default function CartPage() {
 
                         {/* Line Total */}
                         <p className="text-base lg:text-lg font-bold">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          {formatPrice(item.price * item.quantity)}
                         </p>
                       </div>
                     </div>
@@ -137,7 +184,7 @@ export default function CartPage() {
                   <div className="space-y-3 lg:space-y-4">
                     <div className="flex justify-between text-sm lg:text-base">
                       <span className="text-muted-foreground">Subtotal</span>
-                      <span className="font-semibold">${subtotal.toFixed(2)}</span>
+                      <span className="font-semibold">{formatPrice(subtotal)}</span>
                     </div>
                     <div className="flex justify-between text-sm lg:text-base">
                       <span className="text-muted-foreground">Shipping</span>
@@ -149,14 +196,32 @@ export default function CartPage() {
 
                   <div className="flex justify-between text-base lg:text-lg font-bold">
                     <span>Grand Total</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>{formatPrice(subtotal)}</span>
                   </div>
 
-                  <Link href="/checkout">
-                    <Button size="lg" className="w-full mt-6 lg:mt-8 font-bold h-11 lg:h-12">
-                      Proceed to Checkout
-                    </Button>
-                  </Link>
+                  <Button
+                    size="lg"
+                    className="w-full mt-6 lg:mt-8 font-bold h-11 lg:h-12"
+                    onClick={() => {
+                      // Track Begin Checkout
+                      beginCheckout({ // Use the destructured beginCheckout
+                        currency: "PKR",
+                        value: subtotal,
+                        items: items.map(item => ({
+                          item_id: item.product_id,
+                          item_name: item.name,
+                          price: item.price,
+                          quantity: item.quantity,
+                          item_variant: item.material,
+                          item_category: "Wall Decor"
+                        }))
+                      });
+                      // Navigate
+                      router.push("/checkout"); // Use router.push for navigation
+                    }}
+                  >
+                    Proceed to Checkout
+                  </Button>
 
                   <div className="mt-4 text-center">
                     <Link
@@ -177,7 +242,7 @@ export default function CartPage() {
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 }
 

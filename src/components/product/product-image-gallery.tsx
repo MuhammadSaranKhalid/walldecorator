@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { BlurhashImage } from "@/components/ui/blurhash-image";
+import { getImageUrl, getImageSizes } from "@/lib/image-helpers";
 
 interface ProductImage {
     id: string;
@@ -33,24 +34,20 @@ export function ProductImageGallery({
 
     return (
         <div className="flex flex-col gap-4">
-            {/* Main Image */}
+            {/* Main Image - Use large variant (1200px) for high quality detail view */}
             <div className="relative w-full aspect-square rounded-xl overflow-hidden shadow-sm">
                 <BlurhashImage
-                    src={
-                        currentImageData?.large_url ||
-                        currentImageData?.original_url ||
-                        ""
-                    }
+                    src={getImageUrl(currentImageData, 'large')}
                     alt={currentImageData?.alt_text || productName}
                     blurhash={currentImageData?.blurhash || undefined}
                     fill
-                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    sizes={getImageSizes('detail-main')}
                     priority
                     objectFit="cover"
                 />
             </div>
 
-            {/* Thumbnail Gallery */}
+            {/* Thumbnail Gallery - Use thumbnail variant (400px) for small previews */}
             {sortedImages.length > 1 && (
                 <div className="flex overflow-x-auto gap-3 pb-2">
                     {sortedImages.map((image, index) => (
@@ -63,13 +60,13 @@ export function ProductImageGallery({
                                 }`}
                         >
                             <BlurhashImage
-                                src={image.thumbnail_url || image.original_url}
+                                src={getImageUrl(image, 'thumbnail')}
                                 alt={
                                     image.alt_text || `${productName} view ${index + 1}`
                                 }
                                 blurhash={image.blurhash || undefined}
                                 fill
-                                sizes="96px"
+                                sizes={getImageSizes('detail-thumb')}
                                 objectFit="cover"
                             />
                         </button>

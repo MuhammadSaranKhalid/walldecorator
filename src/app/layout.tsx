@@ -12,10 +12,20 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: "WallDecor Co. - Art That Defines Your Space",
   description: "Discover unique wall decor in acrylic, steel, iron, and wood to transform your home.",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/logo.png",
+  },
+  openGraph: {
+    siteName: "WallDecorator",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@walldecorator",
   },
 };
 
@@ -44,9 +54,11 @@ export default async function RootLayout({
           `}
         </Script>
         <Suspense>
-          <RefineContext>{children}</RefineContext>
+          <RefineContext>
+            {children}
+            <AnalyticsProvider />
+          </RefineContext>
         </Suspense>
-        <AnalyticsProvider />
       </body>
     </html>
   );
