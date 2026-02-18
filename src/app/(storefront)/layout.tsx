@@ -9,7 +9,7 @@ export default function StorefrontLayout({
   return (
     <div className="relative flex min-h-screen w-full flex-col">
       <Header />
-      <main className="flex-grow">{children}</main>
+      <main className="flex-grow pt-20">{children}</main>
       <Footer />
     </div>
   );

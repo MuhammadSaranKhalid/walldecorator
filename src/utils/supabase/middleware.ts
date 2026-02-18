@@ -51,11 +51,14 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  // Refresh existing session or sign in anonymously
-  const { data: { user } } = await supabase.auth.getUser();
+  // Skip anonymous auth in development to avoid slow middleware
+  if (process.env.NODE_ENV !== 'development') {
+    // Refresh existing session or sign in anonymously
+    const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
-    await supabase.auth.signInAnonymously();
+    if (!user) {
+      await supabase.auth.signInAnonymously();
+    }
   }
 
   return response;

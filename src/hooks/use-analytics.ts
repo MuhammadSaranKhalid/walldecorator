@@ -2,12 +2,17 @@
 
 import { useCallback } from 'react';
 
+const isDev = process.env.NODE_ENV === 'development';
+
 export const useAnalytics = () => {
     // trackEvent — fires event to the server (session is auto-created by the endpoint)
     const trackEvent = useCallback(async (
         eventName: string,
         metadata: Record<string, any> = {},
     ) => {
+        // Skip analytics in development to avoid slow compilation
+        if (isDev) return;
+
         try {
             await fetch('/api/analytics/event', {
                 method: 'POST',
@@ -30,3 +35,4 @@ export const useAnalytics = () => {
 
     return { trackEvent };
 };
+

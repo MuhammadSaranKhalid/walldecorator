@@ -192,7 +192,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const { id } = await params;
   const product = await getProduct(id);
 
-  console.log(product);
+
 
   if (!product) {
     notFound();
@@ -271,7 +271,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
         <Tabs defaultValue="description" className="w-full">
           <TabsList>
             <TabsTrigger value="description">Description</TabsTrigger>
-            {(product.dimensions_width ||
+            {!!(product.dimensions_width ||
               product.dimensions_height ||
               product.dimensions_depth ||
               product.weight) && (
@@ -286,7 +286,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
             </p>
           </TabsContent>
 
-          {(product.dimensions_width ||
+          {!!(product.dimensions_width ||
             product.dimensions_height ||
             product.dimensions_depth ||
             product.weight) && (
