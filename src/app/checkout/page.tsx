@@ -5,16 +5,33 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Shield, Truck, ChevronRight, Lock, ChevronDown, ChevronUp } from "lucide-react";
-import { useCreate } from "@refinedev/core";
+import { useCreate, useCreateMany } from "@refinedev/core";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { FieldError } from "@/components/ui/field";
 import { useCartStore, CartItem } from "@/stores/cart-store";
 import { usePrice } from "@/hooks/use-price";
 import { toast } from "sonner";
 import { supabaseBrowserClient } from "@/utils/supabase/client";
-import { sendOrderConfirmationEmail } from "@/actions/email-actions";
-import { format } from "date-fns";
 import { useEcommerceAnalytics } from "@/lib/analytics-events";
+
+const checkoutSchema = z.object({
+  email: z.string().min(1, "Email is required").email("Please enter a valid email"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  phone: z.string().min(1, "Phone number is required"),
+  address: z.string().min(1, "Address is required"),
+  addressLine2: z.string(),
+  city: z.string().min(1, "City is required"),
+  state: z.string(),
+  country: z.string().length(2, "Must be a 2-letter country code"),
+  postalCode: z.string().min(1, "Postal code is required"),
+});
+
+type CheckoutFormValues = z.infer<typeof checkoutSchema>;
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -22,17 +39,25 @@ export default function CheckoutPage() {
   const { formatPrice } = usePrice();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [summaryOpen, setSummaryOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    firstName: "",
-    lastName: "",
-    address: "",
-    addressLine2: "",
-    city: "",
-    state: "",
-    country: "PK",
-    postalCode: "",
-    phone: "",
+
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<CheckoutFormValues>({
+    resolver: zodResolver(checkoutSchema),
+    defaultValues: {
+      email: "",
+      firstName: "",
+      lastName: "",
+      address: "",
+      addressLine2: "",
+      city: "",
+      state: "",
+      country: "PK",
+      postalCode: "",
+      phone: "",
+    },
   });
 
   const subtotal = getTotalPrice();
@@ -40,18 +65,14 @@ export default function CheckoutPage() {
   const taxAmount = 0;
   const total = subtotal + shippingCost;
 
-  const { mutate: createAddress } = useCreate();
-  const { mutate: createOrder } = useCreate();
-  const { mutate: createOrderItems } = useCreate();
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const { mutateAsync: createAddress } = useCreate();
+  const { mutateAsync: createOrder } = useCreate();
+  const { mutateAsync: createOrderItems } = useCreateMany();
 
   const { addPaymentInfo, purchase } = useEcommerceAnalytics();
 
-  const handlePlaceOrder = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (formData: CheckoutFormValues) => {
+    console.log("[onSubmit] Form submitted", { formData, items, subtotal, total });
 
     if (items.length === 0) {
       toast.error("Your cart is empty");
@@ -78,93 +99,73 @@ export default function CheckoutPage() {
         await supabaseBrowserClient.rpc("generate_order_number");
 
       if (orderNumberError || !orderNumber) {
+        console.error("[onSubmit] Failed to generate order number", orderNumberError);
         throw new Error("Failed to generate order number");
       }
 
-      const addressPromise = new Promise((resolve, reject) => {
-        createAddress(
-          {
-            resource: "addresses",
-            values: {
-              customer_id: null,
-              address_type: "shipping",
-              first_name: formData.firstName,
-              last_name: formData.lastName,
-              address_line1: formData.address,
-              address_line2: formData.addressLine2 || null,
-              city: formData.city,
-              state: formData.state || null,
-              postal_code: formData.postalCode,
-              country: formData.country,
-              phone: formData.phone,
-              is_default: false,
-            },
-          },
-          {
-            onSuccess: (data) => resolve(data.data.id),
-            onError: (error) => reject(error),
-          }
-        );
+      console.log("[onSubmit] Order number generated:", orderNumber);
+
+      // Step 1: Create shipping address
+      const { data: { id: shippingAddressId } } = await createAddress({
+        resource: "addresses",
+        values: {
+          customer_id: null,
+          address_type: "shipping",
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          address_line1: formData.address,
+          address_line2: formData.addressLine2 || null,
+          city: formData.city,
+          state: formData.state || null,
+          postal_code: formData.postalCode,
+          country: formData.country,
+          phone: formData.phone,
+          is_default: false,
+        },
       });
 
-      const shippingAddressId = await addressPromise;
+      console.log("[onSubmit] Step 1 — Shipping address created, id:", shippingAddressId);
 
-      const orderPromise = new Promise((resolve, reject) => {
-        createOrder(
-          {
-            resource: "orders",
-            values: {
-              order_number: orderNumber,
-              customer_id: null,
-              customer_email: formData.email,
-              status: "pending",
-              subtotal: subtotal,
-              shipping_cost: shippingCost,
-              tax_amount: taxAmount,
-              discount_amount: 0,
-              total: total,
-              shipping_address_id: shippingAddressId,
-              billing_address_id: shippingAddressId,
-              shipping_method: "Standard Delivery",
-              payment_method: "cash_on_delivery",
-              payment_status: "pending",
-            },
-          },
-          {
-            onSuccess: (data) => resolve(data.data.id),
-            onError: (error) => reject(error),
-          }
-        );
+      // Step 2: Create order
+      const { data: { id: orderId } } = await createOrder({
+        resource: "orders",
+        values: {
+          order_number: orderNumber,
+          customer_id: null,
+          customer_email: formData.email,
+          status: "pending",
+          subtotal: subtotal,
+          shipping_cost: shippingCost,
+          tax_amount: taxAmount,
+          discount_amount: 0,
+          total: total,
+          shipping_address_id: shippingAddressId,
+          billing_address_id: shippingAddressId,
+          shipping_method: "Standard Delivery",
+          payment_method: "cash_on_delivery",
+          payment_status: "pending",
+        },
       });
 
-      const orderId = await orderPromise;
+      console.log("[onSubmit] Step 2 — Order created, id:", orderId);
 
-      const orderItemsPromises = items.map((item) => {
-        return new Promise((resolve, reject) => {
-          createOrderItems(
-            {
-              resource: "order_items",
-              values: {
-                order_id: orderId,
-                product_id: item.product_id,
-                product_material_id: item.product_material_id || null,
-                product_name: item.name,
-                product_sku: item.sku || null,
-                material_name: item.material,
-                quantity: item.quantity,
-                unit_price: item.price,
-                total_price: item.price * item.quantity,
-              },
-            },
-            {
-              onSuccess: (data) => resolve(data),
-              onError: (error) => reject(error),
-            }
-          );
-        });
+      // Step 3: Create order items (bulk insert via useCreateMany)
+      await createOrderItems({
+        resource: "order_items",
+        values: items.map((item) => ({
+          order_id: orderId,
+          product_id: item.product_id,
+          product_material_id: item.product_material_id || null,
+          product_name: item.name,
+          product_sku: item.sku || null,
+          material_name: item.material,
+          quantity: item.quantity,
+          unit_price: item.price,
+          total_price: item.price * item.quantity,
+        })),
       });
 
-      await Promise.all(orderItemsPromises);
+      console.log("[onSubmit] Step 3 — Order items created");
 
       purchase({
         transaction_id: orderNumber as string,
@@ -181,46 +182,12 @@ export default function CheckoutPage() {
         })),
       });
 
-      const trackingUrl = `${window.location.origin}/track-order`;
-      const emailResult = await sendOrderConfirmationEmail({
-        orderNumber: orderNumber,
-        customerEmail: formData.email,
-        customerName: `${formData.firstName} ${formData.lastName}`,
-        orderDate: format(new Date(), "MMMM d, yyyy"),
-        items: items.map((item) => ({
-          name: item.name,
-          material: item.material,
-          quantity: item.quantity,
-          unitPrice: item.price,
-          totalPrice: item.price * item.quantity,
-          imageUrl: item.image_url,
-        })),
-        subtotal: subtotal,
-        shippingCost: shippingCost,
-        taxAmount: taxAmount,
-        total: total,
-        shippingAddress: {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          addressLine1: formData.address,
-          addressLine2: formData.addressLine2,
-          city: formData.city,
-          state: formData.state,
-          postalCode: formData.postalCode,
-          country: formData.country,
-        },
-        trackingUrl: trackingUrl,
-      });
-
-      if (!emailResult.success) {
-        console.error("Failed to send confirmation email:", emailResult.error);
-      }
-
+      console.log("[onSubmit] Order placed successfully:", orderNumber);
       toast.success(`Order ${orderNumber} placed successfully!`);
       clearCart();
       router.push(`/order-confirmation?order=${orderNumber}`);
     } catch (error) {
-      console.error("Order creation failed:", error);
+      console.error("[onSubmit] Order creation failed:", error);
       toast.error("Failed to place order. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -290,23 +257,30 @@ export default function CheckoutPage() {
 
         {/* Form */}
         <div className="flex-1 px-6 sm:px-10 xl:px-16 py-8">
-          <form onSubmit={handlePlaceOrder} className="max-w-lg space-y-10">
+          <form onSubmit={handleSubmit(onSubmit)} className="max-w-lg space-y-10">
             {/* ── Contact ────────────────────────────────── */}
             <section>
               <h2 className="text-base font-semibold mb-4">Contact</h2>
               <div className="rounded-lg border overflow-hidden">
-                <Input
-                  id="email"
+                <Controller
                   name="email"
-                  type="email"
-                  placeholder="Email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                  autoComplete="email"
-                  className="h-12 rounded-none border-0 border-b focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <Input
+                      {...field}
+                      id="email"
+                      type="email"
+                      placeholder="Email"
+                      autoComplete="email"
+                      aria-invalid={fieldState.invalid}
+                      className="h-12 rounded-none border-0 border-b focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm"
+                    />
+                  )}
                 />
               </div>
+              {errors.email && (
+                <FieldError errors={[errors.email]} className="mt-2" />
+              )}
               <p className="text-xs text-muted-foreground mt-2">
                 Order confirmation and tracking details will be sent here.
               </p>
@@ -318,120 +292,174 @@ export default function CheckoutPage() {
               <div className="rounded-lg border overflow-hidden divide-y">
                 {/* First / Last name */}
                 <div className="flex divide-x">
-                  <Input
-                    id="firstName"
+                  <Controller
                     name="firstName"
-                    type="text"
-                    placeholder="First name"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    required
-                    autoComplete="given-name"
-                    className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm w-1/2"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <Input
+                        {...field}
+                        id="firstName"
+                        type="text"
+                        placeholder="First name"
+                        autoComplete="given-name"
+                        aria-invalid={fieldState.invalid}
+                        className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm w-1/2"
+                      />
+                    )}
                   />
-                  <Input
-                    id="lastName"
+                  <Controller
                     name="lastName"
-                    type="text"
-                    placeholder="Last name"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    required
-                    autoComplete="family-name"
-                    className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm w-1/2"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <Input
+                        {...field}
+                        id="lastName"
+                        type="text"
+                        placeholder="Last name"
+                        autoComplete="family-name"
+                        aria-invalid={fieldState.invalid}
+                        className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm w-1/2"
+                      />
+                    )}
                   />
                 </div>
 
                 {/* Phone */}
-                <Input
-                  id="phone"
+                <Controller
                   name="phone"
-                  type="tel"
-                  placeholder="Phone number"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  required
-                  autoComplete="tel"
-                  className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <Input
+                      {...field}
+                      id="phone"
+                      type="tel"
+                      placeholder="Phone number"
+                      autoComplete="tel"
+                      aria-invalid={fieldState.invalid}
+                      className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm"
+                    />
+                  )}
                 />
 
                 {/* Address line 1 */}
-                <Input
-                  id="address"
+                <Controller
                   name="address"
-                  type="text"
-                  placeholder="Address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  required
-                  autoComplete="street-address"
-                  className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <Input
+                      {...field}
+                      id="address"
+                      type="text"
+                      placeholder="Address"
+                      autoComplete="street-address"
+                      aria-invalid={fieldState.invalid}
+                      className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm"
+                    />
+                  )}
                 />
 
                 {/* Address line 2 (optional) */}
-                <Input
-                  id="addressLine2"
+                <Controller
                   name="addressLine2"
-                  type="text"
-                  placeholder="Apartment, suite, etc. (optional)"
-                  value={formData.addressLine2}
-                  onChange={handleInputChange}
-                  autoComplete="address-line2"
-                  className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <Input
+                      {...field}
+                      id="addressLine2"
+                      type="text"
+                      placeholder="Apartment, suite, etc. (optional)"
+                      autoComplete="address-line2"
+                      aria-invalid={fieldState.invalid}
+                      className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm"
+                    />
+                  )}
                 />
 
                 {/* City / Postal */}
                 <div className="flex divide-x">
-                  <Input
-                    id="city"
+                  <Controller
                     name="city"
-                    type="text"
-                    placeholder="City"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    required
-                    autoComplete="address-level2"
-                    className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm w-1/2"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <Input
+                        {...field}
+                        id="city"
+                        type="text"
+                        placeholder="City"
+                        autoComplete="address-level2"
+                        aria-invalid={fieldState.invalid}
+                        className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm w-1/2"
+                      />
+                    )}
                   />
-                  <Input
-                    id="postalCode"
+                  <Controller
                     name="postalCode"
-                    type="text"
-                    placeholder="Postal code"
-                    value={formData.postalCode}
-                    onChange={handleInputChange}
-                    required
-                    autoComplete="postal-code"
-                    className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm w-1/2"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <Input
+                        {...field}
+                        id="postalCode"
+                        type="text"
+                        placeholder="Postal code"
+                        autoComplete="postal-code"
+                        aria-invalid={fieldState.invalid}
+                        className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm w-1/2"
+                      />
+                    )}
                   />
                 </div>
 
                 {/* State / Country */}
                 <div className="flex divide-x">
-                  <Input
-                    id="state"
+                  <Controller
                     name="state"
-                    type="text"
-                    placeholder="State / Province"
-                    value={formData.state}
-                    onChange={handleInputChange}
-                    autoComplete="address-level1"
-                    className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm w-1/2"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <Input
+                        {...field}
+                        id="state"
+                        type="text"
+                        placeholder="State / Province"
+                        autoComplete="address-level1"
+                        aria-invalid={fieldState.invalid}
+                        className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm w-1/2"
+                      />
+                    )}
                   />
-                  <Input
-                    id="country"
+                  <Controller
                     name="country"
-                    type="text"
-                    placeholder="Country code (e.g. PK)"
-                    value={formData.country}
-                    onChange={handleInputChange}
-                    required
-                    maxLength={2}
-                    autoComplete="country"
-                    className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm w-1/2"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <Input
+                        {...field}
+                        id="country"
+                        type="text"
+                        placeholder="Country code (e.g. PK)"
+                        maxLength={2}
+                        autoComplete="country"
+                        aria-invalid={fieldState.invalid}
+                        className="h-12 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-4 text-sm w-1/2"
+                      />
+                    )}
                   />
                 </div>
               </div>
+
+              {/* Delivery field errors */}
+              {(errors.firstName || errors.lastName || errors.phone || errors.address || errors.city || errors.postalCode || errors.country) && (
+                <FieldError
+                  className="mt-2"
+                  errors={[
+                    errors.firstName,
+                    errors.lastName,
+                    errors.phone,
+                    errors.address,
+                    errors.city,
+                    errors.postalCode,
+                    errors.country,
+                  ]}
+                />
+              )}
 
               {/* Delivery estimate */}
               <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
