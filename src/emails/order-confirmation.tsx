@@ -122,11 +122,11 @@ export const OrderConfirmationEmail = ({
                     {/* Order Details Card */}
                     <Section style={orderInfoCard}>
                         <Row>
-                            <Column>
+                            <Column style={{ width: "50%", paddingRight: "12px" }}>
                                 <Text style={orderLabel}>Order Number</Text>
                                 <Text style={orderValue}>{orderNumber}</Text>
                             </Column>
-                            <Column align="right">
+                            <Column style={{ width: "50%", paddingLeft: "12px", textAlign: "right" as const }}>
                                 <Text style={orderLabel}>Order Date</Text>
                                 <Text style={orderValue}>{orderDate}</Text>
                             </Column>
