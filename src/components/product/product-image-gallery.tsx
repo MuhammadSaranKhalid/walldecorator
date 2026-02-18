@@ -35,7 +35,7 @@ export function ProductImageGallery({
     return (
         <div className="flex flex-col gap-4">
             {/* Main Image - Use large variant (1200px) for high quality detail view */}
-            <div className="relative w-full aspect-square rounded-xl overflow-hidden shadow-sm">
+            <div className="relative w-full aspect-3/4 rounded-xl overflow-hidden shadow-sm">
                 <BlurhashImage
                     src={getImageUrl(currentImageData, 'large')}
                     alt={currentImageData?.alt_text || productName}
