@@ -120,17 +120,19 @@ export const OrderConfirmationEmail = ({
                     </Section>
 
                     {/* Order Details Card */}
-                    <Section style={orderInfoCard}>
-                        <Row>
-                            <Column style={{ width: "50%", paddingRight: "12px" }}>
-                                <Text style={orderLabel}>Order Number</Text>
-                                <Text style={orderValue}>{orderNumber}</Text>
-                            </Column>
-                            <Column style={{ width: "50%", paddingLeft: "12px", textAlign: "right" as const }}>
-                                <Text style={orderLabel}>Order Date</Text>
-                                <Text style={orderValue}>{orderDate}</Text>
-                            </Column>
-                        </Row>
+                    <Section style={{ padding: "0 40px" }}>
+                        <Section style={orderInfoCardInner}>
+                            <Row>
+                                <Column style={{ verticalAlign: "top" }}>
+                                    <Text style={orderLabel}>Order Number</Text>
+                                    <Text style={orderValue}>{orderNumber}</Text>
+                                </Column>
+                                <Column style={{ width: "170px", verticalAlign: "top" }}>
+                                    <Text style={{ ...orderLabel, textAlign: "right" as const }}>Order Date</Text>
+                                    <Text style={{ ...orderValue, textAlign: "right" as const }}>{orderDate}</Text>
+                                </Column>
+                            </Row>
+                        </Section>
                     </Section>
 
                     {/* Order Items */}
@@ -341,8 +343,7 @@ const successText: React.CSSProperties = {
     margin: "0",
 };
 
-const orderInfoCard: React.CSSProperties = {
-    margin: "0 40px",
+const orderInfoCardInner: React.CSSProperties = {
     padding: "20px 24px",
     backgroundColor: BRAND_GOLD_LIGHT,
     borderRadius: "10px",
