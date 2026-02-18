@@ -54,7 +54,7 @@ export function ProductCard({
       className={cn("flex flex-col gap-3 group", className)}
       onClick={handleProductClick}
     >
-      <div className="relative w-full overflow-hidden rounded-lg aspect-[3/4] bg-muted">
+      <div className="relative w-full overflow-hidden rounded-lg aspect-square bg-muted">
         <BlurhashImage
           src={image_url}
           alt={name}
@@ -62,8 +62,8 @@ export function ProductCard({
           sizes={getImageSizes('card')}
           fill
           priority={priority}
-          className="w-full h-full transition-transform duration-300 group-hover:scale-105"
-          objectFit="cover"
+          className="w-full h-full transition-transform duration-300 group-hover:scale-105 p-2"
+          objectFit="contain"
         />
       </div>
       <div>
