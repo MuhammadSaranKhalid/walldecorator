@@ -12,6 +12,7 @@ import {
     Text,
     Row,
     Column,
+    Font,
 } from "@react-email/components";
 import * as React from "react";
 
@@ -48,6 +49,10 @@ interface OrderConfirmationEmailProps {
     trackingUrl?: string;
 }
 
+const formatPrice = (amount: number) => `Rs ${amount.toLocaleString("en-PK", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
 export const OrderConfirmationEmail = ({
     orderNumber = "ORD-123456",
     customerName = "John Doe",
@@ -57,50 +62,65 @@ export const OrderConfirmationEmail = ({
             name: "Modern Abstract Wall Art",
             material: "Canvas",
             quantity: 2,
-            unitPrice: 89.99,
-            totalPrice: 179.98,
+            unitPrice: 4500,
+            totalPrice: 9000,
             imageUrl: "https://placehold.co/80x80",
         },
     ],
-    subtotal = 179.98,
-    shippingCost = 10.0,
-    taxAmount = 19.0,
-    total = 208.98,
+    subtotal = 9000,
+    shippingCost = 500,
+    taxAmount = 0,
+    total = 9500,
     shippingAddress = {
-        firstName: "John",
-        lastName: "Doe",
-        addressLine1: "123 Art Street",
-        city: "New York",
-        state: "NY",
-        postalCode: "10001",
-        country: "US",
+        firstName: "Ahmed",
+        lastName: "Khan",
+        addressLine1: "123 Main Boulevard",
+        city: "Lahore",
+        state: "Punjab",
+        postalCode: "54000",
+        country: "Pakistan",
     },
     trackingUrl,
 }: OrderConfirmationEmailProps) => {
-    const previewText = `Order ${orderNumber} confirmed - Thank you for your purchase!`;
+    const previewText = `Order ${orderNumber} confirmed — Thank you for your purchase!`;
 
     return (
         <Html>
-            <Head />
+            <Head>
+                <Font
+                    fontFamily="Manrope"
+                    fallbackFontFamily="Arial"
+                    webFont={{
+                        url: "https://fonts.gstatic.com/s/manrope/v15/xn7_YHE41ni1AdIRqAuZuw1Bx9mbZk79FO_F.woff2",
+                        format: "woff2",
+                    }}
+                    fontWeight={400}
+                    fontStyle="normal"
+                />
+            </Head>
             <Preview>{previewText}</Preview>
             <Body style={main}>
                 <Container style={container}>
-                    {/* Header */}
+                    {/* Header with Logo */}
                     <Section style={header}>
-                        <Heading style={h1}>WallDecorator</Heading>
+                        <Link href={SITE_URL} style={{ textDecoration: "none" }}>
+                            <Text style={logoText}>WallDecorator</Text>
+                        </Link>
+                        <Text style={tagline}>Art That Defines Your Space</Text>
                     </Section>
 
-                    {/* Success Message */}
-                    <Section style={messageSection}>
-                        <Heading style={h2}>Order Confirmed!</Heading>
-                        <Text style={text}>
+                    {/* Success Banner */}
+                    <Section style={successBanner}>
+                        <Text style={checkIcon}>✓</Text>
+                        <Heading style={successHeading}>Order Confirmed!</Heading>
+                        <Text style={successText}>
                             Hi {customerName}, thank you for your order. We&apos;ve received your
-                            order and will send you another email when it ships.
+                            order and will notify you once it ships.
                         </Text>
                     </Section>
 
-                    {/* Order Details */}
-                    <Section style={orderInfoSection}>
+                    {/* Order Details Card */}
+                    <Section style={orderInfoCard}>
                         <Row>
                             <Column>
                                 <Text style={orderLabel}>Order Number</Text>
@@ -113,33 +133,31 @@ export const OrderConfirmationEmail = ({
                         </Row>
                     </Section>
 
-                    <Hr style={hr} />
-
                     {/* Order Items */}
-                    <Section>
-                        <Heading style={h3}>Order Items</Heading>
+                    <Section style={sectionPadding}>
+                        <Heading style={sectionTitle}>Order Items</Heading>
                         {items.map((item, index) => (
-                            <Section key={index} style={itemSection}>
+                            <Section key={index} style={itemRow}>
                                 <Row>
-                                    <Column style={itemImageColumn}>
+                                    <Column style={itemImageCol}>
                                         {item.imageUrl && (
                                             <Img
                                                 src={item.imageUrl}
                                                 alt={item.name}
-                                                width="80"
-                                                height="80"
+                                                width="72"
+                                                height="72"
                                                 style={itemImage}
                                             />
                                         )}
                                     </Column>
-                                    <Column style={itemDetailsColumn}>
+                                    <Column style={itemDetailsCol}>
                                         <Text style={itemName}>{item.name}</Text>
-                                        <Text style={itemMaterial}>Material: {item.material}</Text>
-                                        <Text style={itemQuantity}>Quantity: {item.quantity}</Text>
+                                        <Text style={itemMeta}>Material: {item.material}</Text>
+                                        <Text style={itemMeta}>Qty: {item.quantity} × {formatPrice(item.unitPrice)}</Text>
                                     </Column>
-                                    <Column align="right" style={itemPriceColumn}>
+                                    <Column align="right" style={itemPriceCol}>
                                         <Text style={itemPrice}>
-                                            ${item.totalPrice.toFixed(2)}
+                                            {formatPrice(item.totalPrice)}
                                         </Text>
                                     </Column>
                                 </Row>
@@ -147,50 +165,41 @@ export const OrderConfirmationEmail = ({
                         ))}
                     </Section>
 
-                    <Hr style={hr} />
+                    <Hr style={divider} />
 
                     {/* Order Summary */}
                     <Section style={summarySection}>
                         <Row>
-                            <Column>
-                                <Text style={summaryLabel}>Subtotal</Text>
-                            </Column>
-                            <Column align="right">
-                                <Text style={summaryValue}>${subtotal.toFixed(2)}</Text>
-                            </Column>
+                            <Column><Text style={summaryLabel}>Subtotal</Text></Column>
+                            <Column align="right"><Text style={summaryValue}>{formatPrice(subtotal)}</Text></Column>
                         </Row>
                         <Row>
-                            <Column>
-                                <Text style={summaryLabel}>Shipping</Text>
-                            </Column>
+                            <Column><Text style={summaryLabel}>Shipping</Text></Column>
                             <Column align="right">
-                                <Text style={summaryValue}>${shippingCost.toFixed(2)}</Text>
+                                <Text style={summaryValue}>
+                                    {shippingCost === 0 ? "Free" : formatPrice(shippingCost)}
+                                </Text>
                             </Column>
                         </Row>
+                        {taxAmount > 0 && (
+                            <Row>
+                                <Column><Text style={summaryLabel}>Tax</Text></Column>
+                                <Column align="right"><Text style={summaryValue}>{formatPrice(taxAmount)}</Text></Column>
+                            </Row>
+                        )}
+                        <Hr style={summaryDivider} />
                         <Row>
-                            <Column>
-                                <Text style={summaryLabel}>Tax</Text>
-                            </Column>
-                            <Column align="right">
-                                <Text style={summaryValue}>${taxAmount.toFixed(2)}</Text>
-                            </Column>
-                        </Row>
-                        <Row style={totalRow}>
-                            <Column>
-                                <Text style={totalLabel}>Total</Text>
-                            </Column>
-                            <Column align="right">
-                                <Text style={totalValue}>${total.toFixed(2)}</Text>
-                            </Column>
+                            <Column><Text style={totalLabel}>Total</Text></Column>
+                            <Column align="right"><Text style={totalValue}>{formatPrice(total)}</Text></Column>
                         </Row>
                     </Section>
 
-                    <Hr style={hr} />
+                    <Hr style={divider} />
 
                     {/* Shipping Address */}
-                    <Section>
-                        <Heading style={h3}>Shipping Address</Heading>
-                        <Text style={address}>
+                    <Section style={sectionPadding}>
+                        <Heading style={sectionTitle}>Shipping Address</Heading>
+                        <Text style={addressText}>
                             {shippingAddress.firstName} {shippingAddress.lastName}
                             <br />
                             {shippingAddress.addressLine1}
@@ -208,24 +217,36 @@ export const OrderConfirmationEmail = ({
                         </Text>
                     </Section>
 
-                    <Hr style={hr} />
-
                     {/* Track Order Button */}
                     {trackingUrl && (
                         <Section style={buttonSection}>
-                            <Link style={button} href={trackingUrl}>
+                            <Link style={primaryButton} href={trackingUrl}>
                                 Track Your Order
                             </Link>
                         </Section>
                     )}
 
+                    {/* Browse More CTA */}
+                    <Section style={buttonSection}>
+                        <Link style={secondaryButton} href={`${SITE_URL}/products`}>
+                            Continue Shopping
+                        </Link>
+                    </Section>
+
                     {/* Footer */}
                     <Section style={footer}>
+                        <Hr style={footerDivider} />
+                        <Link href={SITE_URL} style={{ textDecoration: "none" }}>
+                            <Text style={footerLogo}>WallDecorator</Text>
+                        </Link>
                         <Text style={footerText}>
-                            If you have any questions, please contact our customer support.
+                            If you have any questions about your order, please contact us at{" "}
+                            <Link href="mailto:support@walldecorator.pk" style={footerLink}>
+                                support@walldecorator.pk
+                            </Link>
                         </Text>
-                        <Text style={footerText}>
-                            © 2024 WallDecorator. All rights reserved.
+                        <Text style={footerCopyright}>
+                            © {new Date().getFullYear()} WallDecorator. All rights reserved.
                         </Text>
                     </Section>
                 </Container>
@@ -236,202 +257,281 @@ export const OrderConfirmationEmail = ({
 
 export default OrderConfirmationEmail;
 
-// Styles
-const main = {
-    backgroundColor: "#f6f9fc",
-    fontFamily:
-        '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
+// ─── Brand Colors ───
+const BRAND_GOLD = "#C8982F";
+const BRAND_GOLD_LIGHT = "#F5EFE0";
+const BRAND_DARK = "#1A1A1A";
+const BRAND_TEXT = "#333333";
+const BRAND_MUTED = "#737373";
+const BRAND_BORDER = "#E8E0D0";
+const BRAND_BG = "#FAFAF7";
+
+// ─── Styles ───
+const main: React.CSSProperties = {
+    backgroundColor: BRAND_BG,
+    fontFamily: "'Manrope', Arial, Helvetica, sans-serif",
 };
 
-const container = {
-    backgroundColor: "#ffffff",
+const container: React.CSSProperties = {
+    backgroundColor: "#FFFFFF",
     margin: "0 auto",
-    padding: "20px 0 48px",
-    marginBottom: "64px",
     maxWidth: "600px",
+    borderRadius: "12px",
+    overflow: "hidden",
+    boxShadow: "0 4px 24px rgba(0, 0, 0, 0.06)",
+    marginTop: "40px",
+    marginBottom: "40px",
 };
 
-const header = {
-    padding: "32px 40px",
-    backgroundColor: "#000000",
-    textAlign: "center" as const,
+const header: React.CSSProperties = {
+    backgroundColor: BRAND_DARK,
+    padding: "36px 40px 28px",
+    textAlign: "center",
 };
 
-const h1 = {
-    color: "#ffffff",
+const logoText: React.CSSProperties = {
+    color: BRAND_GOLD,
     fontSize: "28px",
-    fontWeight: "bold",
+    fontWeight: "800",
+    letterSpacing: "-0.5px",
     margin: "0",
-    padding: "0",
+    fontFamily: "'Manrope', Arial, sans-serif",
 };
 
-const messageSection = {
-    padding: "40px 40px 20px",
+const tagline: React.CSSProperties = {
+    color: "#999999",
+    fontSize: "12px",
+    fontWeight: "500",
+    letterSpacing: "2px",
+    textTransform: "uppercase",
+    margin: "8px 0 0",
 };
 
-const h2 = {
-    color: "#000000",
+const successBanner: React.CSSProperties = {
+    padding: "36px 40px 24px",
+    textAlign: "center",
+};
+
+const checkIcon: React.CSSProperties = {
+    display: "inline-block",
+    width: "48px",
+    height: "48px",
+    lineHeight: "48px",
+    borderRadius: "50%",
+    backgroundColor: BRAND_GOLD_LIGHT,
+    color: BRAND_GOLD,
     fontSize: "24px",
     fontWeight: "bold",
-    margin: "0 0 16px",
+    margin: "0 auto 16px",
+    textAlign: "center",
 };
 
-const h3 = {
-    color: "#000000",
-    fontSize: "18px",
-    fontWeight: "bold",
+const successHeading: React.CSSProperties = {
+    color: BRAND_DARK,
+    fontSize: "26px",
+    fontWeight: "800",
     margin: "0 0 12px",
-    padding: "0 40px",
+    letterSpacing: "-0.3px",
 };
 
-const text = {
-    color: "#525252",
-    fontSize: "16px",
+const successText: React.CSSProperties = {
+    color: BRAND_MUTED,
+    fontSize: "15px",
     lineHeight: "24px",
     margin: "0",
 };
 
-const orderInfoSection = {
-    padding: "20px 40px",
+const orderInfoCard: React.CSSProperties = {
+    margin: "0 40px",
+    padding: "20px 24px",
+    backgroundColor: BRAND_GOLD_LIGHT,
+    borderRadius: "10px",
+    border: `1px solid ${BRAND_BORDER}`,
 };
 
-const orderLabel = {
-    color: "#737373",
-    fontSize: "12px",
-    fontWeight: "500",
-    textTransform: "uppercase" as const,
+const orderLabel: React.CSSProperties = {
+    color: BRAND_MUTED,
+    fontSize: "11px",
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: "1px",
     margin: "0 0 4px",
 };
 
-const orderValue = {
-    color: "#000000",
+const orderValue: React.CSSProperties = {
+    color: BRAND_DARK,
+    fontSize: "15px",
+    fontWeight: "700",
+    margin: "0",
+};
+
+const sectionPadding: React.CSSProperties = {
+    padding: "28px 40px 12px",
+};
+
+const sectionTitle: React.CSSProperties = {
+    color: BRAND_DARK,
     fontSize: "16px",
-    fontWeight: "600",
-    margin: "0",
+    fontWeight: "800",
+    margin: "0 0 16px",
+    letterSpacing: "-0.2px",
 };
 
-const hr = {
-    borderColor: "#e5e5e5",
-    margin: "0",
+const itemRow: React.CSSProperties = {
+    padding: "12px 0",
+    borderBottom: `1px solid #F0F0F0`,
 };
 
-const itemSection = {
-    padding: "12px 40px",
-};
-
-const itemImageColumn = {
-    width: "80px",
+const itemImageCol: React.CSSProperties = {
+    width: "72px",
     paddingRight: "16px",
 };
 
-const itemImage = {
+const itemImage: React.CSSProperties = {
     borderRadius: "8px",
-    border: "1px solid #e5e5e5",
+    border: `1px solid ${BRAND_BORDER}`,
+    objectFit: "cover",
 };
 
-const itemDetailsColumn = {
-    verticalAlign: "top" as const,
+const itemDetailsCol: React.CSSProperties = {
+    verticalAlign: "top",
 };
 
-const itemName = {
-    color: "#000000",
-    fontSize: "16px",
-    fontWeight: "600",
+const itemName: React.CSSProperties = {
+    color: BRAND_DARK,
+    fontSize: "15px",
+    fontWeight: "700",
     margin: "0 0 4px",
 };
 
-const itemMaterial = {
-    color: "#737373",
-    fontSize: "14px",
+const itemMeta: React.CSSProperties = {
+    color: BRAND_MUTED,
+    fontSize: "13px",
     margin: "0 0 2px",
 };
 
-const itemQuantity = {
-    color: "#737373",
-    fontSize: "14px",
+const itemPriceCol: React.CSSProperties = {
+    verticalAlign: "top",
+    width: "120px",
+};
+
+const itemPrice: React.CSSProperties = {
+    color: BRAND_DARK,
+    fontSize: "15px",
+    fontWeight: "700",
     margin: "0",
 };
 
-const itemPriceColumn = {
-    verticalAlign: "top" as const,
+const divider: React.CSSProperties = {
+    borderColor: "#F0F0F0",
+    margin: "0 40px",
 };
 
-const itemPrice = {
-    color: "#000000",
-    fontSize: "16px",
-    fontWeight: "600",
-    margin: "0",
-};
-
-const summarySection = {
+const summarySection: React.CSSProperties = {
     padding: "20px 40px",
 };
 
-const summaryLabel = {
-    color: "#737373",
+const summaryLabel: React.CSSProperties = {
+    color: BRAND_MUTED,
     fontSize: "14px",
     margin: "0 0 8px",
 };
 
-const summaryValue = {
-    color: "#000000",
+const summaryValue: React.CSSProperties = {
+    color: BRAND_TEXT,
     fontSize: "14px",
+    fontWeight: "500",
     margin: "0 0 8px",
 };
 
-const totalRow = {
-    marginTop: "12px",
-    paddingTop: "12px",
-    borderTop: "1px solid #e5e5e5",
+const summaryDivider: React.CSSProperties = {
+    borderColor: BRAND_BORDER,
+    margin: "8px 0",
 };
 
-const totalLabel = {
-    color: "#000000",
-    fontSize: "16px",
-    fontWeight: "bold",
+const totalLabel: React.CSSProperties = {
+    color: BRAND_DARK,
+    fontSize: "17px",
+    fontWeight: "800",
     margin: "0",
 };
 
-const totalValue = {
-    color: "#000000",
-    fontSize: "18px",
-    fontWeight: "bold",
+const totalValue: React.CSSProperties = {
+    color: BRAND_GOLD,
+    fontSize: "20px",
+    fontWeight: "800",
     margin: "0",
 };
 
-const address = {
-    color: "#525252",
+const addressText: React.CSSProperties = {
+    color: BRAND_TEXT,
     fontSize: "14px",
     lineHeight: "22px",
     margin: "0",
-    padding: "0 40px",
 };
 
-const buttonSection = {
-    padding: "32px 40px",
-    textAlign: "center" as const,
+const buttonSection: React.CSSProperties = {
+    padding: "8px 40px 16px",
+    textAlign: "center",
 };
 
-const button = {
-    backgroundColor: "#000000",
+const primaryButton: React.CSSProperties = {
+    backgroundColor: BRAND_GOLD,
     borderRadius: "8px",
-    color: "#ffffff",
-    fontSize: "16px",
-    fontWeight: "600",
+    color: "#FFFFFF",
+    fontSize: "15px",
+    fontWeight: "700",
     textDecoration: "none",
-    textAlign: "center" as const,
+    textAlign: "center",
     display: "inline-block",
-    padding: "14px 32px",
+    padding: "14px 36px",
+    letterSpacing: "0.3px",
 };
 
-const footer = {
-    padding: "32px 40px",
-    textAlign: "center" as const,
+const secondaryButton: React.CSSProperties = {
+    backgroundColor: "transparent",
+    borderRadius: "8px",
+    border: `2px solid ${BRAND_DARK}`,
+    color: BRAND_DARK,
+    fontSize: "14px",
+    fontWeight: "700",
+    textDecoration: "none",
+    textAlign: "center",
+    display: "inline-block",
+    padding: "12px 32px",
 };
 
-const footerText = {
-    color: "#737373",
+const footer: React.CSSProperties = {
+    padding: "8px 40px 32px",
+    textAlign: "center",
+};
+
+const footerDivider: React.CSSProperties = {
+    borderColor: BRAND_BORDER,
+    margin: "0 0 24px",
+};
+
+const footerLogo: React.CSSProperties = {
+    color: BRAND_GOLD,
+    fontSize: "18px",
+    fontWeight: "800",
+    margin: "0 0 12px",
+};
+
+const footerText: React.CSSProperties = {
+    color: BRAND_MUTED,
     fontSize: "12px",
-    lineHeight: "18px",
-    margin: "4px 0",
+    lineHeight: "20px",
+    margin: "0 0 8px",
+};
+
+const footerLink: React.CSSProperties = {
+    color: BRAND_GOLD,
+    textDecoration: "underline",
+};
+
+const footerCopyright: React.CSSProperties = {
+    color: "#A0A0A0",
+    fontSize: "11px",
+    margin: "12px 0 0",
 };
