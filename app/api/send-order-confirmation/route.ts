@@ -46,14 +46,6 @@ interface OrderItem {
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify webhook secret
-    const authHeader = request.headers.get("authorization");
-    const webhookSecret = process.env.SUPABASE_WEBHOOK_SECRET;
-
-    if (webhookSecret && authHeader !== `Bearer ${webhookSecret}`) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const payload: WebhookPayload = await request.json();
 
     // Only send email when order status changes to 'confirmed'
