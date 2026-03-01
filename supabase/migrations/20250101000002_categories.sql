@@ -40,9 +40,17 @@ ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 -- =====================================================
 -- RLS POLICIES
 -- =====================================================
+-- Public access
 CREATE POLICY "Anyone can view visible categories"
   ON public.categories FOR SELECT
   USING (is_visible = true);
+
+-- Admin access (service role)
+CREATE POLICY "Service role can manage categories"
+  ON public.categories FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
 
 -- =====================================================
 -- TRIGGERS

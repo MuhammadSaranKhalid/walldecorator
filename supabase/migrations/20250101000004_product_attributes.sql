@@ -91,6 +91,7 @@ ALTER TABLE public.product_attribute_values ENABLE ROW LEVEL SECURITY;
 -- =====================================================
 -- RLS POLICIES
 -- =====================================================
+-- Public access
 CREATE POLICY "Anyone can view product attributes"
   ON public.product_attributes FOR SELECT
   USING (true);
@@ -98,3 +99,16 @@ CREATE POLICY "Anyone can view product attributes"
 CREATE POLICY "Anyone can view attribute values"
   ON public.product_attribute_values FOR SELECT
   USING (true);
+
+-- Admin access (service role)
+CREATE POLICY "Service role can manage product_attributes"
+  ON public.product_attributes FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
+
+CREATE POLICY "Service role can manage product_attribute_values"
+  ON public.product_attribute_values FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);

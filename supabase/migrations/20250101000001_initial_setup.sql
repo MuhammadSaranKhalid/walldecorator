@@ -6,6 +6,10 @@
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+-- Enable pg_net extension for HTTP requests from database triggers
+-- Required for image processing webhook trigger
+CREATE EXTENSION IF NOT EXISTS pg_net;
+
 -- =====================================================
 -- HELPER FUNCTION: Auto-update updated_at timestamp
 -- =====================================================

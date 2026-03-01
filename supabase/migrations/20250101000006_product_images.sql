@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS public.product_images (
   storage_path TEXT NOT NULL, -- Original uploaded image path
   alt_text TEXT,
   display_order INTEGER DEFAULT 0,
+  is_primary BOOLEAN DEFAULT false, -- Primary/featured image for the product
 
   -- Auto-generated image variants (WebP format)
   thumbnail_path TEXT, -- 150x150
@@ -42,12 +43,14 @@ COMMENT ON COLUMN public.product_images.thumbnail_path IS 'Auto-generated 150x15
 COMMENT ON COLUMN public.product_images.medium_path IS 'Auto-generated 600x600 WebP variant';
 COMMENT ON COLUMN public.product_images.large_path IS 'Auto-generated 1200x1200 WebP variant';
 COMMENT ON COLUMN public.product_images.blurhash IS 'BlurHash string for low-quality image placeholder';
+COMMENT ON COLUMN public.product_images.is_primary IS 'Primary/featured image for the product (only one per product)';
 
 -- =====================================================
 -- INDEXES FOR PERFORMANCE
 -- =====================================================
 CREATE INDEX idx_product_images_product_id ON public.product_images(product_id, display_order);
 CREATE INDEX idx_product_images_variant_id ON public.product_images(variant_id, display_order);
+CREATE INDEX idx_product_images_primary ON public.product_images(product_id) WHERE is_primary = true;
 
 -- =====================================================
 -- ENABLE ROW LEVEL SECURITY
@@ -57,6 +60,7 @@ ALTER TABLE public.product_images ENABLE ROW LEVEL SECURITY;
 -- =====================================================
 -- RLS POLICIES
 -- =====================================================
+-- Public access
 CREATE POLICY "Anyone can view images of active products"
   ON public.product_images FOR SELECT
   USING (
@@ -67,6 +71,13 @@ CREATE POLICY "Anyone can view images of active products"
     )
   );
 
+-- Admin access (service role)
+CREATE POLICY "Service role can manage product_images"
+  ON public.product_images FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
+
 -- =====================================================
 -- TRIGGERS
 -- =====================================================
@@ -74,6 +85,37 @@ CREATE TRIGGER set_updated_at_product_images
   BEFORE UPDATE ON public.product_images
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_updated_at();
+
+-- =====================================================
+-- TRIGGER: Ensure only one primary image per product
+-- =====================================================
+CREATE OR REPLACE FUNCTION public.ensure_single_primary_image()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  -- If this image is being set as primary, unset all other primary images for this product
+  IF NEW.is_primary = true THEN
+    UPDATE public.product_images
+    SET is_primary = false
+    WHERE product_id = NEW.product_id
+      AND id != NEW.id
+      AND is_primary = true;
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER ensure_single_primary_image_trigger
+  BEFORE INSERT OR UPDATE OF is_primary ON public.product_images
+  FOR EACH ROW
+  WHEN (NEW.is_primary = true)
+  EXECUTE FUNCTION public.ensure_single_primary_image();
+
+COMMENT ON FUNCTION public.ensure_single_primary_image IS 'Ensures only one image per product can be marked as primary';
 
 -- =====================================================
 -- WEBHOOK TRIGGER: Process image variants
@@ -99,11 +141,6 @@ BEGIN
   WHERE name = 'image_webhook_url'
   LIMIT 1;
 
-  SELECT decrypted_secret INTO v_webhook_secret
-  FROM vault.decrypted_secrets
-  WHERE name = 'webhook_secret'
-  LIMIT 1;
-
   -- Ensure webhook URL is configured
   IF v_webhook_url IS NULL THEN
     RAISE WARNING 'image_webhook_url not found in Vault. Skipping image processing.';
@@ -113,15 +150,16 @@ BEGIN
   -- Call Next.js API using pg_net extension (non-blocking HTTP POST)
   PERFORM net.http_post(
     url := v_webhook_url,
+    body := jsonb_build_object(
+      'imageId', NEW.id::text,
+      'storagePath', NEW.storage_path,
+      'productId', NEW.product_id::text
+    ),
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
       'Authorization', 'Bearer ' || COALESCE(v_webhook_secret, '')
     ),
-    body := jsonb_build_object(
-      'imageId', NEW.id,
-      'storagePath', NEW.storage_path,
-      'productId', NEW.product_id
-    )::text
+    timeout_milliseconds := 5000
   );
 
   RETURN NEW;
@@ -135,3 +173,19 @@ CREATE TRIGGER trigger_image_processing_on_insert
   EXECUTE FUNCTION public.trigger_image_processing();
 
 COMMENT ON FUNCTION public.trigger_image_processing IS 'Webhook trigger to call Next.js API for image variant generation. Reads secrets from Supabase Vault.';
+
+-- =====================================================
+-- IMPORTANT: Configure Vault Secrets for Image Processing
+-- Run this AFTER deploying your Next.js app:
+-- =====================================================
+-- SELECT vault.create_secret(
+--   'https://your-domain.vercel.app/api/process-image',
+--   'image_webhook_url',
+--   'URL for image processing webhook'
+-- );
+-- SELECT vault.create_secret(
+--   'your-webhook-secret-here',
+--   'webhook_secret',
+--   'Secret for webhook authorization'
+-- );
+-- =====================================================

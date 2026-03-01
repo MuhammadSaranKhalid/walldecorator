@@ -55,6 +55,7 @@ ALTER TABLE public.product_variants ENABLE ROW LEVEL SECURITY;
 -- =====================================================
 -- RLS POLICIES
 -- =====================================================
+-- Public access
 CREATE POLICY "Anyone can view variants of active products"
   ON public.product_variants FOR SELECT
   USING (
@@ -64,6 +65,13 @@ CREATE POLICY "Anyone can view variants of active products"
       AND products.status = 'active'
     )
   );
+
+-- Admin access (service role)
+CREATE POLICY "Service role can manage product_variants"
+  ON public.product_variants FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
 
 -- =====================================================
 -- TRIGGERS
