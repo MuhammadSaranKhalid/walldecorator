@@ -5,7 +5,6 @@ import type {
   HomepageData,
   Category,
   HomepageProduct,
-  ProductImage,
 } from '@/types/homepage'
 
 /**
@@ -14,9 +13,9 @@ import type {
  */
 export const getHomepageData = cache(async (): Promise<HomepageData> => {
   const cacheKey = 'homepage:data'
-  const cached = await redis.get(cacheKey)
+  const cached = await redis.get<HomepageData>(cacheKey)
   if (cached) {
-    return typeof cached === 'string' ? JSON.parse(cached) : cached
+    return typeof cached === 'string' ? JSON.parse(cached) as HomepageData : cached
   }
 
   const supabase = await createServerClient()
@@ -55,9 +54,9 @@ export const getHomepageData = cache(async (): Promise<HomepageData> => {
  */
 export const getCategories = cache(async (): Promise<Category[]> => {
   const cacheKey = 'homepage:categories'
-  const cached = await redis.get(cacheKey)
+  const cached = await redis.get<Category[]>(cacheKey)
   if (cached) {
-    return typeof cached === 'string' ? JSON.parse(cached) : cached
+    return typeof cached === 'string' ? JSON.parse(cached) as Category[] : cached
   }
 
   const supabase = await createServerClient()
@@ -81,10 +80,9 @@ export const getCategories = cache(async (): Promise<Category[]> => {
  */
 export const getFeaturedProducts = cache(async (): Promise<HomepageProduct[]> => {
   const cacheKey = 'homepage:featured'
-  const cached = await redis.get(cacheKey)
-  console.log(cached)
+  const cached = await redis.get<HomepageProduct[]>(cacheKey)
   if (cached) {
-    return typeof cached === 'string' ? JSON.parse(cached) : cached
+    return typeof cached === 'string' ? JSON.parse(cached) as HomepageProduct[] : cached
   }
 
   const supabase = await createServerClient()
@@ -114,9 +112,9 @@ export const getFeaturedProducts = cache(async (): Promise<HomepageProduct[]> =>
  */
 export const getBestsellers = cache(async (): Promise<HomepageProduct[]> => {
   const cacheKey = 'homepage:bestsellers'
-  const cached = await redis.get(cacheKey)
+  const cached = await redis.get<HomepageProduct[]>(cacheKey)
   if (cached) {
-    return typeof cached === 'string' ? JSON.parse(cached) : cached
+    return typeof cached === 'string' ? JSON.parse(cached) as HomepageProduct[] : cached
   }
 
   const supabase = await createServerClient()

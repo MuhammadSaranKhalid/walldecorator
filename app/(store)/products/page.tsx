@@ -40,7 +40,6 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           <FilterSidebar
             categories={categories}
             attributes={attributes}
-            currentParams={parsedParams}
           />
         </aside>
 
@@ -54,7 +53,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           </div>
 
           {/* Active filter chips */}
-          <ActiveFilters currentParams={parsedParams} />
+          <ActiveFilters />
 
           {/* Product grid wrapped in Suspense for streaming */}
           <Suspense fallback={<ProductGridSkeleton />}>

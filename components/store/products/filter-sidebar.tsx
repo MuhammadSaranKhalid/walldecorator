@@ -6,20 +6,16 @@ import { useTransition } from 'react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Slider } from '@/components/ui/slider'
-import { Label } from '@/components/ui/label'
 import type { Category, FilterAttribute } from '@/types/products'
-import type { InferOutput } from 'nuqs/server'
 
 type FilterSidebarProps = {
   categories: Category[]
   attributes: FilterAttribute[]
-  currentParams: InferOutput<typeof productSearchParams>
 }
 
 export function FilterSidebar({
   categories,
   attributes,
-  currentParams,
 }: FilterSidebarProps) {
   // useTransition gives us a pending state while the server re-renders
   const [isPending, startTransition] = useTransition()

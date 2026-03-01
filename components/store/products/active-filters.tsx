@@ -5,13 +5,8 @@ import { productSearchParams } from '@/lib/search-params/products'
 import { useTransition } from 'react'
 import { X } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import type { InferOutput } from 'nuqs/server'
 
-type ActiveFiltersProps = {
-  currentParams: InferOutput<typeof productSearchParams>
-}
-
-export function ActiveFilters({ currentParams }: ActiveFiltersProps) {
+export function ActiveFilters() {
   const [isPending, startTransition] = useTransition()
   const [params, setParams] = useQueryStates(productSearchParams, {
     shallow: false,
