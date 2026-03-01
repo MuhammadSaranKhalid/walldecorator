@@ -14,7 +14,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
   return (
     <div className="flex flex-col">
       {/* Product Name */}
-      <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
+      <h1 className="text-3xl font-bold text-primary">{product.name}</h1>
 
       {/* Stock Badge */}
       <div className="mt-3">
@@ -31,17 +31,17 @@ export function ProductInfo({ product }: ProductInfoProps) {
       </div>
 
       {/* Trust signals */}
-      <div className="flex flex-col gap-2 mt-6 p-4 bg-gray-50 rounded-xl text-sm text-gray-600">
+      <div className="flex flex-col gap-2 mt-6 p-4 bg-secondary/50 border border-border rounded-xl text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
-          <span>✓</span>
+          <span className="text-accent">✓</span>
           <span>Free shipping on orders over Rs 5,000</span>
         </div>
         <div className="flex items-center gap-2">
-          <span>✓</span>
+          <span className="text-accent">✓</span>
           <span>30-day hassle-free returns</span>
         </div>
         <div className="flex items-center gap-2">
-          <span>✓</span>
+          <span className="text-accent">✓</span>
           <span>Secure checkout</span>
         </div>
       </div>

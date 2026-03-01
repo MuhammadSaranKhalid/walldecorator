@@ -100,7 +100,7 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
   return (
     <div className="w-full">
       {/* Header with Logo */}
-      <div className="border-b bg-white">
+      <div className="border-b bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center">
@@ -113,16 +113,16 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
               />
             </Link>
             {/* Breadcrumb - Hidden on mobile */}
-            <nav className="hidden lg:flex items-center text-sm text-gray-500">
-              <Link href="/" className="hover:text-gray-900 transition-colors">
+            <nav className="hidden lg:flex items-center text-sm text-muted-foreground">
+              <Link href="/" className="hover:text-primary transition-colors">
                 Home
               </Link>
               <ChevronRight className="h-4 w-4 mx-2" />
-              <Link href="/products" className="hover:text-gray-900 transition-colors">
+              <Link href="/products" className="hover:text-primary transition-colors">
                 Shop
               </Link>
               <ChevronRight className="h-4 w-4 mx-2" />
-              <span className="text-gray-900 font-medium">Checkout</span>
+              <span className="text-primary font-medium">Checkout</span>
             </nav>
           </div>
         </div>
@@ -152,8 +152,8 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
                   {/* Order Notes */}
                   <div className="space-y-4">
                     <div className="pb-2 border-b">
-                      <h2 className="text-xl font-semibold">Order Notes</h2>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <h2 className="text-xl font-semibold text-primary">Order Notes</h2>
+                      <p className="text-sm text-muted-foreground mt-1">
                         Add any special instructions for your order (optional)
                       </p>
                     </div>
@@ -163,7 +163,7 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
                       render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                           <FieldLabel htmlFor={field.name} className="text-sm font-medium">
-                            Special Instructions <span className="text-gray-400 font-normal">(Optional)</span>
+                            Special Instructions <span className="text-muted-foreground font-normal">(Optional)</span>
                           </FieldLabel>
                           <Textarea
                             {...field}

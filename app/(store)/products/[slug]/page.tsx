@@ -123,8 +123,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <Suspense
             fallback={
               <div className="animate-pulse">
-                <div className="h-8 w-32 bg-gray-200 rounded mb-4" />
-                <div className="h-40 bg-gray-200 rounded" />
+                <div className="h-8 w-32 bg-muted rounded mb-4" />
+                <div className="h-40 bg-muted rounded" />
               </div>
             }
           >
@@ -137,13 +137,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <Suspense
             fallback={
               <div className="animate-pulse">
-                <div className="h-8 w-48 bg-gray-200 rounded mb-6" />
+                <div className="h-8 w-48 bg-muted rounded mb-6" />
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <div key={i} className="space-y-3">
-                      <div className="aspect-square bg-gray-200 rounded-xl" />
-                      <div className="h-4 bg-gray-200 rounded w-3/4" />
-                      <div className="h-4 bg-gray-200 rounded w-1/2" />
+                      <div className="aspect-square bg-muted rounded-xl" />
+                      <div className="h-4 bg-muted rounded w-3/4" />
+                      <div className="h-4 bg-muted rounded w-1/2" />
                     </div>
                   ))}
                 </div>

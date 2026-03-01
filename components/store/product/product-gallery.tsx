@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { getStorageUrl } from '@/lib/supabase/storage'
 import type { ProductDetailImage } from '@/types/products'
+import { blurhashToDataURL } from '@/lib/blurhash'
 
 type ProductGalleryProps = {
   images: ProductDetailImage[]
@@ -50,7 +51,8 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
           src={getStorageUrl(activeImage.storage_path)}
           alt={activeImage.alt_text || productName}
           fill
-          priority
+          loading="eager"
+          quality={90}
           sizes="(max-width: 1024px) 100vw, 50vw"
           className={`object-cover transition-transform duration-200 ${
             isZoomed ? 'scale-150' : 'scale-100'
@@ -62,6 +64,8 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                 }
               : undefined
           }
+          placeholder="blur"
+          blurDataURL={blurhashToDataURL(activeImage.blurhash)}
         />
       </div>
 
@@ -88,6 +92,9 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                 fill
                 sizes="80px"
                 className="object-cover"
+                quality={50}
+                placeholder="blur"
+                blurDataURL={blurhashToDataURL(image.blurhash)}
               />
             </button>
           ))}

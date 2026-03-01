@@ -92,7 +92,7 @@ export const getFeaturedProducts = cache(async (): Promise<HomepageProduct[]> =>
     .select(
       `
       id, name, slug,
-      product_images(storage_path, alt_text, display_order),
+      product_images(storage_path, alt_text, display_order, blurhash),
       product_variants(price, compare_at_price)
     `
     )
@@ -124,7 +124,7 @@ export const getBestsellers = cache(async (): Promise<HomepageProduct[]> => {
     .select(
       `
       id, name, slug,
-      product_images(storage_path, alt_text, display_order),
+      product_images(storage_path, alt_text, display_order, blurhash),
       product_variants(price, compare_at_price)
     `
     )
@@ -165,6 +165,7 @@ function normalizeProducts(data: any[]): HomepageProduct[] {
           storage_path: primaryImage.storage_path,
           alt_text: primaryImage.alt_text,
           display_order: primaryImage.display_order,
+          blurhash: primaryImage.blurhash,
         }
         : null,
       price: minPrice,

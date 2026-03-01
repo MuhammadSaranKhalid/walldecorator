@@ -97,7 +97,7 @@ export function FilterSidebar({
         {/* Category Filter */}
         {categories.length > 0 && (
           <div className="border-b pb-6">
-            <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide">
+            <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide text-primary">
               Category
             </h3>
             <div className="space-y-2">
@@ -107,8 +107,8 @@ export function FilterSidebar({
                   onClick={() => handleCategoryChange(cat.slug)}
                   className={`block w-full text-left px-3 py-2 rounded text-sm transition-colors ${
                     params.category === cat.slug
-                      ? 'bg-black text-white font-medium'
-                      : 'hover:bg-gray-100'
+                      ? 'bg-primary text-primary-foreground font-medium'
+                      : 'hover:bg-secondary'
                   }`}
                 >
                   {cat.name}
@@ -120,7 +120,7 @@ export function FilterSidebar({
 
         {/* Price Range Filter */}
         <div className="border-b pb-6">
-          <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide">
+          <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide text-primary">
             Price Range
           </h3>
           <div className="space-y-4">
@@ -132,7 +132,7 @@ export function FilterSidebar({
               onValueChange={handlePriceChange}
               className="w-full"
             />
-            <div className="flex items-center justify-between text-sm text-gray-600">
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
               <span>Rs. {params.minPrice.toLocaleString()}</span>
               <span>
                 Rs. {(params.maxPrice || 50000).toLocaleString()}
@@ -144,7 +144,7 @@ export function FilterSidebar({
         {/* Color Filter */}
         {colorAttributes && colorAttributes.values.length > 0 && (
           <div className="border-b pb-6">
-            <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide">
+            <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide text-primary">
               Color
             </h3>
             <div className="space-y-2">
@@ -167,7 +167,7 @@ export function FilterSidebar({
         {/* Size Filter */}
         {sizeAttributes && sizeAttributes.values.length > 0 && (
           <div className="pb-6">
-            <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide">
+            <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide text-primary">
               Size
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -177,8 +177,8 @@ export function FilterSidebar({
                   onClick={() => handleSizeToggle(size)}
                   className={`px-4 py-2 border rounded text-sm transition-colors ${
                     params.sizes.includes(size)
-                      ? 'bg-black text-white border-black'
-                      : 'hover:border-gray-400'
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'hover:border-accent'
                   }`}
                 >
                   {size}

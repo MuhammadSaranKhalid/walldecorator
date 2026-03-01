@@ -8,18 +8,18 @@ type BestsellersProps = {
 
 export function Bestsellers({ products }: BestsellersProps) {
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
         <div className="flex items-end justify-between mb-8">
           <div>
-            <p className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-1">
+            <p className="text-sm font-semibold text-accent uppercase tracking-widest mb-1">
               Most Popular
             </p>
-            <h2 className="text-3xl font-bold text-gray-900">Bestsellers</h2>
+            <h2 className="text-3xl font-bold text-primary">Bestsellers</h2>
           </div>
           <Link
             href="/products?sort=popularity"
-            className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+            className="text-sm font-medium text-muted-foreground hover:text-accent transition-colors"
           >
             See All →
           </Link>

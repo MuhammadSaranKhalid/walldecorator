@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import { render } from "@react-email/components";
 import OrderConfirmationEmail from "@/emails/order-confirmation";
 import { getAdminClient } from "@/lib/supabase/admin";
+import { getStorageUrl } from "@/lib/supabase/storage";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -36,12 +37,19 @@ interface WebhookPayload {
   };
 }
 
-interface OrderItem {
+interface OrderItemWithImage {
   product_name: string;
   variant_description: string;
   quantity: number;
   unit_price: number;
   total_price: number;
+  product_id: string;
+  products?: {
+    product_images?: Array<{
+      storage_path: string;
+      display_order: number;
+    }>;
+  };
 }
 
 export async function POST(request: NextRequest) {
@@ -68,7 +76,14 @@ export async function POST(request: NextRequest) {
         variant_description,
         quantity,
         unit_price,
-        total_price
+        total_price,
+        product_id,
+        products (
+          product_images (
+            storage_path,
+            display_order
+          )
+        )
       `)
       .eq("order_id", order.id);
 
@@ -80,14 +95,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Format items for email
-    const emailItems = (orderItems as OrderItem[]).map((item) => ({
-      name: item.product_name,
-      material: item.variant_description || "Standard",
-      quantity: item.quantity,
-      unitPrice: Number(item.unit_price),
-      totalPrice: Number(item.total_price),
-    }));
+    // Format items for email with product images
+    const emailItems = (orderItems as OrderItemWithImage[]).map((item) => {
+      // Get the primary image (lowest display_order)
+      const primaryImage = item.products?.product_images?.sort(
+        (a, b) => a.display_order - b.display_order
+      )[0];
+
+      return {
+        name: item.product_name,
+        material: item.variant_description || "Standard",
+        quantity: item.quantity,
+        unitPrice: Number(item.unit_price),
+        totalPrice: Number(item.total_price),
+        imageUrl: primaryImage
+          ? getStorageUrl(primaryImage.storage_path, 'product-images')
+          : undefined,
+      };
+    });
 
     // Format date
     const orderDate = new Date(order.created_at).toLocaleDateString("en-PK", {

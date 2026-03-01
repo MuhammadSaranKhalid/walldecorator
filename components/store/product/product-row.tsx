@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getStorageUrl } from '@/lib/supabase/storage'
 import { formatPrice } from '@/lib/utils/format'
 import type { HomepageProduct } from '@/types/homepage'
+import { blurhashToDataURL } from '@/lib/blurhash'
 
 type ProductRowProps = {
   products: HomepageProduct[]
@@ -43,9 +44,12 @@ export function ProductRow({ products, priority = false }: ProductRowProps) {
                 src={getStorageUrl(product.image.storage_path)}
                 alt={product.image.alt_text || product.name}
                 fill
-                priority={priority && index < 4}
+                loading={priority && index < 4 ? "eager" : "lazy"}
+                quality={priority && index < 4 ? 90 : 75}
                 sizes="(max-width: 768px) 70vw, 25vw"
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
+                placeholder="blur"
+                blurDataURL={blurhashToDataURL(product.image.blurhash)}
               />
             )}
             {product.compareAtPrice && (

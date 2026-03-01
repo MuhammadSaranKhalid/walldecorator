@@ -29,9 +29,9 @@ export function PromoBanner({ data }: PromoBannerProps) {
         <Link
           href={data.ctaLink}
           className="
-            inline-block px-10 py-4 bg-white text-black
-            font-semibold text-base rounded-full
-            hover:bg-gray-100 transition-colors duration-200
+            inline-block px-10 py-4 bg-accent text-accent-foreground
+            font-semibold text-base rounded-full shadow-lg
+            hover:bg-accent/90 hover:shadow-xl transition-all duration-200
           "
         >
           {data.ctaText}

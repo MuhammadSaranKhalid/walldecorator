@@ -67,7 +67,7 @@ function CartDrawerContent() {
           // Empty state
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6">
             <div className="text-6xl">🛒</div>
-            <p className="text-center text-gray-500">
+            <p className="text-center text-muted-foreground">
               Your cart is empty. Start shopping!
             </p>
             <DrawerClose asChild>
@@ -96,13 +96,13 @@ function CartDrawerContent() {
             <div className="border-t px-6 py-6 space-y-4">
               {/* Order summary */}
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Subtotal</span>
                   <span>{formatPrice(total)}</span>
                 </div>
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Shipping</span>
-                  <span className="text-green-600">
+                  <span className="text-accent font-medium">
                     {total >= FREE_SHIPPING_THRESHOLD
                       ? 'Free'
                       : 'Calculated at checkout'}
@@ -130,7 +130,7 @@ function CartDrawerContent() {
               </DrawerClose>
 
               {/* Trust badge */}
-              <p className="text-xs text-center text-gray-400 flex items-center justify-center gap-1">
+              <p className="text-xs text-center text-muted-foreground flex items-center justify-center gap-1">
                 🔒 Secure checkout
               </p>
             </div>

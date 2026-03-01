@@ -37,7 +37,8 @@ export const getProductBySlug = cache(async (slug: string): Promise<ProductDetai
         storage_path,
         alt_text,
         display_order,
-        variant_id
+        variant_id,
+        blurhash
       ),
       product_variants(
         id,
@@ -222,7 +223,7 @@ export const getRelatedProducts = cache(
         id,
         name,
         slug,
-        product_images(storage_path, alt_text, display_order),
+        product_images(storage_path, alt_text, display_order, blurhash),
         product_variants(price, compare_at_price)
       `)
       .eq('category_id', categoryId)

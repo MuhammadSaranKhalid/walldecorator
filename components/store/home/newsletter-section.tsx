@@ -29,25 +29,25 @@ export function NewsletterSection() {
   }
 
   return (
-    <section className="py-20 bg-black">
+    <section className="py-20 bg-primary">
       <div className="container mx-auto px-4 text-center max-w-2xl">
-        <p className="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-3">
+        <p className="text-sm font-semibold uppercase tracking-widest text-accent mb-3">
           Stay in the Loop
         </p>
-        <h2 className="text-3xl lg:text-4xl font-bold text-white mb-3">
+        <h2 className="text-3xl lg:text-4xl font-bold text-primary-foreground mb-3">
           Get 10% Off Your First Order
         </h2>
-        <p className="text-gray-400 mb-8">
+        <p className="text-primary-foreground/70 mb-8">
           Subscribe to our newsletter for exclusive deals, new arrivals, and
           style tips.
         </p>
 
         {status === 'success' ? (
-          <div className="bg-green-500/10 border border-green-500/30 rounded-2xl px-8 py-6">
-            <p className="text-green-400 font-semibold text-lg">
+          <div className="bg-accent/20 border border-accent rounded-2xl px-8 py-6">
+            <p className="text-accent font-semibold text-lg">
               🎉 You&apos;re in!
             </p>
-            <p className="text-green-400/70 text-sm mt-1">
+            <p className="text-accent/80 text-sm mt-1">
               Check your inbox for your 10% discount code.
             </p>
           </div>
@@ -64,9 +64,9 @@ export function NewsletterSection() {
               required
               disabled={isPending}
               className="
-                flex-1 px-5 py-4 rounded-full bg-white/10 border border-white/20
-                text-white placeholder-gray-400
-                focus:outline-none focus:border-white/50
+                flex-1 px-5 py-4 rounded-full bg-primary-foreground/10 border border-primary-foreground/20
+                text-primary-foreground placeholder-primary-foreground/50
+                focus:outline-none focus:border-accent
                 disabled:opacity-50 disabled:cursor-not-allowed
                 transition-colors
               "
@@ -75,10 +75,10 @@ export function NewsletterSection() {
               type="submit"
               disabled={isPending}
               className="
-                px-8 py-4 bg-white text-black font-semibold
-                rounded-full shrink-0
-                hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed
-                transition-colors
+                px-8 py-4 bg-accent text-accent-foreground font-semibold
+                rounded-full shrink-0 shadow-lg
+                hover:bg-accent/90 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed
+                transition-all
               "
             >
               {isPending ? 'Subscribing...' : 'Subscribe'}
@@ -87,10 +87,10 @@ export function NewsletterSection() {
         )}
 
         {status === 'error' && (
-          <p className="text-red-400 text-sm mt-3">{errorMessage}</p>
+          <p className="text-destructive text-sm mt-3">{errorMessage}</p>
         )}
 
-        <p className="text-gray-500 text-xs mt-4">
+        <p className="text-primary-foreground/50 text-xs mt-4">
           No spam, ever. Unsubscribe at any time.
         </p>
       </div>

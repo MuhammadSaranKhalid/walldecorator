@@ -29,22 +29,22 @@ const testimonials: Testimonial[] = [
 
 export function Testimonials() {
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-secondary/50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <p className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-2">
+          <p className="text-sm font-semibold text-accent uppercase tracking-widest mb-2">
             Social Proof
           </p>
-          <h2 className="text-3xl font-bold text-gray-900">
+          <h2 className="text-3xl font-bold text-primary">
             What Our Customers Say
           </h2>
           <div className="flex items-center justify-center gap-1 mt-3">
             {[...Array(5)].map((_, i) => (
-              <span key={i} className="text-yellow-400 text-xl">
+              <span key={i} className="text-accent text-xl">
                 ★
               </span>
             ))}
-            <span className="ml-2 text-gray-500 text-sm">
+            <span className="ml-2 text-muted-foreground text-sm">
               4.9/5 from 2,400+ reviews
             </span>
           </div>
@@ -54,30 +54,30 @@ export function Testimonials() {
           {testimonials.map((t) => (
             <div
               key={t.id}
-              className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+              className="bg-card rounded-2xl p-6 shadow-sm border border-border"
             >
               {/* Stars */}
               <div className="flex gap-0.5 mb-4">
                 {[...Array(t.rating)].map((_, i) => (
-                  <span key={i} className="text-yellow-400">
+                  <span key={i} className="text-accent">
                     ★
                   </span>
                 ))}
               </div>
 
               {/* Quote */}
-              <p className="text-gray-700 leading-relaxed mb-4">{t.quote}</p>
+              <p className="text-foreground leading-relaxed mb-4">{t.quote}</p>
 
               {/* Author */}
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold text-gray-600">
+                <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-sm font-semibold text-secondary-foreground">
                   {t.author[0]}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-sm font-semibold text-foreground">
                     {t.author}
                   </p>
-                  <p className="text-xs text-gray-400">{t.location}</p>
+                  <p className="text-xs text-muted-foreground">{t.location}</p>
                 </div>
               </div>
             </div>

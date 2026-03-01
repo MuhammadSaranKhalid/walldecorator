@@ -120,15 +120,15 @@ export function VariantSelector({ product, variants, productImages }: VariantSel
     <div className="flex flex-col gap-5">
       {/* Dynamic price display */}
       <div className="flex items-baseline gap-2">
-        <span className="text-2xl font-semibold">
+        <span className="text-2xl font-semibold text-primary">
           {formatPrice(selectedVariant.price)}
         </span>
         {selectedVariant.compare_at_price && (
           <>
-            <span className="text-gray-400 line-through text-lg">
+            <span className="text-muted-foreground line-through text-lg">
               {formatPrice(selectedVariant.compare_at_price)}
             </span>
-            <span className="bg-red-100 text-red-700 text-sm px-2 py-0.5 rounded-full">
+            <span className="bg-destructive/10 text-destructive text-sm px-2 py-0.5 rounded-full font-semibold">
               {Math.round(
                 ((selectedVariant.compare_at_price - selectedVariant.price) /
                   selectedVariant.compare_at_price) *
@@ -143,9 +143,9 @@ export function VariantSelector({ product, variants, productImages }: VariantSel
       {/* Attribute selectors (Size, Color, etc.) */}
       {Object.entries(attributeGroups).map(([attributeName, values]) => (
         <div key={attributeName}>
-          <p className="text-sm font-medium text-gray-700 mb-2">
+          <p className="text-sm font-medium text-foreground mb-2">
             {attributeName}:
-            <span className="font-normal ml-1">{selectedAttributes[attributeName]}</span>
+            <span className="font-normal ml-1 text-accent">{selectedAttributes[attributeName]}</span>
           </p>
 
           <div className="flex flex-wrap gap-2">
@@ -168,10 +168,10 @@ export function VariantSelector({ product, variants, productImages }: VariantSel
                     transition-all duration-150
                     ${
                       isSelected
-                        ? 'border-black bg-black text-white'
+                        ? 'border-primary bg-primary text-primary-foreground'
                         : isUnavailable
-                          ? 'border-gray-200 text-gray-300 cursor-not-allowed line-through'
-                          : 'border-gray-200 text-gray-700 hover:border-gray-400'
+                          ? 'border-border text-muted-foreground/40 cursor-not-allowed line-through'
+                          : 'border-border text-foreground hover:border-accent'
                     }
                   `}
                 >
@@ -185,7 +185,7 @@ export function VariantSelector({ product, variants, productImages }: VariantSel
 
       {/* Stock indicator */}
       {isLowStock && (
-        <p className="text-orange-600 text-sm font-medium">
+        <p className="text-accent text-sm font-medium">
           Only {stockAvailable} left in stock
         </p>
       )}
@@ -193,18 +193,18 @@ export function VariantSelector({ product, variants, productImages }: VariantSel
       {/* Quantity selector */}
       {!isOutOfStock && (
         <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-gray-700">Quantity:</span>
-          <div className="flex items-center border rounded-lg">
+          <span className="text-sm font-medium text-foreground">Quantity:</span>
+          <div className="flex items-center border border-border rounded-lg">
             <button
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-l-lg"
+              className="px-3 py-2 text-muted-foreground hover:bg-secondary rounded-l-lg"
             >
               −
             </button>
             <span className="px-4 py-2 text-sm font-medium">{quantity}</span>
             <button
               onClick={() => setQuantity((q) => Math.min(stockAvailable, q + 1))}
-              className="px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-r-lg"
+              className="px-3 py-2 text-muted-foreground hover:bg-secondary rounded-r-lg"
             >
               +
             </button>
@@ -218,13 +218,13 @@ export function VariantSelector({ product, variants, productImages }: VariantSel
         disabled={isOutOfStock || isPending}
         className={`
           w-full py-4 rounded-xl font-semibold text-base
-          transition-all duration-200
+          transition-all duration-200 shadow-lg
           ${
             isOutOfStock
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              ? 'bg-muted text-muted-foreground cursor-not-allowed'
               : justAdded
-                ? 'bg-green-600 text-white scale-[0.99]'
-                : 'bg-black text-white hover:bg-gray-800 active:scale-[0.99]'
+                ? 'bg-accent text-accent-foreground scale-[0.99]'
+                : 'bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-xl active:scale-[0.99]'
           }
         `}
       >

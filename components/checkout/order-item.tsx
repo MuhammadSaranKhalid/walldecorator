@@ -1,6 +1,8 @@
+import { getStorageUrl } from '@/lib/supabase/storage'
 import Image from 'next/image'
 import type { CartItem } from '@/store/cart.store'
 import { formatPrice } from '@/lib/utils'
+import { blurhashToDataURL } from '@/lib/blurhash'
 
 type OrderItemProps = {
   item: CartItem
@@ -13,11 +15,14 @@ export function OrderItem({ item }: OrderItemProps) {
         <div className="h-full w-full overflow-hidden rounded-md border border-gray-300 bg-white">
           {item.image ? (
             <Image
-              src={item.image.storage_path}
+              src={getStorageUrl(item.image.storage_path)}
               alt={item.image.alt_text || item.productName}
               fill
               className="object-cover"
               sizes="64px"
+              quality={75}
+              placeholder="blur"
+              blurDataURL={blurhashToDataURL(item.image.blurhash)}
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-gray-50 text-gray-400 text-xs">

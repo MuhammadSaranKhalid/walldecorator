@@ -53,7 +53,7 @@ export function CheckoutSkeleton() {
         </div>
 
         {/* Order summary skeleton */}
-        <div className="rounded-lg border bg-gray-50/50 p-6">
+        <div className="rounded-lg border bg-secondary/30 p-6">
           <Skeleton className="h-6 w-32 mb-4" />
           <div className="space-y-4">
             <Skeleton className="h-20 w-full" />

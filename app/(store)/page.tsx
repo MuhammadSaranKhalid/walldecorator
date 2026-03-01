@@ -11,6 +11,7 @@ import { NewsletterSection } from '@/components/store/home/newsletter-section'
 import { ProductsSkeleton } from '@/components/store/home/skeletons/products-skeleton'
 import { CategoriesSkeleton } from '@/components/store/home/skeletons/categories-skeleton'
 import { WhatsAppButton } from '@/components/whatsapp-button'
+import CustomCraftSection from '@/components/CustomCraftSection'
 import {
   getHomepageData,
   getFeaturedProducts,
@@ -77,7 +78,11 @@ export default async function HomePage() {
       {/* Fully static — hardcoded or from CMS, no DB needed */}
       <Testimonials />
 
-      {/* ── 8. NEWSLETTER ───────────────────────────────────────── */}
+      {/* ── 8. CUSTOM CRAFT ─────────────────────────────────────── */}
+      {/* Client Component — custom order form with file upload */}
+      <CustomCraftSection />
+
+      {/* ── 9. NEWSLETTER ───────────────────────────────────────── */}
       {/* Client Component — needs form interactivity */}
       <NewsletterSection />
 

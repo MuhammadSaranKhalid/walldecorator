@@ -3,6 +3,7 @@ export interface ProductImage {
   storage_path: string
   alt_text: string | null
   display_order: number
+  blurhash: string | null
 }
 
 export interface ProductCategory {
@@ -64,6 +65,7 @@ export interface ProductDetailImage {
   alt_text: string | null
   display_order: number
   variant_id: string | null
+  blurhash: string | null
 }
 
 export interface ProductAttributeValue {

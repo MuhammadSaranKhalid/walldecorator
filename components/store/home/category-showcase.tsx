@@ -11,21 +11,21 @@ export function CategoryShowcase({ categories }: CategoryShowcaseProps) {
   if (categories.length === 0) return null
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
         {/* Section header */}
         <div className="flex items-end justify-between mb-8">
           <div>
-            <p className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-1">
+            <p className="text-sm font-semibold text-accent uppercase tracking-widest mb-1">
               Explore
             </p>
-            <h2 className="text-3xl font-bold text-gray-900">
+            <h2 className="text-3xl font-bold text-primary">
               Shop by Category
             </h2>
           </div>
           <Link
             href="/products"
-            className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+            className="text-sm font-medium text-muted-foreground hover:text-accent transition-colors"
           >
             View All →
           </Link>
@@ -38,7 +38,7 @@ export function CategoryShowcase({ categories }: CategoryShowcaseProps) {
             <Link
               key={category.id}
               href={`/products?category=${category.slug}`}
-              className="group relative overflow-hidden rounded-2xl aspect-3/4 bg-gray-100"
+              className="group relative overflow-hidden rounded-2xl aspect-3/4 bg-muted border border-border"
             >
               {category.image_path && (
                 <Image

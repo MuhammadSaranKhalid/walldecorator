@@ -47,7 +47,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         <main className="flex-1 min-w-0">
           {/* Top bar: result count + sort */}
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-gray-500">{products.totalCount} products</p>
+            <p className="text-sm text-muted-foreground">{products.totalCount} products</p>
             {/* Client Component — updates URL on change */}
             <ProductSort currentSort={parsedParams.sort} />
           </div>

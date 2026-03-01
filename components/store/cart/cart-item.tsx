@@ -6,6 +6,7 @@ import { useCartStore } from '@/store/cart.store'
 import { getStorageUrl } from '@/lib/supabase/storage'
 import { formatPrice } from '@/lib/utils'
 import type { CartItem as CartItemType } from '@/store/cart.store'
+import { blurhashToDataURL } from '@/lib/blurhash'
 
 type CartItemProps = {
   item: CartItemType
@@ -26,6 +27,9 @@ export function CartItem({ item }: CartItemProps) {
             fill
             sizes="80px"
             className="object-cover"
+            quality={50}
+            placeholder="blur"
+            blurDataURL={blurhashToDataURL(item.image.blurhash)}
           />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400 text-xs">

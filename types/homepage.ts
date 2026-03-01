@@ -28,6 +28,7 @@ export interface ProductImage {
   storage_path: string
   alt_text: string | null
   display_order: number
+  blurhash: string | null
 }
 
 export interface HomepageProduct {

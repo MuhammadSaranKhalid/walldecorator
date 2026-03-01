@@ -67,7 +67,7 @@ export const getProducts = cache(async (params: ProductParams): Promise<Products
         slug,
         created_at,
         total_sold,
-        product_images(storage_path, alt_text, display_order),
+        product_images(storage_path, alt_text, display_order, blurhash),
         category:categories(id, name, slug)
       ),
       inventory(quantity_available)

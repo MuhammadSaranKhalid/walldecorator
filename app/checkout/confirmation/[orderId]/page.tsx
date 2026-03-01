@@ -7,6 +7,7 @@ import { formatPrice } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { DeliveryMap } from '@/components/checkout/delivery-map'
 
 type Props = {
   params: Promise<{ orderId: string }>
@@ -52,19 +53,36 @@ export default async function OrderConfirmationPage({ params }: Props) {
     country: string
   }
 
+  // Geocoding query fallbacks (from most specific to least specific)
+  // Nominatim often fails on highly specific house addresses in some countries.
+  const addressQueryOptions = Array.from(new Set([
+    [shippingAddress.line1, shippingAddress.city, shippingAddress.province, shippingAddress.country].filter(Boolean).join(', '),
+    [shippingAddress.city, shippingAddress.province, shippingAddress.country].filter(Boolean).join(', '),
+    [shippingAddress.city, shippingAddress.country].filter(Boolean).join(', '),
+  ].filter(Boolean)))
+
+  // Human-readable label for the map banner
+  const addressLabel = [
+    shippingAddress.line1,
+    shippingAddress.city,
+    shippingAddress.province,
+  ]
+    .filter(Boolean)
+    .join(', ')
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Success header */}
       <div className="text-center mb-8">
         <div className="flex justify-center mb-4">
-          <div className="rounded-full bg-green-100 p-4">
-            <CheckCircle2 className="h-12 w-12 text-green-600" />
+          <div className="rounded-full bg-accent/20 p-4">
+            <CheckCircle2 className="h-12 w-12 text-accent" />
           </div>
         </div>
-        <h1 className="text-3xl font-bold mb-2">Order Confirmed!</h1>
-        <p className="text-gray-600">
+        <h1 className="text-3xl font-bold text-primary mb-2">Order Confirmed!</h1>
+        <p className="text-muted-foreground">
           Thank you for your order. We've sent a confirmation to{' '}
-          <span className="font-medium">{order.customer_email}</span>
+          <span className="font-medium text-foreground">{order.customer_email}</span>
         </p>
       </div>
 
@@ -76,11 +94,11 @@ export default async function OrderConfirmationPage({ params }: Props) {
         <CardContent>
           <div className="space-y-2">
             <div className="flex justify-between">
-              <span className="text-gray-600">Order Number</span>
+              <span className="text-muted-foreground">Order Number</span>
               <span className="font-mono font-medium">{order.order_number}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Order Date</span>
+              <span className="text-muted-foreground">Order Date</span>
               <span className="font-medium">
                 {new Date(order.created_at).toLocaleDateString('en-PK', {
                   year: 'numeric',
@@ -90,7 +108,7 @@ export default async function OrderConfirmationPage({ params }: Props) {
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Payment Method</span>
+              <span className="text-muted-foreground">Payment Method</span>
               <span className="font-medium">Cash on Delivery</span>
             </div>
           </div>
@@ -111,10 +129,10 @@ export default async function OrderConfirmationPage({ params }: Props) {
               <div key={item.id} className="flex justify-between items-start">
                 <div className="flex-1">
                   <p className="font-medium">{item.product_name}</p>
-                  <p className="text-sm text-gray-600">{item.variant_description}</p>
-                  <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+                  <p className="text-sm text-muted-foreground">{item.variant_description}</p>
+                  <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                 </div>
-                <p className="font-medium">{formatPrice(item.total_price)}</p>
+                <p className="font-medium text-primary">{formatPrice(item.total_price)}</p>
               </div>
             ))}
 
@@ -122,14 +140,14 @@ export default async function OrderConfirmationPage({ params }: Props) {
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Subtotal</span>
+                <span className="text-muted-foreground">Subtotal</span>
                 <span>{formatPrice(order.subtotal)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Shipping</span>
+                <span className="text-muted-foreground">Shipping</span>
                 <span>
                   {order.shipping_cost === 0 ? (
-                    <span className="text-green-600">Free</span>
+                    <span className="text-accent font-medium">Free</span>
                   ) : (
                     formatPrice(order.shipping_cost)
                   )}
@@ -170,6 +188,11 @@ export default async function OrderConfirmationPage({ params }: Props) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Delivery map */}
+      <div className="mb-6">
+        <DeliveryMap addressQueryOptions={addressQueryOptions} addressLabel={addressLabel} />
+      </div>
 
       {/* What's next */}
       <Card className="mb-8">

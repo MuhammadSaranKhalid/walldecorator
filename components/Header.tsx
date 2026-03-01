@@ -33,7 +33,7 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-sm border-b border-gray-100 bg-white/95">
+    <header className="sticky top-0 z-50 backdrop-blur-sm border-b border-border bg-background/95">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -116,7 +116,7 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-100">
+          <div className="md:hidden border-t border-border">
             <div className="px-2 pt-2 pb-3 space-y-1">
               {navigation.map((item) => (
                 <Link

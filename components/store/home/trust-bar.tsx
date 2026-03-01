@@ -9,17 +9,17 @@ const trustItems: TrustItem[] = [
 
 export function TrustBar() {
   return (
-    <section className="border-y border-gray-100 bg-white py-6">
+    <section className="border-y border-border bg-secondary py-6">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {trustItems.map((item) => (
             <div key={item.title} className="flex items-center gap-3">
               <span className="text-2xl shrink-0">{item.icon}</span>
               <div>
-                <p className="text-sm font-semibold text-gray-900">
+                <p className="text-sm font-semibold text-primary">
                   {item.title}
                 </p>
-                <p className="text-xs text-gray-500">{item.subtitle}</p>
+                <p className="text-xs text-muted-foreground">{item.subtitle}</p>
               </div>
             </div>
           ))}
