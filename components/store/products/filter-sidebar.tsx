@@ -1,0 +1,197 @@
+'use client'
+
+import { useQueryStates } from 'nuqs'
+import { productSearchParams } from '@/lib/search-params/products'
+import { useTransition } from 'react'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Slider } from '@/components/ui/slider'
+import { Label } from '@/components/ui/label'
+import type { Category, FilterAttribute } from '@/types/products'
+import type { InferOutput } from 'nuqs/server'
+
+type FilterSidebarProps = {
+  categories: Category[]
+  attributes: FilterAttribute[]
+  currentParams: InferOutput<typeof productSearchParams>
+}
+
+export function FilterSidebar({
+  categories,
+  attributes,
+  currentParams,
+}: FilterSidebarProps) {
+  // useTransition gives us a pending state while the server re-renders
+  const [isPending, startTransition] = useTransition()
+
+  // nuqs hook — syncs all filter state with the URL at once
+  const [params, setParams] = useQueryStates(productSearchParams, {
+    // shallow: false means URL changes trigger a server re-render
+    shallow: false,
+    startTransition,
+  })
+
+  function handleCategoryChange(slug: string) {
+    setParams({
+      category: slug === params.category ? '' : slug,
+      page: 1, // Reset to page 1 on filter change
+    })
+  }
+
+  function handlePriceChange(values: number[]) {
+    setParams({
+      minPrice: values[0],
+      maxPrice: values[1],
+      page: 1,
+    })
+  }
+
+  function handleColorToggle(color: string) {
+    const current = params.colors
+    const updated = current.includes(color)
+      ? current.filter((c) => c !== color)
+      : [...current, color]
+    setParams({ colors: updated, page: 1 })
+  }
+
+  function handleSizeToggle(size: string) {
+    const current = params.sizes
+    const updated = current.includes(size)
+      ? current.filter((s) => s !== size)
+      : [...current, size]
+    setParams({ sizes: updated, page: 1 })
+  }
+
+  function handleClearAll() {
+    setParams({
+      category: '',
+      minPrice: 0,
+      maxPrice: 0,
+      colors: [],
+      sizes: [],
+      page: 1,
+    })
+  }
+
+  const hasActiveFilters =
+    params.category ||
+    params.minPrice > 0 ||
+    params.maxPrice > 0 ||
+    params.colors.length > 0 ||
+    params.sizes.length > 0
+
+  const colorAttributes = attributes.find((a) => a.name === 'Color')
+  const sizeAttributes = attributes.find((a) => a.name === 'Size')
+
+  return (
+    <div className={isPending ? 'opacity-50 pointer-events-none' : ''}>
+      <div className="sticky top-4 space-y-6">
+        {/* Clear Filters Button */}
+        {hasActiveFilters && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleClearAll}
+            className="w-full"
+          >
+            Clear All Filters
+          </Button>
+        )}
+
+        {/* Category Filter */}
+        {categories.length > 0 && (
+          <div className="border-b pb-6">
+            <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide">
+              Category
+            </h3>
+            <div className="space-y-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => handleCategoryChange(cat.slug)}
+                  className={`block w-full text-left px-3 py-2 rounded text-sm transition-colors ${
+                    params.category === cat.slug
+                      ? 'bg-black text-white font-medium'
+                      : 'hover:bg-gray-100'
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Price Range Filter */}
+        <div className="border-b pb-6">
+          <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide">
+            Price Range
+          </h3>
+          <div className="space-y-4">
+            <Slider
+              min={0}
+              max={50000}
+              step={500}
+              value={[params.minPrice, params.maxPrice || 50000]}
+              onValueChange={handlePriceChange}
+              className="w-full"
+            />
+            <div className="flex items-center justify-between text-sm text-gray-600">
+              <span>Rs. {params.minPrice.toLocaleString()}</span>
+              <span>
+                Rs. {(params.maxPrice || 50000).toLocaleString()}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Color Filter */}
+        {colorAttributes && colorAttributes.values.length > 0 && (
+          <div className="border-b pb-6">
+            <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide">
+              Color
+            </h3>
+            <div className="space-y-2">
+              {colorAttributes.values.map((color) => (
+                <label
+                  key={color}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <Checkbox
+                    checked={params.colors.includes(color)}
+                    onCheckedChange={() => handleColorToggle(color)}
+                  />
+                  <span className="text-sm capitalize">{color}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Size Filter */}
+        {sizeAttributes && sizeAttributes.values.length > 0 && (
+          <div className="pb-6">
+            <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide">
+              Size
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {sizeAttributes.values.map((size) => (
+                <button
+                  key={size}
+                  onClick={() => handleSizeToggle(size)}
+                  className={`px-4 py-2 border rounded text-sm transition-colors ${
+                    params.sizes.includes(size)
+                      ? 'bg-black text-white border-black'
+                      : 'hover:border-gray-400'
+                  }`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

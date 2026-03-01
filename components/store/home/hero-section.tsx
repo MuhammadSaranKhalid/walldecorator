@@ -1,0 +1,99 @@
+import Image from 'next/image'
+import Link from 'next/link'
+import { getStorageUrl } from '@/lib/supabase/storage'
+
+type HeroProps = {
+  data: {
+    headline: string
+    subheadline: string
+    ctaText: string
+    ctaLink: string
+    imagePath: string | null
+  }
+}
+
+export function HeroSection({ data }: HeroProps) {
+  return (
+    <section className="relative overflow-hidden bg-gray-50">
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[85vh] lg:min-h-[75vh] items-center gap-8 py-16">
+          {/* Left — Text Content */}
+          <div className="flex flex-col items-start order-2 lg:order-1">
+            {/* Eyebrow label */}
+            <span className="text-sm font-semibold tracking-widest uppercase text-gray-500 mb-4">
+              New Collection 2025
+            </span>
+
+            {/* Main headline — largest text on page, critical for LCP */}
+            <h1 className="text-5xl lg:text-7xl font-bold text-gray-900 leading-tight">
+              {data.headline}
+            </h1>
+
+            {/* Subheadline */}
+            <p className="mt-4 text-lg text-gray-600 max-w-md leading-relaxed">
+              {data.subheadline}
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap items-center gap-4 mt-8">
+              <Link
+                href={data.ctaLink}
+                className="
+                  px-8 py-4 bg-black text-white text-base font-semibold
+                  rounded-full hover:bg-gray-800
+                  transition-all duration-200 hover:scale-105
+                  active:scale-100
+                "
+              >
+                {data.ctaText}
+              </Link>
+              <Link
+                href="/products"
+                className="
+                  px-8 py-4 bg-transparent text-black text-base font-semibold
+                  rounded-full border-2 border-black
+                  hover:bg-black hover:text-white
+                  transition-all duration-200
+                "
+              >
+                View All
+              </Link>
+            </div>
+
+            {/* Inline trust signals — right below CTA */}
+            <div className="flex items-center gap-6 mt-8 text-sm text-gray-500">
+              <div className="flex items-center gap-1.5">
+                <span>🚚</span>
+                <span>Free shipping Rs. 5,000+</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span>↩️</span>
+                <span>30-day returns</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right — Hero Image */}
+          <div className="relative order-1 lg:order-2 aspect-4/5 lg:aspect-auto lg:h-[75vh]">
+            {data.imagePath ? (
+              <Image
+                src={getStorageUrl(data.imagePath)}
+                alt="New Collection"
+                fill
+                priority // LCP element — always priority
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover rounded-3xl"
+                quality={90}
+              />
+            ) : (
+              // Fallback placeholder when no image is set
+              <div className="w-full h-full bg-linear-to-br from-gray-100 to-gray-200 rounded-3xl flex items-center justify-center">
+                <span className="text-gray-400 text-lg">Hero Image</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}

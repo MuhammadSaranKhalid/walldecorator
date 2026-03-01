@@ -1,0 +1,120 @@
+-- =====================================================
+-- Migration: Products
+-- Description: Products table with RLS, triggers, and category count function
+-- =====================================================
+
+-- =====================================================
+-- PRODUCTS TABLE
+-- Wall art designs (base products)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS public.products (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  category_id UUID REFERENCES public.categories(id) ON DELETE SET NULL,
+  name TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  description TEXT,
+  status TEXT CHECK (status IN ('draft', 'active', 'archived')) DEFAULT 'draft',
+  is_featured BOOLEAN DEFAULT false,
+  featured_order INTEGER DEFAULT 0,
+  total_sold INTEGER DEFAULT 0,
+  view_count INTEGER DEFAULT 0,
+  seo_title TEXT,
+  seo_description TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+COMMENT ON TABLE public.products IS 'Wall art designs (prices are on variants)';
+
+-- =====================================================
+-- INDEXES FOR PERFORMANCE
+-- =====================================================
+CREATE INDEX idx_products_category_id ON public.products(category_id);
+CREATE INDEX idx_products_slug ON public.products(slug);
+CREATE INDEX idx_products_status ON public.products(status);
+CREATE INDEX idx_products_featured ON public.products(is_featured, featured_order) WHERE is_featured = true;
+CREATE INDEX idx_products_total_sold ON public.products(total_sold DESC);
+CREATE INDEX idx_products_view_count ON public.products(view_count DESC);
+
+-- =====================================================
+-- ENABLE ROW LEVEL SECURITY
+-- =====================================================
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+
+-- =====================================================
+-- RLS POLICIES
+-- =====================================================
+CREATE POLICY "Anyone can view active products"
+  ON public.products FOR SELECT
+  USING (status = 'active');
+
+-- =====================================================
+-- TRIGGERS
+-- =====================================================
+CREATE TRIGGER set_updated_at_products
+  BEFORE UPDATE ON public.products
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_updated_at();
+
+-- =====================================================
+-- FUNCTION: Update category product count
+-- =====================================================
+CREATE OR REPLACE FUNCTION public.update_category_product_count()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF TG_OP = 'UPDATE' AND OLD.category_id IS DISTINCT FROM NEW.category_id THEN
+    UPDATE public.categories
+    SET product_count = (
+      SELECT COUNT(*) FROM public.products
+      WHERE category_id = OLD.category_id AND status = 'active'
+    )
+    WHERE id = OLD.category_id;
+  END IF;
+
+  IF TG_OP IN ('INSERT', 'UPDATE') AND NEW.category_id IS NOT NULL THEN
+    UPDATE public.categories
+    SET product_count = (
+      SELECT COUNT(*) FROM public.products
+      WHERE category_id = NEW.category_id AND status = 'active'
+    )
+    WHERE id = NEW.category_id;
+  END IF;
+
+  IF TG_OP = 'DELETE' AND OLD.category_id IS NOT NULL THEN
+    UPDATE public.categories
+    SET product_count = (
+      SELECT COUNT(*) FROM public.products
+      WHERE category_id = OLD.category_id AND status = 'active'
+    )
+    WHERE id = OLD.category_id;
+  END IF;
+
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+CREATE TRIGGER update_category_product_count_trigger
+  AFTER INSERT OR UPDATE OR DELETE ON public.products
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_category_product_count();
+
+-- =====================================================
+-- FUNCTION: Increment product view count
+-- Called from server action when product page is viewed
+-- =====================================================
+CREATE OR REPLACE FUNCTION public.increment_product_view_count(p_product_id UUID)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  UPDATE public.products
+  SET view_count = view_count + 1
+  WHERE id = p_product_id;
+END;
+$$;
+
+COMMENT ON FUNCTION public.increment_product_view_count IS 'Atomically increment product view count';
