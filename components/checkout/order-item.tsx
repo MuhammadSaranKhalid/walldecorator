@@ -9,6 +9,8 @@ type OrderItemProps = {
 }
 
 export function OrderItem({ item }: OrderItemProps) {
+  const blurUrl = item.image ? blurhashToDataURL(item.image.blurhash) : undefined
+
   return (
     <div className="flex gap-3 py-3">
       <div className="relative h-16 w-16 shrink-0">
@@ -21,8 +23,7 @@ export function OrderItem({ item }: OrderItemProps) {
               className="object-cover"
               sizes="64px"
               quality={75}
-              placeholder="blur"
-              blurDataURL={blurhashToDataURL(item.image.blurhash)}
+              {...(blurUrl ? { placeholder: 'blur', blurDataURL: blurUrl } : {})}
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-gray-50 text-gray-400 text-xs">

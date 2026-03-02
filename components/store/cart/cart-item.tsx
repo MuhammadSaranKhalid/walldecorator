@@ -15,6 +15,7 @@ type CartItemProps = {
 export function CartItem({ item }: CartItemProps) {
   const updateQuantity = useCartStore((state) => state.updateQuantity)
   const removeItem = useCartStore((state) => state.removeItem)
+  const blurUrl = item.image ? blurhashToDataURL(item.image.blurhash) : undefined
 
   return (
     <div className="flex gap-4">
@@ -28,8 +29,7 @@ export function CartItem({ item }: CartItemProps) {
             sizes="80px"
             className="object-cover"
             quality={50}
-            placeholder="blur"
-            blurDataURL={blurhashToDataURL(item.image.blurhash)}
+            {...(blurUrl ? { placeholder: 'blur', blurDataURL: blurUrl } : {})}
           />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400 text-xs">

@@ -18,6 +18,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 })
 
   const activeImage = sorted[activeIndex] || sorted[0]
+  const activeBlurUrl = activeImage ? blurhashToDataURL(activeImage.blurhash) : undefined
 
   function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect()
@@ -54,50 +55,47 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
           loading="eager"
           quality={90}
           sizes="(max-width: 1024px) 100vw, 50vw"
-          className={`object-cover transition-transform duration-200 ${
-            isZoomed ? 'scale-150' : 'scale-100'
-          }`}
+          className={`object-cover transition-transform duration-200 ${isZoomed ? 'scale-150' : 'scale-100'
+            }`}
           style={
             isZoomed
-              ? {
-                  transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
-                }
+              ? { transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%` }
               : undefined
           }
-          placeholder="blur"
-          blurDataURL={blurhashToDataURL(activeImage.blurhash)}
+          {...(activeBlurUrl ? { placeholder: 'blur', blurDataURL: activeBlurUrl } : {})}
         />
       </div>
 
       {/* Thumbnail Row */}
       {sorted.length > 1 && (
         <div className="flex gap-2 overflow-x-auto pb-1">
-          {sorted.map((image, index) => (
-            <button
-              key={image.id}
-              onClick={() => setActiveIndex(index)}
-              className={`
-                relative shrink-0 w-20 h-20 rounded-lg overflow-hidden
-                border-2 transition-colors
-                ${
-                  index === activeIndex
+          {sorted.map((image, index) => {
+            const thumbBlurUrl = blurhashToDataURL(image.blurhash)
+            return (
+              <button
+                key={image.id}
+                onClick={() => setActiveIndex(index)}
+                className={`
+                  relative shrink-0 w-20 h-20 rounded-lg overflow-hidden
+                  border-2 transition-colors
+                  ${index === activeIndex
                     ? 'border-black'
                     : 'border-transparent hover:border-gray-300'
-                }
-              `}
-            >
-              <Image
-                src={getStorageUrl(image.storage_path)}
-                alt={image.alt_text || `${productName} view ${index + 1}`}
-                fill
-                sizes="80px"
-                className="object-cover"
-                quality={50}
-                placeholder="blur"
-                blurDataURL={blurhashToDataURL(image.blurhash)}
-              />
-            </button>
-          ))}
+                  }
+                `}
+              >
+                <Image
+                  src={getStorageUrl(image.storage_path)}
+                  alt={image.alt_text || `${productName} view ${index + 1}`}
+                  fill
+                  sizes="80px"
+                  className="object-cover"
+                  quality={50}
+                  {...(thumbBlurUrl ? { placeholder: 'blur', blurDataURL: thumbBlurUrl } : {})}
+                />
+              </button>
+            )
+          })}
         </div>
       )}
     </div>

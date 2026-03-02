@@ -20,6 +20,8 @@ export function ProductCard({ variant, priority = false }: ProductCardProps) {
   const isLowStock =
     variant.inventory && variant.inventory.quantity_available <= 5
 
+  const blurUrl = primaryImage ? blurhashToDataURL(primaryImage.blurhash) : undefined
+
   return (
     <Link href={`/products/${product.slug}`} className="group block">
       <div className="relative aspect-square overflow-hidden rounded-lg bg-muted border border-border">
@@ -30,10 +32,9 @@ export function ProductCard({ variant, priority = false }: ProductCardProps) {
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
             className="object-cover group-hover:scale-105 transition-transform duration-300"
-            loading={priority ? "eager" : "lazy"}
+            loading={priority ? 'eager' : 'lazy'}
             quality={priority ? 90 : 75}
-            placeholder="blur"
-            blurDataURL={blurhashToDataURL(primaryImage.blurhash)}
+            {...(blurUrl ? { placeholder: 'blur', blurDataURL: blurUrl } : {})}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-muted">

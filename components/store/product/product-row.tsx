@@ -31,52 +31,56 @@ export function ProductRow({ products, priority = false }: ProductRowProps) {
         scrollbar-hide
       "
     >
-      {products.map((product, index) => (
-        <Link
-          key={product.id}
-          href={`/products/${product.slug}`}
-          className="group shrink-0 w-[70vw] sm:w-[45vw] md:w-auto snap-start"
-        >
-          {/* Image */}
-          <div className="relative aspect-square overflow-hidden rounded-xl bg-gray-100">
-            {product.image && (
-              <Image
-                src={getStorageUrl(product.image.storage_path)}
-                alt={product.image.alt_text || product.name}
-                fill
-                loading={priority && index < 4 ? "eager" : "lazy"}
-                quality={priority && index < 4 ? 90 : 75}
-                sizes="(max-width: 768px) 70vw, 25vw"
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
-                placeholder="blur"
-                blurDataURL={blurhashToDataURL(product.image.blurhash)}
-              />
-            )}
-            {product.compareAtPrice && (
-              <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-                Sale
-              </span>
-            )}
-          </div>
-
-          {/* Info */}
-          <div className="mt-3 space-y-1">
-            <h3 className="text-sm font-medium text-gray-900 truncate group-hover:text-gray-600 transition-colors">
-              {product.name}
-            </h3>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold">
-                {formatPrice(product.price)}
-              </span>
+      {products.map((product, index) => {
+        const blurUrl = product.image
+          ? blurhashToDataURL(product.image.blurhash)
+          : undefined
+        return (
+          <Link
+            key={product.id}
+            href={`/products/${product.slug}`}
+            className="group shrink-0 w-[70vw] sm:w-[45vw] md:w-auto snap-start"
+          >
+            {/* Image */}
+            <div className="relative aspect-square overflow-hidden rounded-xl bg-gray-100">
+              {product.image && (
+                <Image
+                  src={getStorageUrl(product.image.storage_path)}
+                  alt={product.image.alt_text || product.name}
+                  fill
+                  loading={priority && index < 4 ? 'eager' : 'lazy'}
+                  quality={priority && index < 4 ? 90 : 75}
+                  sizes="(max-width: 768px) 70vw, 25vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  {...(blurUrl ? { placeholder: 'blur', blurDataURL: blurUrl } : {})}
+                />
+              )}
               {product.compareAtPrice && (
-                <span className="text-xs text-gray-400 line-through">
-                  {formatPrice(product.compareAtPrice)}
+                <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                  Sale
                 </span>
               )}
             </div>
-          </div>
-        </Link>
-      ))}
+
+            {/* Info */}
+            <div className="mt-3 space-y-1">
+              <h3 className="text-sm font-medium text-gray-900 truncate group-hover:text-gray-600 transition-colors">
+                {product.name}
+              </h3>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold">
+                  {formatPrice(product.price)}
+                </span>
+                {product.compareAtPrice && (
+                  <span className="text-xs text-gray-400 line-through">
+                    {formatPrice(product.compareAtPrice)}
+                  </span>
+                )}
+              </div>
+            </div>
+          </Link>
+        )
+      })}
     </div>
   )
 }

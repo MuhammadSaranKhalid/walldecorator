@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getStorageUrl } from '@/lib/supabase/storage'
 import { formatPrice } from '@/lib/utils'
+import { blurhashToDataURL } from '@/lib/blurhash'
 
 type RelatedProduct = {
   id: string
@@ -11,6 +12,7 @@ type RelatedProduct = {
     storage_path: string
     alt_text: string | null
     display_order: number
+    blurhash: string | null
   }>
   product_variants: Array<{
     price: number
@@ -38,6 +40,7 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
           const firstVariant = product.product_variants.sort(
             (a, b) => a.price - b.price
           )[0]
+          const blurUrl = firstImage ? blurhashToDataURL(firstImage.blurhash) : undefined
 
           return (
             <Link
@@ -53,6 +56,7 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
                     fill
                     sizes="(max-width: 768px) 50vw, 25vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-200"
+                    {...(blurUrl ? { placeholder: 'blur', blurDataURL: blurUrl } : {})}
                   />
                 )}
               </div>
