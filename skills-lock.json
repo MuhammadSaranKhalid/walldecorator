@@ -6,6 +6,11 @@
       "sourceType": "github",
       "computedHash": "b6da967054f0824794e890124a64ddde50fbdca1361b05fbde7a21b469b4e42c"
     },
+    "nextjs-seo": {
+      "source": "laguagu/claude-code-nextjs-skills",
+      "sourceType": "github",
+      "computedHash": "cb162b4dddde7d73157a338d2a86347b816e67db691c39a8c29f1e1e7145cba5"
+    },
     "prisma-client-api": {
       "source": "prisma/skills",
       "sourceType": "github",

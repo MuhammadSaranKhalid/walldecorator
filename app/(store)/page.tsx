@@ -27,6 +27,7 @@ export const metadata: Metadata = {
     title: 'Wall Decorator',
     description: 'Shop our latest collection of metal wall art.',
     type: 'website',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Wall Decorator — Metal Wall Art' }],
   },
 }
 

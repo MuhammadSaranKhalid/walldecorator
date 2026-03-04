@@ -12,8 +12,16 @@ export const dynamic = 'force-dynamic'
 
 // SEO metadata
 export const metadata = {
-  title: 'Products | Wall Decorator',
-  description: 'Browse our full collection of premium metal wall art products.',
+  title: 'Shop Metal Wall Art | Wall Decorator',
+  description:
+    'Shop our curated collection of premium laser-cut metal wall art. Explore anime, vehicles, custom designs and more. Free shipping over Rs. 5,000.',
+  openGraph: {
+    title: 'Shop Metal Wall Art | Wall Decorator',
+    description:
+      'Shop our curated collection of premium laser-cut metal wall art. Explore anime, vehicles, custom designs and more. Free shipping over Rs. 5,000.',
+    type: 'website',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Wall Decorator — Metal Wall Art Collection' }],
+  },
 }
 
 type ProductsPageProps = {
@@ -31,6 +39,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Page H1 — hidden visually on desktop (sidebar+grid layout), but visible to crawlers */}
+      <h1 className="sr-only">Shop Metal Wall Art</h1>
       <div className="flex gap-8">
         {/* Sidebar */}
         <aside className="hidden lg:block w-64 shrink-0">

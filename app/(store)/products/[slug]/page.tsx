@@ -50,12 +50,16 @@ export async function generateMetadata({
   const firstImage = product.product_images[0]
 
   return {
-    title: `${product.name} | Wall Decorator`,
+    title: product.name,
     description: product.seo_description || product.description?.slice(0, 160),
+    alternates: {
+      canonical: `/products/${slug}`,
+    },
     openGraph: {
       title: product.name,
       description: product.seo_description || product.description?.slice(0, 160),
-      images: firstImage ? [{ url: getStorageUrl(firstImage.storage_path) }] : [],
+      type: 'website',
+      images: firstImage ? [{ url: getStorageUrl(firstImage.storage_path), alt: product.name }] : [],
     },
   }
 }
@@ -93,6 +97,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
             '@type': 'Product',
             name: product.name,
             description: product.description,
+            sku: product.id,
+            brand: {
+              '@type': 'Brand',
+              name: 'Wall Decorator',
+            },
             image: product.product_images.map((img) => getStorageUrl(img.storage_path)),
             offers: product.product_variants.map((v) => ({
               '@type': 'Offer',
