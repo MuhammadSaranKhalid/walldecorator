@@ -17,29 +17,33 @@ export function ActiveFilters() {
     params.category && {
       key: 'category',
       label: `Category: ${params.category}`,
-      clear: () => setParams({ category: '', page: 1 }),
+      clear: () => setParams({ category: null, page: null }),
     },
     params.minPrice > 0 && {
       key: 'minPrice',
       label: `Min: Rs. ${params.minPrice.toLocaleString()}`,
-      clear: () => setParams({ minPrice: 0, page: 1 }),
+      clear: () => setParams({ minPrice: null, page: null }),
     },
     params.maxPrice > 0 && {
       key: 'maxPrice',
       label: `Max: Rs. ${params.maxPrice.toLocaleString()}`,
-      clear: () => setParams({ maxPrice: 0, page: 1 }),
+      clear: () => setParams({ maxPrice: null, page: null }),
     },
     ...params.colors.map((c) => ({
       key: `color-${c}`,
       label: `Color: ${c}`,
-      clear: () =>
-        setParams({ colors: params.colors.filter((x) => x !== c), page: 1 }),
+      clear: () => {
+        const next = params.colors.filter((x) => x !== c)
+        setParams({ colors: next.length > 0 ? next : null, page: null })
+      },
     })),
     ...params.sizes.map((s) => ({
       key: `size-${s}`,
       label: `Size: ${s}`,
-      clear: () =>
-        setParams({ sizes: params.sizes.filter((x) => x !== s), page: 1 }),
+      clear: () => {
+        const next = params.sizes.filter((x) => x !== s)
+        setParams({ sizes: next.length > 0 ? next : null, page: null })
+      },
     })),
   ].filter(Boolean) as Array<{ key: string; label: string; clear: () => void }>
 

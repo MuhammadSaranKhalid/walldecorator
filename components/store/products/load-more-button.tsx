@@ -32,7 +32,7 @@ export function LoadMoreButton({
   return (
     <div className="mt-12 text-center">
       <Button
-        onClick={() => setPage(currentPage + 1)}
+        onClick={() => setPage(prev => (prev || 1) + 1)}
         disabled={isPending}
         size="lg"
         className="px-8"

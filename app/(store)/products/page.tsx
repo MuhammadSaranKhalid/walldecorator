@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import type { SearchParams } from 'nuqs/server'
 import { searchParamsCache } from '@/lib/search-params/products'
 import { getProducts, getProductCategories } from '@/queries/products'
 import { ProductGrid } from '@/components/store/products/product-grid'
@@ -24,14 +25,14 @@ export const metadata = {
   },
 }
 
+
 type ProductsPageProps = {
-  searchParams: Promise<Record<string, string | string[] | undefined>>
+  searchParams: Promise<SearchParams>
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-  // Parse and validate all URL params in one call
-  const awaitedParams = await searchParams
-  const parsedParams = searchParamsCache.parse(awaitedParams)
+  // Parse and validate all URL params in one call (awaits the promise in Next.js 15+)
+  const parsedParams = await searchParamsCache.parse(searchParams)
 
   // Start data fetches immediately, but don't await them here
   const productsPromise = getProducts(parsedParams)
@@ -40,7 +41,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Page H1 — hidden visually on desktop (sidebar+grid layout), but visible to crawlers */}
-      <h1 className="sr-only">Shop Metal Wall Art</h1>
+      <h1 className="sr-only">Shop Wall Art</h1>
       <div className="flex gap-8">
         {/* Sidebar */}
         <aside className="hidden lg:block w-64 shrink-0">

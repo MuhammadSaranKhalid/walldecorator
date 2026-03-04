@@ -11,6 +11,11 @@
       "sourceType": "github",
       "computedHash": "cb162b4dddde7d73157a338d2a86347b816e67db691c39a8c29f1e1e7145cba5"
     },
+    "nuqs": {
+      "source": "pproenca/dot-skills",
+      "sourceType": "github",
+      "computedHash": "573a1b8ab42c339b6efc8ab55e720faf75e4902071bdc2f65c006972accfd551"
+    },
     "prisma-client-api": {
       "source": "prisma/skills",
       "sourceType": "github",

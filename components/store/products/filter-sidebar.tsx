@@ -27,29 +27,27 @@ export function FilterSidebar({
 
   function handleCategoryChange(slug: string) {
     setParams({
-      category: slug === params.category ? '' : slug,
-      page: 1, // Reset to page 1 on filter change
+      category: slug === params.category ? null : slug,
+      page: null, // Reset to page 1 implicitly by clearing page from URL
     })
   }
 
   function handlePriceChange(values: number[]) {
     setParams({
-      minPrice: values[0],
-      maxPrice: values[1],
-      page: 1,
+      minPrice: values[0] === 0 ? null : values[0],
+      maxPrice: values[1] === 50000 ? null : values[1],
+      page: null,
     })
   }
 
-
-
   function handleClearAll() {
     setParams({
-      category: '',
-      minPrice: 0,
-      maxPrice: 0,
-      colors: [],
-      sizes: [],
-      page: 1,
+      category: null,
+      minPrice: null,
+      maxPrice: null,
+      colors: null,
+      sizes: null,
+      page: null,
     })
   }
 
@@ -89,8 +87,8 @@ export function FilterSidebar({
                   key={cat.id}
                   onClick={() => handleCategoryChange(cat.slug)}
                   className={`block w-full text-left px-3 py-2 rounded text-sm transition-colors ${params.category === cat.slug
-                      ? 'bg-primary text-primary-foreground font-medium'
-                      : 'hover:bg-secondary'
+                    ? 'bg-primary text-primary-foreground font-medium'
+                    : 'hover:bg-secondary'
                     }`}
                 >
                   {cat.name}

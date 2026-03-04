@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
+import { NuqsAdapter } from "nuqs/adapters/next/app"
 import "./globals.css"
 import { JsonLd } from "@/components/seo/json-ld"
 
@@ -109,9 +110,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <JsonLd data={websiteSchema} />
-        <JsonLd data={organizationSchema} />
-        {children}
+        <NuqsAdapter>
+          <JsonLd data={websiteSchema} />
+          <JsonLd data={organizationSchema} />
+          {children}
+        </NuqsAdapter>
       </body>
     </html>
   )
