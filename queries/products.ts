@@ -1,5 +1,5 @@
 import { cache } from 'react'
-import { createServerClient } from '@/lib/supabase/server'
+import { supabase } from '@/lib/supabase/client'
 import { redis } from '@/lib/upstash/client'
 import { searchParamsCache } from '@/lib/search-params/products'
 import type {
@@ -25,9 +25,6 @@ export const getProducts = cache(async (params: ProductParams): Promise<Products
   if (cached) {
     return (typeof cached === 'string' ? JSON.parse(cached) : cached) as ProductsResult
   }
-
-  // Cache miss — query Supabase
-  const supabase = await createServerClient()
 
   // First, get the attribute value IDs for acrylic, 2x2, and 3mm
   const { data: materialData } = await supabase
@@ -160,7 +157,6 @@ export const getProductCategories = cache(async (): Promise<Category[]> => {
     return (typeof cached === 'string' ? JSON.parse(cached) : cached) as Category[]
   }
 
-  const supabase = await createServerClient()
   const { data, error } = await supabase
     .from('categories')
     .select('id, name, slug, parent_id')
@@ -191,8 +187,6 @@ export const getFilterAttributes = cache(
     if (cached) {
       return (typeof cached === 'string' ? JSON.parse(cached) : cached) as FilterAttribute[]
     }
-
-    const supabase = await createServerClient()
 
     // Get all unique attribute values
     // TODO: Add category filtering when schema relationships are clearer

@@ -1,5 +1,5 @@
 import { cache } from 'react'
-import { createServerClient } from '@/lib/supabase/server'
+import { supabase } from '@/lib/supabase/client'
 import { redis } from '@/lib/upstash/client'
 import type {
   HomepageData,
@@ -17,8 +17,6 @@ export const getHomepageData = cache(async (): Promise<HomepageData> => {
   if (cached) {
     return typeof cached === 'string' ? JSON.parse(cached) as HomepageData : cached
   }
-
-  const supabase = await createServerClient()
 
   const { data } = await supabase
     .from('homepage_config')
@@ -59,8 +57,6 @@ export const getCategories = cache(async (): Promise<Category[]> => {
     return typeof cached === 'string' ? JSON.parse(cached) as Category[] : cached
   }
 
-  const supabase = await createServerClient()
-
   const { data } = await supabase
     .from('categories')
     .select('id, name, slug, image_path, product_count')
@@ -85,7 +81,6 @@ export const getFeaturedProducts = cache(async (): Promise<HomepageProduct[]> =>
     return typeof cached === 'string' ? JSON.parse(cached) as HomepageProduct[] : cached
   }
 
-  const supabase = await createServerClient()
 
   const { data } = await supabase
     .from('products')
@@ -117,7 +112,6 @@ export const getBestsellers = cache(async (): Promise<HomepageProduct[]> => {
     return typeof cached === 'string' ? JSON.parse(cached) as HomepageProduct[] : cached
   }
 
-  const supabase = await createServerClient()
 
   const { data } = await supabase
     .from('products')

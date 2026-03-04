@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "ecommerce-seo-audit": {
+      "source": "affilino/ecommerce-seo-audit-skill",
+      "sourceType": "github",
+      "computedHash": "b6da967054f0824794e890124a64ddde50fbdca1361b05fbde7a21b469b4e42c"
+    },
     "prisma-client-api": {
       "source": "prisma/skills",
       "sourceType": "github",

@@ -32,7 +32,7 @@ export function ProductCard({ variant, priority = false }: ProductCardProps) {
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
             className="object-cover group-hover:scale-105 transition-transform duration-300"
-            loading={priority ? 'eager' : 'lazy'}
+            priority={priority}
             quality={priority ? 90 : 75}
             {...(blurUrl ? { placeholder: 'blur', blurDataURL: blurUrl } : {})}
           />
@@ -42,17 +42,17 @@ export function ProductCard({ variant, priority = false }: ProductCardProps) {
           </div>
         )}
 
-        {isOnSale && (
+        {isOnSale ? (
           <span className="absolute top-2 left-2 bg-destructive text-white text-xs px-2 py-1 rounded shadow-md">
             Sale
           </span>
-        )}
+        ) : null}
 
-        {isLowStock && variant.inventory && (
+        {isLowStock && variant.inventory ? (
           <span className="absolute top-2 right-2 bg-accent text-accent-foreground text-xs px-2 py-1 rounded shadow-md font-semibold">
             Only {variant.inventory.quantity_available} left
           </span>
-        )}
+        ) : null}
       </div>
 
       <div className="mt-3">
@@ -63,11 +63,11 @@ export function ProductCard({ variant, priority = false }: ProductCardProps) {
           <span className="text-base font-semibold text-primary">
             Rs. {variant.price.toLocaleString()}
           </span>
-          {isOnSale && variant.compare_at_price && (
+          {isOnSale && variant.compare_at_price ? (
             <span className="text-sm text-muted-foreground line-through">
               Rs. {variant.compare_at_price.toLocaleString()}
             </span>
-          )}
+          ) : null}
         </div>
       </div>
     </Link>

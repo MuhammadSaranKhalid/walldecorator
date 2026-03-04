@@ -40,7 +40,7 @@ export function CategoryShowcase({ categories }: CategoryShowcaseProps) {
               href={`/products?category=${category.slug}`}
               className="group relative overflow-hidden rounded-2xl aspect-3/4 bg-muted border border-border"
             >
-              {category.image_path && (
+              {category.image_path ? (
                 <Image
                   src={getStorageUrl(category.image_path)}
                   alt={category.name}
@@ -50,7 +50,7 @@ export function CategoryShowcase({ categories }: CategoryShowcaseProps) {
                   sizes="(max-width: 768px) 50vw, 25vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-              )}
+              ) : null}
 
               {/* Gradient overlay */}
               <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
@@ -60,11 +60,11 @@ export function CategoryShowcase({ categories }: CategoryShowcaseProps) {
                 <h3 className="text-white font-semibold text-lg leading-tight">
                   {category.name}
                 </h3>
-                {category.product_count > 0 && (
+                {category.product_count > 0 ? (
                   <p className="text-white/70 text-sm mt-0.5">
                     {category.product_count} products
                   </p>
-                )}
+                ) : null}
               </div>
             </Link>
           ))}

@@ -86,9 +86,9 @@ export function NewsletterSection() {
           </form>
         )}
 
-        {status === 'error' && (
+        {status === 'error' ? (
           <p className="text-destructive text-sm mt-3">{errorMessage}</p>
-        )}
+        ) : null}
 
         <p className="text-primary-foreground/50 text-xs mt-4">
           No spam, ever. Unsubscribe at any time.

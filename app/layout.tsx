@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: "Wall Decorator - Modern Metal Wall Art",
   description: "Precision-crafted laser-cut designs that turn your walls into a gallery. Custom sizes and materials available.",
 };
