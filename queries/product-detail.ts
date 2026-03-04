@@ -1,5 +1,4 @@
 import { cache } from 'react'
-import { createServerClient } from '@/lib/supabase/server'
 import { supabase } from '@/lib/supabase/client'
 import { redis } from '@/lib/upstash/client'
 import type { ProductDetail, ReviewsResult } from '@/types/products'
@@ -19,8 +18,6 @@ export const getProductBySlug = cache(async (slug: string): Promise<ProductDetai
   if (cached) {
     return (typeof cached === 'string' ? JSON.parse(cached) : cached) as ProductDetail
   }
-
-  const supabase = await createServerClient()
 
   const { data, error } = await supabase
     .from('products')
@@ -119,7 +116,7 @@ export const getProductBySlug = cache(async (slug: string): Promise<ProductDetai
  * Only called at build time - no caching needed
  * Uses the client-side Supabase client (no cookies needed at build time)
  */
-export async function getTopProductSlugs(limit: number): Promise<string[]> {
+export const getTopProductSlugs = cache(async (limit: number): Promise<string[]> => {
   const { data } = await supabase
     .from('products')
     .select('slug')
@@ -128,7 +125,7 @@ export async function getTopProductSlugs(limit: number): Promise<string[]> {
     .limit(limit)
 
   return data?.map((p) => p.slug) ?? []
-}
+})
 
 // ─── Get Product Reviews ──────────────────────────────────────────────────────
 
@@ -142,8 +139,6 @@ export const getProductReviews = cache(async (productId: string): Promise<Review
   if (cached) {
     return (typeof cached === 'string' ? JSON.parse(cached) : cached) as ReviewsResult
   }
-
-  const supabase = await createServerClient()
 
   // Fetch both reviews and all ratings in parallel
   const [reviewsResult, ratingsResult] = await Promise.all([
@@ -212,8 +207,6 @@ export const getRelatedProducts = cache(
     if (cached) {
       return typeof cached === 'string' ? JSON.parse(cached) : cached
     }
-
-    const supabase = await createServerClient()
 
     console.log('Fetching related products for category:', categoryId, 'excluding:', excludeProductId)
 

@@ -3,10 +3,10 @@
 import { useState, useTransition, useMemo } from 'react'
 import { useCartStore } from '@/store/cart.store'
 import { formatPrice } from '@/lib/utils'
-import type { ProductDetailVariant, ProductDetailImage, ProductDetail } from '@/types/products'
+import type { ProductDetailVariant, ProductDetailImage } from '@/types/products'
 
 type VariantSelectorProps = {
-  product: ProductDetail
+  productName: string
   variants: ProductDetailVariant[]
   productImages: ProductDetailImage[]
 }
@@ -48,7 +48,7 @@ function formatVariantDescription(variant: ProductDetailVariant): string {
   return variant.product_attribute_values.map((av) => av.value).join(', ')
 }
 
-export function VariantSelector({ product, variants, productImages }: VariantSelectorProps) {
+export function VariantSelector({ productName, variants, productImages }: VariantSelectorProps) {
   const [selectedVariant, setSelectedVariant] = useState(variants[0])
   const [quantity, setQuantity] = useState(1)
   const [isPending, startTransition] = useTransition()
@@ -88,7 +88,7 @@ export function VariantSelector({ product, variants, productImages }: VariantSel
     startTransition(() => {
       addItem({
         variantId: selectedVariant.id,
-        productName: product.name,
+        productName,
         variantDescription: formatVariantDescription(selectedVariant),
         sku: selectedVariant.sku,
         price: selectedVariant.price,
@@ -112,7 +112,7 @@ export function VariantSelector({ product, variants, productImages }: VariantSel
         <span className="text-2xl font-semibold text-primary">
           {formatPrice(selectedVariant.price)}
         </span>
-        {selectedVariant.compare_at_price && (
+        {selectedVariant.compare_at_price ? (
           <>
             <span className="text-muted-foreground line-through text-lg">
               {formatPrice(selectedVariant.compare_at_price)}
@@ -126,7 +126,7 @@ export function VariantSelector({ product, variants, productImages }: VariantSel
               % off
             </span>
           </>
-        )}
+        ) : null}
       </div>
 
       {/* Attribute selectors (Size, Color, etc.) */}

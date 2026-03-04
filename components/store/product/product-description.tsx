@@ -7,7 +7,7 @@ export function ProductDescription({ description, specs }: ProductDescriptionPro
   return (
     <div className="space-y-8">
       {/* Description */}
-      {description && (
+      {description ? (
         <div>
           <h2 className="text-2xl font-bold mb-4">Description</h2>
           <div className="prose prose-sm max-w-none text-gray-600">
@@ -16,10 +16,10 @@ export function ProductDescription({ description, specs }: ProductDescriptionPro
             ))}
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Specifications */}
-      {specs && Object.keys(specs).length > 0 && (
+      {specs && Object.keys(specs).length > 0 ? (
         <div>
           <h2 className="text-2xl font-bold mb-4">Specifications</h2>
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -34,7 +34,7 @@ export function ProductDescription({ description, specs }: ProductDescriptionPro
             ))}
           </dl>
         </div>
-      )}
+      ) : null}
     </div>
   )
 }

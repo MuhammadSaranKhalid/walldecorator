@@ -49,7 +49,7 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
               className="group"
             >
               <div className="relative aspect-square overflow-hidden rounded-xl bg-gray-100 mb-3">
-                {firstImage && (
+                {firstImage ? (
                   <Image
                     src={getStorageUrl(firstImage.storage_path)}
                     alt={firstImage.alt_text || product.name}
@@ -58,23 +58,23 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
                     className="object-cover group-hover:scale-105 transition-transform duration-200"
                     {...(blurUrl ? { placeholder: 'blur', blurDataURL: blurUrl } : {})}
                   />
-                )}
+                ) : null}
               </div>
               <h3 className="text-sm font-medium text-gray-900 mb-1 line-clamp-2">
                 {product.name}
               </h3>
-              {firstVariant && (
+              {firstVariant ? (
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold">
                     {formatPrice(firstVariant.price)}
                   </span>
-                  {firstVariant.compare_at_price && (
+                  {firstVariant.compare_at_price ? (
                     <span className="text-xs text-gray-400 line-through">
                       {formatPrice(firstVariant.compare_at_price)}
                     </span>
-                  )}
+                  ) : null}
                 </div>
-              )}
+              ) : null}
             </Link>
           )
         })}

@@ -24,7 +24,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
       {/* Variant Selector — Client Component (needs interactivity) */}
       <div className="mt-6">
         <VariantSelector
-          product={product}
+          productName={product.name}
           variants={product.product_variants}
           productImages={product.product_images}
         />

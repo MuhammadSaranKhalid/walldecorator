@@ -67,7 +67,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       </div>
 
       {/* Thumbnail Row */}
-      {sorted.length > 1 && (
+      {sorted.length > 1 ? (
         <div className="flex gap-2 overflow-x-auto pb-1">
           {sorted.map((image, index) => {
             const thumbBlurUrl = blurhashToDataURL(image.blurhash)
@@ -97,7 +97,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             )
           })}
         </div>
-      )}
+      ) : null}
     </div>
   )
 }
