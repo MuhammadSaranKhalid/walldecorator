@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { X } from 'lucide-react'
 import { useCartStore } from '@/store/cart.store'
+import { useShallow } from 'zustand/react/shallow'
 import { getStorageUrl } from '@/lib/supabase/storage'
 import { formatPrice } from '@/lib/utils'
 import type { CartItem as CartItemType } from '@/store/cart.store'
@@ -13,8 +14,13 @@ type CartItemProps = {
 }
 
 export function CartItem({ item }: CartItemProps) {
-  const updateQuantity = useCartStore((state) => state.updateQuantity)
-  const removeItem = useCartStore((state) => state.removeItem)
+  // Single subscription via useShallow — prevents double re-render
+  const { updateQuantity, removeItem } = useCartStore(
+    useShallow((state) => ({
+      updateQuantity: state.updateQuantity,
+      removeItem: state.removeItem,
+    }))
+  )
   const blurUrl = item.image ? blurhashToDataURL(item.image.blurhash) : undefined
 
   return (

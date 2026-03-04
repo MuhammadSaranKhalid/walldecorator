@@ -11,7 +11,7 @@ import { NewsletterSection } from '@/components/store/home/newsletter-section'
 import { ProductsSkeleton } from '@/components/store/home/skeletons/products-skeleton'
 import { CategoriesSkeleton } from '@/components/store/home/skeletons/categories-skeleton'
 import { WhatsAppButton } from '@/components/whatsapp-button'
-import CustomCraftSection from '@/components/CustomCraftSection'
+import { CustomCraftSectionLazy } from '@/components/CustomCraftSectionLazy'
 import {
   getHomepageData,
   getFeaturedProducts,
@@ -65,9 +65,9 @@ export default async function HomePage() {
 
       {/* ── 5. PROMO BANNER ─────────────────────────────────────── */}
       {/* Static markup, data from homepageData (already fetched) */}
-      {homepageData.promo.isActive && (
+      {homepageData.promo.isActive ? (
         <PromoBanner data={homepageData.promo} />
-      )}
+      ) : null}
 
       {/* ── 6. BESTSELLERS ──────────────────────────────────────── */}
       {/* Streamed — independent section */}
@@ -80,8 +80,8 @@ export default async function HomePage() {
       <Testimonials />
 
       {/* ── 8. CUSTOM CRAFT ─────────────────────────────────────── */}
-      {/* Client Component — custom order form with file upload */}
-      <CustomCraftSection />
+      {/* Client Component — lazy loaded below the fold (react-hook-form + zod) */}
+      <CustomCraftSectionLazy />
 
       {/* ── 9. NEWSLETTER ───────────────────────────────────────── */}
       {/* Client Component — needs form interactivity */}

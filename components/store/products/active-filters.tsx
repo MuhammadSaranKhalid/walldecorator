@@ -1,8 +1,8 @@
 'use client'
 
+import { useMemo, useTransition } from 'react'
 import { useQueryStates } from 'nuqs'
 import { productSearchParams } from '@/lib/search-params/products'
-import { useTransition } from 'react'
 import { X } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
@@ -13,22 +13,23 @@ export function ActiveFilters() {
     startTransition,
   })
 
-  const activeFilters = [
-    params.category && {
+  // Memoize — rebuilds only when URL params actually change
+  const activeFilters = useMemo(() => [
+    params.category ? {
       key: 'category',
       label: `Category: ${params.category}`,
       clear: () => setParams({ category: null, page: null }),
-    },
-    params.minPrice > 0 && {
+    } : null,
+    params.minPrice > 0 ? {
       key: 'minPrice',
       label: `Min: Rs. ${params.minPrice.toLocaleString()}`,
       clear: () => setParams({ minPrice: null, page: null }),
-    },
-    params.maxPrice > 0 && {
+    } : null,
+    params.maxPrice > 0 ? {
       key: 'maxPrice',
       label: `Max: Rs. ${params.maxPrice.toLocaleString()}`,
       clear: () => setParams({ maxPrice: null, page: null }),
-    },
+    } : null,
     ...params.colors.map((c) => ({
       key: `color-${c}`,
       label: `Color: ${c}`,
@@ -45,7 +46,9 @@ export function ActiveFilters() {
         setParams({ sizes: next.length > 0 ? next : null, page: null })
       },
     })),
-  ].filter(Boolean) as Array<{ key: string; label: string; clear: () => void }>
+  ].filter(Boolean) as Array<{ key: string; label: string; clear: () => void }>,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [params.category, params.minPrice, params.maxPrice, params.colors.join(','), params.sizes.join(',')])
 
   if (activeFilters.length === 0) return null
 

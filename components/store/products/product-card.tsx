@@ -13,7 +13,7 @@ type ProductCardProps = {
 export function ProductCard({ variant, priority = false }: ProductCardProps) {
   const product = variant.product
   const primaryImage = product.product_images
-    .sort((a, b) => a.display_order - b.display_order)[0]
+    .toSorted((a, b) => a.display_order - b.display_order)[0]
 
   const isOnSale =
     variant.compare_at_price && variant.compare_at_price > variant.price

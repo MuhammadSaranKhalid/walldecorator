@@ -182,8 +182,10 @@ export function DeliveryMap({ addressQueryOptions, addressLabel }: Props) {
                 mapInstanceRef.current = null
             }
         }
+        // Use a joined string instead of JSON.stringify — stable primitive dep that avoids
+        // the linter warning and doesn't create a new reference on every render.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [JSON.stringify(addressQueryOptions)]) // using JSON.stringify to deep compare array prop
+    }, [(addressQueryOptions ?? []).join('|')])
 
     return (
         <div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm">
@@ -199,27 +201,27 @@ export function DeliveryMap({ addressQueryOptions, addressLabel }: Props) {
             </div>
 
             {/* Address banner */}
-            {addressLabel && mapState !== 'unavailable' && (
+            {addressLabel && mapState !== 'unavailable' ? (
                 <div className="bg-green-50 border-b border-green-100 px-5 py-2 flex items-center gap-2">
                     <Navigation className="h-3.5 w-3.5 text-green-600 shrink-0" />
                     <p className="text-xs text-green-800 font-medium truncate" title={addressLabel}>
                         {addressLabel}
                     </p>
                 </div>
-            )}
+            ) : null}
 
             {/* Map area — always rendered so Leaflet has a real DOM node to mount into */}
             <div className="relative">
                 {/* Spinner overlay */}
-                {mapState === 'loading' && (
+                {mapState === 'loading' ? (
                     <div className="absolute inset-0 z-10 bg-gray-50 flex flex-col items-center justify-center gap-3">
                         <Loader2 className="h-8 w-8 text-green-500 animate-spin" />
                         <p className="text-sm text-gray-500">Locating address…</p>
                     </div>
-                )}
+                ) : null}
 
                 {/* Unavailable state */}
-                {mapState === 'unavailable' && (
+                {mapState === 'unavailable' ? (
                     <div className="h-36 bg-gray-50 flex flex-col items-center justify-center gap-2 px-6 text-center">
                         <Navigation className="h-6 w-6 text-gray-300" />
                         <p className="text-sm text-gray-700 font-medium">Map preview unavailable</p>
@@ -227,7 +229,7 @@ export function DeliveryMap({ addressQueryOptions, addressLabel }: Props) {
                             We couldn't automatically locate this exact address on the map, but your order was still placed successfully.
                         </p>
                     </div>
-                )}
+                ) : null}
 
                 {/* Leaflet mounts here */}
                 <div

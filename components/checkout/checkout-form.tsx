@@ -55,12 +55,11 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
     mode: 'onBlur',
   })
 
-  const onInvalid = (errors: object) => {
-    console.log('Form validation errors:', errors)
+  const onInvalid = () => {
+    // Form validation failed — react-hook-form shows field errors automatically
   }
 
   const onSubmit: SubmitHandler<CheckoutFormData> = async (data) => {
-    console.log('Submitting checkout form with data:', data)
     setIsSubmitting(true)
     setError(null)
 

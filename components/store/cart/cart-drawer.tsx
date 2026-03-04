@@ -42,13 +42,13 @@ function CartDrawerContent() {
   const itemCount = getTotalItems()
 
   return (
-    <Drawer open={isOpen} onOpenChange={(open) => !open && closeCart()} direction="right">
+    <Drawer open={isOpen} onOpenChange={(open) => { if (!open) closeCart() }} direction="right">
       <DrawerContent className="h-full w-full sm:max-w-md">
         {/* Header */}
         <DrawerHeader className="border-b px-6 py-4">
           <div className="flex items-center justify-between">
             <DrawerTitle className="text-lg">
-              Your Cart {itemCount > 0 && `(${itemCount})`}
+              Your Cart {itemCount > 0 ? `(${itemCount})` : null}
             </DrawerTitle>
             <DrawerClose asChild>
               <Button

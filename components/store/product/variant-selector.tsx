@@ -49,7 +49,6 @@ function formatVariantDescription(variant: ProductDetailVariant): string {
 }
 
 export function VariantSelector({ productName, variants, productImages }: VariantSelectorProps) {
-  const [selectedVariant, setSelectedVariant] = useState(variants[0])
   const [quantity, setQuantity] = useState(1)
   const [isPending, startTransition] = useTransition()
   const [justAdded, setJustAdded] = useState(false)
@@ -57,28 +56,85 @@ export function VariantSelector({ productName, variants, productImages }: Varian
   const addItem = useCartStore((state) => state.addItem)
   const openCart = useCartStore((state) => state.openCart)
 
-  // Group variants by attribute for rendering selectors
-  const attributeGroups = useMemo(() => groupVariantsByAttribute(variants), [variants])
+  // 1. Determine cascade order from first variant
+  const attributeOrder = useMemo(() => {
+    if (!variants.length) return []
+    return variants[0].product_attribute_values.map((av) => av.attribute.name)
+  }, [variants])
 
-  // Track selected attribute values
+  // 2. Track selected attribute values
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>(
     () => getDefaultAttributes(variants[0])
   )
 
-  function handleAttributeChange(attributeName: string, value: string) {
-    const newAttributes = { ...selectedAttributes, [attributeName]: value }
-    setSelectedAttributes(newAttributes)
+  // 3. Find active variant based on exact selection match
+  const selectedVariant = useMemo(() => {
+    return variants.find((v) =>
+      v.product_attribute_values.every((av) => selectedAttributes[av.attribute.name] === av.value)
+    ) || variants[0]
+  }, [variants, selectedAttributes])
 
-    // Find the variant that matches all selected attributes
-    const matchingVariant = variants.find((v) =>
-      v.product_attribute_values.every((av) => newAttributes[av.attribute.name] === av.value)
-    )
-    if (matchingVariant) {
-      setSelectedVariant(matchingVariant)
+  // 4. Calculate available options for each level in the cascade
+  const attributeGroups = useMemo(() => {
+    const result: Record<string, string[]> = {}
+
+    attributeOrder.forEach((attrName, index) => {
+      const precedingAttrs = attributeOrder.slice(0, index)
+
+      // Filter to variants that match the current upstream selections
+      const eligibleVariants = variants.filter((v) =>
+        precedingAttrs.every((upstreamAttr) => {
+          const variantVal = v.product_attribute_values.find((av) => av.attribute.name === upstreamAttr)?.value
+          return variantVal === selectedAttributes[upstreamAttr]
+        })
+      )
+
+      // Collect all available values for *this* attribute from the eligible variants
+      const values = eligibleVariants.flatMap(
+        (v) => v.product_attribute_values.find((av) => av.attribute.name === attrName)?.value ?? []
+      )
+
+      // Deduplicate and sort
+      result[attrName] = [...new Set(values)].sort()
+    })
+
+    return result
+  }, [variants, attributeOrder, selectedAttributes])
+
+  function handleAttributeChange(attributeName: string, value: string) {
+    const changedIndex = attributeOrder.indexOf(attributeName)
+    const newSelections = { ...selectedAttributes, [attributeName]: value }
+
+    // Auto-advance checking downstream validity
+    const downstreamAttrs = attributeOrder.slice(changedIndex + 1)
+
+    let currentEligible = variants.filter(v => {
+      return Object.entries(newSelections).every(([k, val]) => {
+        if (attributeOrder.indexOf(k) > changedIndex) return true
+        return v.product_attribute_values.find(av => av.attribute.name === k)?.value === val
+      })
+    })
+
+    for (const dAttr of downstreamAttrs) {
+      const validDownstreamValues = [...new Set(currentEligible.flatMap(v =>
+        v.product_attribute_values.find(av => av.attribute.name === dAttr)?.value ?? []
+      ))]
+
+      if (!validDownstreamValues.includes(newSelections[dAttr])) {
+        // Auto-pick the first valid one
+        newSelections[dAttr] = validDownstreamValues[0] ?? ''
+      }
+
+      currentEligible = currentEligible.filter(v =>
+        v.product_attribute_values.find(av => av.attribute.name === dAttr)?.value === newSelections[dAttr]
+      )
     }
+
+    setSelectedAttributes(newSelections)
+    setQuantity(1)
   }
 
-  const stockAvailable = selectedVariant.inventory?.quantity_available ?? 0
+  const stockAvailable = selectedVariant?.inventory?.quantity_available ?? 0
   const isOutOfStock = stockAvailable === 0
   const isLowStock = stockAvailable > 0 && stockAvailable <= 5
 
@@ -93,7 +149,7 @@ export function VariantSelector({ productName, variants, productImages }: Varian
         sku: selectedVariant.sku,
         price: selectedVariant.price,
         quantity,
-        image: productImages.find((img) => img.variant_id === selectedVariant.id) ?? productImages[0] ?? null,
+        image: productImages[0] ?? null,
       })
 
       // Open cart drawer immediately

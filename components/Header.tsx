@@ -6,6 +6,14 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { useCartStore } from '@/store/cart.store'
 
+// Hoisted to module level — created once, never re-created on re-renders
+const navigation = [
+  { name: 'Home', href: '/' },
+  { name: 'Shop', href: '/products' },
+  { name: 'About', href: '/about' },
+  { name: 'Track Order', href: '/track-order' },
+]
+
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isClient, setIsClient] = useState(false)
@@ -18,12 +26,7 @@ export default function Header() {
     setIsClient(true)
   }, [])
 
-  const navigation = [
-    { name: 'Home', href: '/' },
-    { name: 'Shop', href: '/products' },
-    { name: 'About', href: '/about' },
-    { name: 'Track Order', href: '/track-order' },
-  ]
+  // navigation is now defined at module level above
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -55,11 +58,10 @@ export default function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`text-sm font-medium transition-colors pb-1 ${
-                  isActive(item.href)
+                className={`text-sm font-medium transition-colors pb-1 ${isActive(item.href)
                     ? 'text-brand-gold border-b-2 border-brand-gold'
                     : 'text-brand-navy hover:text-brand-gold border-b-2 border-transparent'
-                }`}
+                  }`}
               >
                 {item.name}
               </Link>
@@ -88,11 +90,11 @@ export default function Header() {
                   strokeWidth="2"
                 />
               </svg>
-              {isClient && cartItemCount > 0 && (
+              {isClient && cartItemCount > 0 ? (
                 <span className="absolute -top-1 -right-1 bg-brand-gold text-brand-navy-dark text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                   {cartItemCount > 99 ? '99+' : cartItemCount}
                 </span>
-              )}
+              ) : null}
             </button>
 
             {/* Mobile Menu Button */}
@@ -123,11 +125,10 @@ export default function Header() {
                   key={item.name}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                    isActive(item.href)
+                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive(item.href)
                       ? 'text-brand-gold bg-brand-navy/5'
                       : 'text-brand-navy hover:text-brand-gold hover:bg-brand-navy/5'
-                  }`}
+                    }`}
                 >
                   {item.name}
                 </Link>

@@ -1,5 +1,4 @@
-'use client'
-
+// Server Component — static link with no hooks or interactivity needed
 import { MessageCircle } from 'lucide-react'
 
 export function WhatsAppButton() {
