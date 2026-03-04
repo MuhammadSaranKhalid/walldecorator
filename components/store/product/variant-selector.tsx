@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useTransition, useEffect, useRef } from 'react'
+import { useState, useTransition, useMemo } from 'react'
 import { useCartStore } from '@/store/cart.store'
 import { formatPrice } from '@/lib/utils'
-import { incrementProductViewCount } from '@/actions/product'
 import type { ProductDetailVariant, ProductDetailImage, ProductDetail } from '@/types/products'
 
 type VariantSelectorProps = {
@@ -54,22 +53,12 @@ export function VariantSelector({ product, variants, productImages }: VariantSel
   const [quantity, setQuantity] = useState(1)
   const [isPending, startTransition] = useTransition()
   const [justAdded, setJustAdded] = useState(false)
-  const hasTrackedView = useRef(false)
 
   const addItem = useCartStore((state) => state.addItem)
   const openCart = useCartStore((state) => state.openCart)
 
-  // Track product view once on mount
-  useEffect(() => {
-    if (hasTrackedView.current) return
-    hasTrackedView.current = true
-
-    // Fire and forget - don't block UI
-    incrementProductViewCount(product.id).catch(console.error)
-  }, [product.id])
-
   // Group variants by attribute for rendering selectors
-  const attributeGroups = groupVariantsByAttribute(variants)
+  const attributeGroups = useMemo(() => groupVariantsByAttribute(variants), [variants])
 
   // Track selected attribute values
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>(
@@ -132,7 +121,7 @@ export function VariantSelector({ product, variants, productImages }: VariantSel
               {Math.round(
                 ((selectedVariant.compare_at_price - selectedVariant.price) /
                   selectedVariant.compare_at_price) *
-                  100
+                100
               )}
               % off
             </span>
@@ -166,12 +155,11 @@ export function VariantSelector({ product, variants, productImages }: VariantSel
                   className={`
                     px-4 py-2 rounded-lg border text-sm font-medium
                     transition-all duration-150
-                    ${
-                      isSelected
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : isUnavailable
-                          ? 'border-border text-muted-foreground/40 cursor-not-allowed line-through'
-                          : 'border-border text-foreground hover:border-accent'
+                    ${isSelected
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : isUnavailable
+                        ? 'border-border text-muted-foreground/40 cursor-not-allowed line-through'
+                        : 'border-border text-foreground hover:border-accent'
                     }
                   `}
                 >
@@ -219,12 +207,11 @@ export function VariantSelector({ product, variants, productImages }: VariantSel
         className={`
           w-full py-4 rounded-xl font-semibold text-base
           transition-all duration-200 shadow-lg
-          ${
-            isOutOfStock
-              ? 'bg-muted text-muted-foreground cursor-not-allowed'
-              : justAdded
-                ? 'bg-accent text-accent-foreground scale-[0.99]'
-                : 'bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-xl active:scale-[0.99]'
+          ${isOutOfStock
+            ? 'bg-muted text-muted-foreground cursor-not-allowed'
+            : justAdded
+              ? 'bg-accent text-accent-foreground scale-[0.99]'
+              : 'bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-xl active:scale-[0.99]'
           }
         `}
       >

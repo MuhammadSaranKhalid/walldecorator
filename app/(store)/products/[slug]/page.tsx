@@ -1,6 +1,8 @@
 import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
+import { after } from 'next/server'
 import type { Metadata } from 'next'
+import { incrementProductViewCount } from '@/actions/product'
 import {
   getProductBySlug,
   getRelatedProducts,
@@ -74,6 +76,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
   if (!product || product.status !== 'active') {
     notFound()
   }
+
+  // Schedule view tracking after response is done (React 19 / Next.js 15 best practice)
+  after(() => {
+    incrementProductViewCount(product.id).catch(console.error)
+  })
 
   return (
     <>
