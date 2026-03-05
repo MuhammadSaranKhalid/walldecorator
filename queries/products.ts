@@ -77,7 +77,6 @@ export const getProducts = cache(async (params: ProductParams): Promise<Products
     .eq('products.status', 'active')
     .gt('inventory.quantity_available', 0)
 
-
   // Apply category filter
   if (params.category) {
     query = query.eq('products.category.slug', params.category)
