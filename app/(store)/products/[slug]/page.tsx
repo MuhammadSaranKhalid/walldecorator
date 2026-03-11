@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { Suspense, use } from 'react'
 import { notFound } from 'next/navigation'
 import { after } from 'next/server'
 import type { Metadata } from 'next'
@@ -103,12 +103,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
               name: 'Wall Decorator',
             },
             image: product.product_images.map((img) => getStorageUrl(img.storage_path)),
-            offers: product.product_variants.map((v) => ({
+            offers: Object.values(product.selection_map).map((v) => ({
               '@type': 'Offer',
               price: v.price,
               priceCurrency: 'PKR',
               availability:
-                (v.inventory?.quantity_available ?? 0) > 0
+                v.stock > 0
                   ? 'https://schema.org/InStock'
                   : 'https://schema.org/OutOfStock',
             })),
@@ -177,10 +177,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
   )
 }
 
-// ─── Async Server Components for Streaming ───────────────────────────────────
+// ─── Server Components for Streaming (React 19 with use() hook) ─────────────
 
-async function ReviewSection({ productId }: { productId: string }) {
-  const { reviews, summary } = await getProductReviews(productId)
+function ReviewSection({ productId }: { productId: string }) {
+  // React 19: use() hook unwraps promises - cleaner than async/await
+  const { reviews, summary } = use(getProductReviews(productId))
 
   return (
     <>
@@ -190,13 +191,14 @@ async function ReviewSection({ productId }: { productId: string }) {
   )
 }
 
-async function RelatedProductsSection({
+function RelatedProductsSection({
   categoryId,
   currentProductId,
 }: {
   categoryId: string
   currentProductId: string
 }) {
-  const related = await getRelatedProducts(categoryId, currentProductId)
+  // React 19: use() hook unwraps promises
+  const related = use(getRelatedProducts(categoryId, currentProductId))
   return <RelatedProducts products={related} />
 }

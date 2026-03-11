@@ -3,7 +3,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { getStorageUrl } from '@/lib/supabase/storage'
 import type { ProductVariant } from '@/types/products'
-import { blurhashToDataURL } from '@/lib/blurhash'
 
 type ProductCardProps = {
   variant: ProductVariant
@@ -11,16 +10,13 @@ type ProductCardProps = {
 }
 
 export function ProductCard({ variant, priority = false }: ProductCardProps) {
-  const product = variant.product
-  const primaryImage = product.product_images
-    .toSorted((a, b) => a.display_order - b.display_order)[0]
+  const product = variant.products
+  const primaryImage = product.product_images[0]
 
   const isOnSale =
     variant.compare_at_price && variant.compare_at_price > variant.price
   const isLowStock =
     variant.inventory && variant.inventory.quantity_available <= 5
-
-  const blurUrl = primaryImage ? blurhashToDataURL(primaryImage.blurhash) : undefined
 
   return (
     <Link href={`/products/${product.slug}`} className="group block">
@@ -34,7 +30,6 @@ export function ProductCard({ variant, priority = false }: ProductCardProps) {
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             priority={priority}
             quality={priority ? 90 : 75}
-            {...(blurUrl ? { placeholder: 'blur', blurDataURL: blurUrl } : {})}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-muted">

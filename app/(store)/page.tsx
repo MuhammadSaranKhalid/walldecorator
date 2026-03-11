@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { Suspense, use } from 'react'
 import type { Metadata } from 'next'
 import { HeroSection } from '@/components/store/home/hero-section'
 import { TrustBar } from '@/components/store/home/trust-bar'
@@ -94,22 +94,25 @@ export default async function HomePage() {
   )
 }
 
-// ─── Async Server Components for Streaming ────────────────────────────────────
-// Each is an independent async Server Component.
+// ─── Server Components for Streaming (React 19 with use() hook) ─────────────
+// Each is an independent Server Component using React 19's use() hook.
 // Wrapped in Suspense above — they stream in parallel.
 // The hero and trust bar are visible instantly while these load.
 
-async function CategoryShowcaseSection() {
-  const categories = await getCategories()
+function CategoryShowcaseSection() {
+  // React 19: use() hook unwraps promises - can be called conditionally
+  const categories = use(getCategories())
   return <CategoryShowcase categories={categories} />
 }
 
-async function FeaturedProductsSection() {
-  const products = await getFeaturedProducts()
+function FeaturedProductsSection() {
+  // React 19: use() hook unwraps promises - cleaner than async/await
+  const products = use(getFeaturedProducts())
   return <FeaturedProducts products={products} />
 }
 
-async function BestsellersSection() {
-  const products = await getBestsellers()
+function BestsellersSection() {
+  // React 19: use() hook unwraps promises
+  const products = use(getBestsellers())
   return <Bestsellers products={products} />
 }

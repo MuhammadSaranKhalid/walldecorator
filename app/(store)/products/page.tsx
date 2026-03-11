@@ -1,8 +1,8 @@
-import { Suspense } from 'react'
+import { Suspense, use } from 'react'
 import type { SearchParams } from 'nuqs/server'
 import { searchParamsCache } from '@/lib/search-params/products'
 import { getProducts, getProductCategories } from '@/queries/products'
-import { ProductGrid } from '@/components/store/products/product-grid'
+import { InfiniteProductGrid } from '@/components/store/products/infinite-product-grid'
 import { FilterSidebar } from '@/components/store/products/filter-sidebar'
 import { ProductSort } from '@/components/store/products/product-sort'
 import { ActiveFilters } from '@/components/store/products/active-filters'
@@ -70,26 +70,28 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   )
 }
 
-// ─── Async Server Components for Streaming ───────────────────────────────────
+// ─── Server Components for Streaming (React 19 with use() hook) ─────────────
 
-async function FilterSidebarSection({
+function FilterSidebarSection({
   categoriesPromise,
 }: {
   categoriesPromise: ReturnType<typeof getProductCategories>
 }) {
-  const categories = await categoriesPromise
+  // React 19: use() hook unwraps promises - cleaner than async/await
+  const categories = use(categoriesPromise)
 
   return <FilterSidebar categories={categories} />
 }
 
-async function ProductResultsSection({
+function ProductResultsSection({
   productsPromise,
   parsedParams,
 }: {
   productsPromise: ReturnType<typeof getProducts>
   parsedParams: Awaited<ReturnType<typeof searchParamsCache.parse>>
 }) {
-  const products = await productsPromise
+  // React 19: use() hook unwraps promises - can be called conditionally
+  const products = use(productsPromise)
 
   return (
     <>
@@ -98,10 +100,10 @@ async function ProductResultsSection({
         <ProductSort currentSort={parsedParams.sort} />
       </div>
 
-      <ProductGrid
-        products={products.items}
+      <InfiniteProductGrid
+        initialProducts={products.items}
+        initialPage={parsedParams.page}
         totalCount={products.totalCount}
-        currentPage={parsedParams.page}
         limit={parsedParams.limit}
       />
     </>

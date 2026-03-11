@@ -21,7 +21,7 @@ export interface Category {
   name: string
   slug: string
   image_path: string | null
-  product_count: number
+  product_count: number | null
 }
 
 export interface ProductImage {

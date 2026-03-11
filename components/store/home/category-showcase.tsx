@@ -60,7 +60,7 @@ export function CategoryShowcase({ categories }: CategoryShowcaseProps) {
                 <h3 className="text-white font-semibold text-lg leading-tight">
                   {category.name}
                 </h3>
-                {category.product_count > 0 ? (
+                {category.product_count && category.product_count > 0 ? (
                   <p className="text-white/70 text-sm mt-0.5">
                     {category.product_count} products
                   </p>

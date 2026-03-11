@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useForm, FormProvider, Controller, type SubmitHandler } from 'react-hook-form'
@@ -32,9 +31,8 @@ type CheckoutFormProps = {
 export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
   const router = useRouter()
   const { items, clearCart } = useCartStore()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
+  // React Hook Form with Zod validation
   const methods = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
@@ -55,14 +53,14 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
     mode: 'onBlur',
   })
 
+  // Use react-hook-form's formState instead of manual state
+  const { isSubmitting, errors } = methods.formState
+
   const onInvalid = () => {
     // Form validation failed — react-hook-form shows field errors automatically
   }
 
   const onSubmit: SubmitHandler<CheckoutFormData> = async (data) => {
-    setIsSubmitting(true)
-    setError(null)
-
     try {
       const result = await createOrder({
         email: data.email,
@@ -86,13 +84,21 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
         // Redirect to confirmation page
         router.push(`/checkout/confirmation/${result.orderId}`)
       } else {
-        setError(result.error || 'Failed to place order')
+        // Use react-hook-form's setError for better error handling
+        methods.setError('root.serverError', {
+          type: 'server',
+          message: result.error || 'Failed to place order',
+        })
+        // Also show toast for immediate feedback
+        toast.error(result.error || 'Failed to place order')
       }
     } catch (err) {
       console.error('Checkout error:', err)
-      setError('An unexpected error occurred. Please try again.')
-    } finally {
-      setIsSubmitting(false)
+      methods.setError('root.serverError', {
+        type: 'server',
+        message: 'An unexpected error occurred. Please try again.',
+      })
+      toast.error('An unexpected error occurred. Please try again.')
     }
   }
 
@@ -180,15 +186,15 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
                     />
                   </div>
 
-                  {/* Error display */}
-                  {error && (
+                  {/* Server error display using react-hook-form's formState */}
+                  {errors.root?.serverError && (
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>{error}</AlertDescription>
+                      <AlertDescription>{errors.root.serverError.message}</AlertDescription>
                     </Alert>
                   )}
 
-                  {/* Submit button */}
+                  {/* Submit button using react-hook-form's isSubmitting state */}
                   <Button
                     type="submit"
                     size="lg"

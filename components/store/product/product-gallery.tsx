@@ -18,13 +18,18 @@ type ProductGalleryProps = {
 }
 
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
-  const sorted = images.toSorted((a, b) => a.display_order - b.display_order)
+  const sorted = [...images].sort((a, b) => a.display_order - b.display_order)
 
   const [activeIndex, setActiveIndex] = useState(0)
   const [api, setApi] = useState<CarouselApi>()
 
   const [isZoomed, setIsZoomed] = useState(false)
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 })
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // Sync Carousel selection -> Thumbnails
   useEffect(() => {
@@ -80,8 +85,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
         <Carousel setApi={setApi} className="w-full">
           <CarouselContent className="ml-0">
             {sorted.map((image, index) => {
-              const blurUrl = blurhashToDataURL(image.blurhash)
-              // Only apply zoom styling if this is the currently active image being hovered
+              const blurUrl = isMounted ? blurhashToDataURL(image.blurhash) : undefined
               const isCurrentlyZooming = isZoomed && index === activeIndex
 
               return (
@@ -118,7 +122,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       {sorted.length > 1 ? (
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
           {sorted.map((image, index) => {
-            const thumbBlurUrl = blurhashToDataURL(image.blurhash)
+            const thumbBlurUrl = isMounted ? blurhashToDataURL(image.blurhash) : undefined
             return (
               <button
                 key={image.id}

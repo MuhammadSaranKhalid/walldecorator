@@ -1,8 +1,6 @@
 import {
   parseAsString,
   parseAsInteger,
-  parseAsFloat,
-  parseAsArrayOf,
   parseAsStringEnum,
   createSearchParamsCache,
   createSerializer,
@@ -17,14 +15,6 @@ export const productSearchParams = {
   // Category filter — single string (slug)
   category: parseAsString.withDefault(''),
 
-  // Price range
-  minPrice: parseAsFloat.withDefault(0),
-  maxPrice: parseAsFloat.withDefault(0), // 0 = no upper limit
-
-  // Attribute filters — array of strings e.g. ['red', 'blue']
-  colors: parseAsArrayOf(parseAsString).withDefault([]),
-  sizes: parseAsArrayOf(parseAsString).withDefault([]),
-
   // Sorting
   sort: parseAsStringEnum([...sortOptions]).withDefault('newest'),
 
@@ -32,7 +22,7 @@ export const productSearchParams = {
   page: parseAsInteger.withDefault(1),
 
   // Items per page
-  limit: parseAsInteger.withDefault(24),
+  limit: parseAsInteger.withDefault(20),
 }
 
 // Server-side cache — lets deeply nested Server Components

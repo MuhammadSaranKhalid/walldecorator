@@ -1,161 +1,91 @@
 'use client'
 
-import { useState, useTransition, useMemo } from 'react'
+import { useState, useTransition, useMemo, useEffect } from 'react'
 import { useCartStore } from '@/store/cart.store'
 import { formatPrice } from '@/lib/utils'
-import type { ProductDetailVariant, ProductDetailImage } from '@/types/products'
+import type {
+  AvailableOptions,
+  SelectionMap,
+  ProductDetailImage,
+  SelectionVariant
+} from '@/types/products'
 
 type VariantSelectorProps = {
   productName: string
-  variants: ProductDetailVariant[]
+  availableOptions: AvailableOptions
+  selectionMap: SelectionMap
   productImages: ProductDetailImage[]
 }
 
-// Helper function to group variants by attribute
-function groupVariantsByAttribute(variants: ProductDetailVariant[]) {
-  const groups: Record<string, Set<string>> = {}
-
-  variants.forEach((variant) => {
-    variant.product_attribute_values.forEach((av) => {
-      const attrName = av.attribute.name
-      if (!groups[attrName]) {
-        groups[attrName] = new Set()
-      }
-      groups[attrName].add(av.value)
-    })
-  })
-
-  // Convert Sets to sorted arrays
-  const result: Record<string, string[]> = {}
-  Object.entries(groups).forEach(([name, values]) => {
-    result[name] = Array.from(values).sort()
-  })
-
-  return result
-}
-
-// Helper to get default attributes from a variant
-function getDefaultAttributes(variant: ProductDetailVariant): Record<string, string> {
-  const attrs: Record<string, string> = {}
-  variant.product_attribute_values.forEach((av) => {
-    attrs[av.attribute.name] = av.value
-  })
-  return attrs
-}
-
-// Helper to format variant description (e.g., "Red, Large")
-function formatVariantDescription(variant: ProductDetailVariant): string {
-  return variant.product_attribute_values.map((av) => av.value).join(', ')
-}
-
-export function VariantSelector({ productName, variants, productImages }: VariantSelectorProps) {
-  const [quantity, setQuantity] = useState(1)
+export function VariantSelector({
+  productName,
+  availableOptions,
+  selectionMap,
+  productImages
+}: VariantSelectorProps) {
   const [isPending, startTransition] = useTransition()
   const [justAdded, setJustAdded] = useState(false)
+  const [quantity, setQuantity] = useState(1)
 
   const addItem = useCartStore((state) => state.addItem)
   const openCart = useCartStore((state) => state.openCart)
 
-  // 1. Determine cascade order from first variant
-  const attributeOrder = useMemo(() => {
-    if (!variants.length) return []
-    return variants[0].product_attribute_values.map((av) => av.attribute.name)
-  }, [variants])
+  // 1. Get ordered attributes from the tree keys
+  const materials = Object.keys(availableOptions)
 
-  // 2. Track selected attribute values
-  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>(
-    () => getDefaultAttributes(variants[0])
-  )
+  // 2. State for selections
+  const [selectedMaterial, setSelectedMaterial] = useState<string>(materials[0])
 
-  // 3. Find active variant based on exact selection match
-  const selectedVariant = useMemo(() => {
-    return variants.find((v) =>
-      v.product_attribute_values.every((av) => selectedAttributes[av.attribute.name] === av.value)
-    ) || variants[0]
-  }, [variants, selectedAttributes])
+  // 3. Derived options based on material
+  const currentMaterialOptions = availableOptions[selectedMaterial]
+  const availableSizes = Object.keys(currentMaterialOptions.sizes)
 
-  // 4. Calculate available options for each level in the cascade
-  const attributeGroups = useMemo(() => {
-    const result: Record<string, string[]> = {}
+  const [selectedSize, setSelectedSize] = useState<string>(availableSizes[0])
 
-    attributeOrder.forEach((attrName, index) => {
-      const precedingAttrs = attributeOrder.slice(0, index)
+  // 4. Derived thicknesses based on size
+  const availableThicknesses = currentMaterialOptions.sizes[selectedSize] || []
+  const [selectedThickness, setSelectedThickness] = useState<string>(availableThicknesses[0])
 
-      // Filter to variants that match the current upstream selections
-      const eligibleVariants = variants.filter((v) =>
-        precedingAttrs.every((upstreamAttr) => {
-          const variantVal = v.product_attribute_values.find((av) => av.attribute.name === upstreamAttr)?.value
-          return variantVal === selectedAttributes[upstreamAttr]
-        })
-      )
-
-      // Collect all available values for *this* attribute from the eligible variants
-      const values = eligibleVariants.flatMap(
-        (v) => v.product_attribute_values.find((av) => av.attribute.name === attrName)?.value ?? []
-      )
-
-      // Deduplicate and sort
-      result[attrName] = [...new Set(values)].sort()
-    })
-
-    return result
-  }, [variants, attributeOrder, selectedAttributes])
-
-  function handleAttributeChange(attributeName: string, value: string) {
-    const changedIndex = attributeOrder.indexOf(attributeName)
-    const newSelections = { ...selectedAttributes, [attributeName]: value }
-
-    // Auto-advance checking downstream validity
-    const downstreamAttrs = attributeOrder.slice(changedIndex + 1)
-
-    let currentEligible = variants.filter(v => {
-      return Object.entries(newSelections).every(([k, val]) => {
-        if (attributeOrder.indexOf(k) > changedIndex) return true
-        return v.product_attribute_values.find(av => av.attribute.name === k)?.value === val
-      })
-    })
-
-    for (const dAttr of downstreamAttrs) {
-      const validDownstreamValues = [...new Set(currentEligible.flatMap(v =>
-        v.product_attribute_values.find(av => av.attribute.name === dAttr)?.value ?? []
-      ))]
-
-      if (!validDownstreamValues.includes(newSelections[dAttr])) {
-        // Auto-pick the first valid one
-        newSelections[dAttr] = validDownstreamValues[0] ?? ''
-      }
-
-      currentEligible = currentEligible.filter(v =>
-        v.product_attribute_values.find(av => av.attribute.name === dAttr)?.value === newSelections[dAttr]
-      )
+  // 5. Reset downstream selections when upstream changes
+  useEffect(() => {
+    const sizes = Object.keys(availableOptions[selectedMaterial].sizes)
+    if (!sizes.includes(selectedSize)) {
+      const nextSize = sizes[0]
+      setSelectedSize(nextSize)
+      const thicknesses = availableOptions[selectedMaterial].sizes[nextSize]
+      setSelectedThickness(thicknesses[0])
     }
+  }, [selectedMaterial, availableOptions])
 
-    setSelectedAttributes(newSelections)
-    setQuantity(1)
-  }
+  useEffect(() => {
+    const thicknesses = availableOptions[selectedMaterial].sizes[selectedSize] || []
+    if (!thicknesses.includes(selectedThickness)) {
+      setSelectedThickness(thicknesses[0])
+    }
+  }, [selectedSize, selectedMaterial, availableOptions])
 
-  const stockAvailable = selectedVariant?.inventory?.quantity_available ?? 0
-  const isOutOfStock = stockAvailable === 0
-  const isLowStock = stockAvailable > 0 && stockAvailable <= 5
+  // 6. Instant lookup for selected variant
+  const selectionKey = `${selectedMaterial}|${selectedSize}|${selectedThickness}`
+  const selectedVariant: SelectionVariant | undefined = selectionMap[selectionKey]
+
+  const isOutOfStock = !selectedVariant || selectedVariant.stock === 0
+  const isLowStock = selectedVariant && selectedVariant.stock > 0 && selectedVariant.stock <= 5
 
   function handleAddToCart() {
-    if (isOutOfStock) return
+    if (!selectedVariant || isOutOfStock) return
 
     startTransition(() => {
       addItem({
         variantId: selectedVariant.id,
         productName,
-        variantDescription: formatVariantDescription(selectedVariant),
+        variantDescription: `${selectedMaterial}, ${selectedSize}, ${selectedThickness}mm`,
         sku: selectedVariant.sku,
         price: selectedVariant.price,
         quantity,
         image: productImages[0] ?? null,
       })
 
-      // Open cart drawer immediately
       openCart()
-
-      // Show "Added!" feedback on button
       setJustAdded(true)
       setTimeout(() => setJustAdded(false), 2000)
     })
@@ -166,9 +96,9 @@ export function VariantSelector({ productName, variants, productImages }: Varian
       {/* Dynamic price display */}
       <div className="flex items-baseline gap-2">
         <span className="text-2xl font-semibold text-primary">
-          {formatPrice(selectedVariant.price)}
+          {selectedVariant ? formatPrice(selectedVariant.price) : 'N/A'}
         </span>
-        {selectedVariant.compare_at_price ? (
+        {selectedVariant?.compare_at_price ? (
           <>
             <span className="text-muted-foreground line-through text-lg">
               {formatPrice(selectedVariant.compare_at_price)}
@@ -185,52 +115,73 @@ export function VariantSelector({ productName, variants, productImages }: Varian
         ) : null}
       </div>
 
-      {/* Attribute selectors (Size, Color, etc.) */}
-      {Object.entries(attributeGroups).map(([attributeName, values]) => (
-        <div key={attributeName}>
-          <p className="text-sm font-medium text-foreground mb-2">
-            {attributeName}:
-            <span className="font-normal ml-1 text-accent">{selectedAttributes[attributeName]}</span>
-          </p>
-
-          <div className="flex flex-wrap gap-2">
-            {values.map((value) => {
-              const isSelected = selectedAttributes[attributeName] === value
-              const variantForValue = variants.find((v) =>
-                v.product_attribute_values.some(
-                  (av) => av.attribute.name === attributeName && av.value === value
-                )
-              )
-              const isUnavailable = variantForValue?.inventory?.quantity_available === 0
-
-              return (
-                <button
-                  key={value}
-                  onClick={() => handleAttributeChange(attributeName, value)}
-                  disabled={isUnavailable}
-                  className={`
-                    px-4 py-2 rounded-lg border text-sm font-medium
-                    transition-all duration-150
-                    ${isSelected
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : isUnavailable
-                        ? 'border-border text-muted-foreground/40 cursor-not-allowed line-through'
-                        : 'border-border text-foreground hover:border-accent'
-                    }
-                  `}
-                >
-                  {value}
-                </button>
-              )
-            })}
-          </div>
+      {/* Material Selector */}
+      <div className="space-y-3">
+        <p className="text-sm font-medium text-foreground">
+          Material: <span className="font-normal text-accent">{availableOptions[selectedMaterial].display_name}</span>
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {materials.map((m) => (
+            <button
+              key={m}
+              onClick={() => setSelectedMaterial(m)}
+              className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${selectedMaterial === m
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border text-foreground hover:border-accent'
+                }`}
+            >
+              {availableOptions[m].display_name}
+            </button>
+          ))}
         </div>
-      ))}
+      </div>
+
+      {/* Size Selector */}
+      <div className="space-y-3">
+        <p className="text-sm font-medium text-foreground">
+          Size: <span className="font-normal text-accent">{selectedSize}</span>
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {availableSizes.map((s) => (
+            <button
+              key={s}
+              onClick={() => setSelectedSize(s)}
+              className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${selectedSize === s
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border text-foreground hover:border-accent'
+                }`}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Thickness Selector */}
+      <div className="space-y-3">
+        <p className="text-sm font-medium text-foreground">
+          Thickness: <span className="font-normal text-accent">{selectedThickness}mm</span>
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {availableThicknesses.map((t) => (
+            <button
+              key={t}
+              onClick={() => setSelectedThickness(t)}
+              className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${selectedThickness === t
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border text-foreground hover:border-accent'
+                }`}
+            >
+              {t}mm
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Stock indicator */}
       {isLowStock && (
         <p className="text-accent text-sm font-medium">
-          Only {stockAvailable} left in stock
+          Only {selectedVariant.stock} left in stock
         </p>
       )}
 
@@ -247,7 +198,7 @@ export function VariantSelector({ productName, variants, productImages }: Varian
             </button>
             <span className="px-4 py-2 text-sm font-medium">{quantity}</span>
             <button
-              onClick={() => setQuantity((q) => Math.min(stockAvailable, q + 1))}
+              onClick={() => setQuantity((q) => Math.min(selectedVariant.stock, q + 1))}
               className="px-3 py-2 text-muted-foreground hover:bg-secondary rounded-r-lg"
             >
               +

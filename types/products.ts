@@ -21,12 +21,12 @@ export interface ProductVariant {
   price: number
   compare_at_price: number | null
   sku: string
-  product: {
+  products: {
     id: string
     name: string
     slug: string
     product_images: ProductImage[]
-    category: ProductCategory | null
+    categories: ProductCategory | null
   }
   inventory: ProductInventory | null
 }
@@ -44,6 +44,7 @@ export interface Category {
   name: string
   slug: string
   parent_id: string | null
+  other_categories?: Category[]
 }
 
 export interface AttributeValue {
@@ -58,7 +59,29 @@ export interface FilterAttribute {
   values: string[]
 }
 
-// Product detail page types
+export interface SelectionVariant {
+  id: string
+  price: number
+  compare_at_price: number | null
+  sku: string
+  stock: number
+}
+
+export interface SelectionMap {
+  [key: string]: SelectionVariant
+}
+
+export interface MaterialOptions {
+  display_name: string
+  sizes: {
+    [size: string]: string[] // [thicknesses]
+  }
+}
+
+export interface AvailableOptions {
+  [material: string]: MaterialOptions
+}
+
 export interface ProductDetailImage {
   id: string
   storage_path: string
@@ -66,22 +89,6 @@ export interface ProductDetailImage {
   display_order: number
   variant_id: string | null
   blurhash: string | null
-}
-
-export interface ProductAttributeValue {
-  value: string
-  attribute: {
-    name: string
-  }
-}
-
-export interface ProductDetailVariant {
-  id: string
-  sku: string
-  price: number
-  compare_at_price: number | null
-  product_attribute_values: ProductAttributeValue[]
-  inventory: ProductInventory | null
 }
 
 export interface ProductDetail {
@@ -93,7 +100,13 @@ export interface ProductDetail {
   status: string
   category: ProductCategory
   product_images: ProductDetailImage[]
-  product_variants: ProductDetailVariant[]
+  available_options: AvailableOptions
+  selection_map: SelectionMap
+  price_range: {
+    min: number
+    max: number
+    has_discount: boolean
+  }
 }
 
 export interface ReviewSummary {

@@ -20,35 +20,9 @@ export function ActiveFilters() {
       label: `Category: ${params.category}`,
       clear: () => setParams({ category: null, page: null }),
     } : null,
-    params.minPrice > 0 ? {
-      key: 'minPrice',
-      label: `Min: Rs. ${params.minPrice.toLocaleString()}`,
-      clear: () => setParams({ minPrice: null, page: null }),
-    } : null,
-    params.maxPrice > 0 ? {
-      key: 'maxPrice',
-      label: `Max: Rs. ${params.maxPrice.toLocaleString()}`,
-      clear: () => setParams({ maxPrice: null, page: null }),
-    } : null,
-    ...params.colors.map((c) => ({
-      key: `color-${c}`,
-      label: `Color: ${c}`,
-      clear: () => {
-        const next = params.colors.filter((x) => x !== c)
-        setParams({ colors: next.length > 0 ? next : null, page: null })
-      },
-    })),
-    ...params.sizes.map((s) => ({
-      key: `size-${s}`,
-      label: `Size: ${s}`,
-      clear: () => {
-        const next = params.sizes.filter((x) => x !== s)
-        setParams({ sizes: next.length > 0 ? next : null, page: null })
-      },
-    })),
   ].filter(Boolean) as Array<{ key: string; label: string; clear: () => void }>,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [params.category, params.minPrice, params.maxPrice, params.colors.join(','), params.sizes.join(',')])
+    [params.category])
 
   if (activeFilters.length === 0) return null
 

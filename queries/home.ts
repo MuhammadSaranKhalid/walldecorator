@@ -1,5 +1,5 @@
 import { cache } from 'react'
-import { supabase } from '@/lib/supabase/client'
+import { prisma } from '@/lib/prisma/client'
 import { redis } from '@/lib/upstash/client'
 import type {
   HomepageData,
@@ -18,10 +18,7 @@ export const getHomepageData = cache(async (): Promise<HomepageData> => {
     return typeof cached === 'string' ? JSON.parse(cached) as HomepageData : cached
   }
 
-  const { data } = await supabase
-    .from('homepage_config')
-    .select('*')
-    .single()
+  const data = await prisma.homepage_config.findFirst()
 
   const result: HomepageData = {
     hero: {
@@ -57,17 +54,19 @@ export const getCategories = cache(async (): Promise<Category[]> => {
     return typeof cached === 'string' ? JSON.parse(cached) as Category[] : cached
   }
 
-  const { data } = await supabase
-    .from('categories')
-    .select('id, name, slug, image_path, product_count')
-    .is('parent_id', null) // Top-level only
-    .eq('is_visible', true)
-    .order('display_order')
-    .limit(8) // Max 8 categories on homepage
+  const data = await prisma.categories.findMany({
+    where: {
+      parent_id: null, // Top-level only
+      is_visible: true,
+    },
+    orderBy: {
+      display_order: 'asc',
+    },
+    take: 8, // Max 8 categories on homepage
+  })
 
-  const result = data ?? []
-  await redis.setex(cacheKey, 3600, JSON.stringify(result))
-  return result
+  await redis.setex(cacheKey, 3600, JSON.stringify(data))
+  return data as Category[]
 })
 
 /**
@@ -81,22 +80,30 @@ export const getFeaturedProducts = cache(async (): Promise<HomepageProduct[]> =>
     return typeof cached === 'string' ? JSON.parse(cached) as HomepageProduct[] : cached
   }
 
+  const data = await prisma.products.findMany({
+    where: {
+      status: 'active',
+      is_featured: true,
+    },
+    include: {
+      product_images: {
+        where: { is_primary: true },
+        take: 1,
+      },
+      product_variants: {
+        orderBy: {
+          price: 'asc',
+        },
+        take: 1,
+      },
+    },
+    orderBy: {
+      featured_order: 'asc',
+    },
+    take: 8,
+  })
 
-  const { data } = await supabase
-    .from('products')
-    .select(
-      `
-      id, name, slug,
-      product_images(storage_path, alt_text, display_order, blurhash),
-      product_variants(price, compare_at_price)
-    `
-    )
-    .eq('status', 'active')
-    .eq('is_featured', true)
-    .order('featured_order')
-    .limit(8)
-
-  const result = normalizeProducts(data ?? [])
+  const result = normalizeProducts(data)
   await redis.setex(cacheKey, 1800, JSON.stringify(result))
   return result
 })
@@ -112,43 +119,40 @@ export const getBestsellers = cache(async (): Promise<HomepageProduct[]> => {
     return typeof cached === 'string' ? JSON.parse(cached) as HomepageProduct[] : cached
   }
 
+  const data = await prisma.products.findMany({
+    where: {
+      status: 'active',
+    },
+    include: {
+      product_images: {
+        where: { is_primary: true },
+        take: 1,
+      },
+      product_variants: {
+        orderBy: {
+          price: 'asc',
+        },
+        take: 1,
+      },
+    },
+    orderBy: {
+      total_sold: 'desc',
+    },
+    take: 8,
+  })
 
-  const { data } = await supabase
-    .from('products')
-    .select(
-      `
-      id, name, slug,
-      product_images(storage_path, alt_text, display_order, blurhash),
-      product_variants(price, compare_at_price)
-    `
-    )
-    .eq('status', 'active')
-    .order('total_sold', { ascending: false })
-    .limit(8)
-
-
-  const result = normalizeProducts(data ?? [])
+  const result = normalizeProducts(data)
   await redis.setex(cacheKey, 3600, JSON.stringify(result)) // 1hr
   return result
 })
 
 /**
- * Normalize product data — pick primary image, lowest variant price
+ * Normalize product data — extract primary image and cheapest variant price
  */
 function normalizeProducts(data: any[]): HomepageProduct[] {
   return data.map((product) => {
-    const primaryImage = product.product_images
-      ?.sort((a: any, b: any) => a.display_order - b.display_order)[0] ?? null
-
-    const prices = product.product_variants?.map((v: any) => v.price) ?? []
-    const minPrice = prices.length > 0 ? Math.min(...prices) : 0
-
-    const comparePrices =
-      product.product_variants
-        ?.map((v: any) => v.compare_at_price)
-        .filter(Boolean) ?? []
-    const maxComparePrice =
-      comparePrices.length > 0 ? Math.max(...comparePrices) : null
+    const primaryImage = product.product_images?.[0] ?? null
+    const cheapestVariant = product.product_variants?.[0]
 
     return {
       id: product.id,
@@ -162,8 +166,8 @@ function normalizeProducts(data: any[]): HomepageProduct[] {
           blurhash: primaryImage.blurhash,
         }
         : null,
-      price: minPrice,
-      compareAtPrice: maxComparePrice,
+      price: cheapestVariant?.price ?? 0,
+      compareAtPrice: cheapestVariant?.compare_at_price ?? null,
     }
   })
 }

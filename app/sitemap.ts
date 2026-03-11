@@ -1,24 +1,42 @@
 import { MetadataRoute } from 'next'
-import { supabase } from '@/lib/supabase/client'
+import { prisma } from '@/lib/prisma/client'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
     // Fetch all active products with their first image
-    const { data: products } = await supabase
-        .from('products')
-        .select('slug, updated_at, product_images(storage_path)')
-        .eq('status', 'active')
+    const products = await prisma.products.findMany({
+        where: {
+            status: 'active',
+        },
+        select: {
+            slug: true,
+            updated_at: true,
+            product_images: {
+                select: {
+                    storage_path: true,
+                },
+                orderBy: {
+                    display_order: 'asc',
+                },
+                take: 1,
+            },
+        },
+    })
 
     // Fetch all categories
-    const { data: categories } = await supabase
-        .from('categories')
-        .select('slug')
-        .eq('is_visible', true)
+    const categories = await prisma.categories.findMany({
+        where: {
+            is_visible: true,
+        },
+        select: {
+            slug: true,
+        },
+    })
 
-    const productEntries: MetadataRoute.Sitemap = (products || []).map((product) => {
+    const productEntries: MetadataRoute.Sitemap = products.map((product) => {
         // Build the public Supabase storage URL for each product's first image
-        const imageStoragePath = (product.product_images as { storage_path: string }[] | null)?.[0]?.storage_path
+        const imageStoragePath = product.product_images[0]?.storage_path
         const imageUrl = imageStoragePath
             ? `https://srjfclplxoonrzczpfyz.supabase.co/storage/v1/object/public/product-images/${imageStoragePath}`
             : undefined
@@ -32,7 +50,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }
     })
 
-    const categoryEntries: MetadataRoute.Sitemap = (categories || []).map((category) => ({
+    const categoryEntries: MetadataRoute.Sitemap = categories.map((category) => ({
         url: `${baseUrl}/products?category=${category.slug}`,
         lastModified: new Date(),
         changeFrequency: 'weekly',

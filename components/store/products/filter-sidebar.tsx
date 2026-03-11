@@ -4,12 +4,52 @@ import { useQueryStates } from 'nuqs'
 import { productSearchParams } from '@/lib/search-params/products'
 import { useTransition } from 'react'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Slider } from '@/components/ui/slider'
-import type { Category, FilterAttribute } from '@/types/products'
+import type { Category } from '@/types/products'
 
 type FilterSidebarProps = {
   categories: Category[]
+}
+
+type CategoryTreeProps = {
+  category: Category
+  level: number
+  selectedSlug: string | null
+  onSelect: (slug: string) => void
+}
+
+function CategoryTree({ category, level, selectedSlug, onSelect }: CategoryTreeProps) {
+  const hasChildren = category.other_categories && category.other_categories.length > 0
+  const isSelected = selectedSlug === category.slug
+
+  return (
+    <div>
+      <button
+        onClick={() => onSelect(category.slug)}
+        className={`block w-full text-left px-3 py-2 rounded text-sm transition-colors ${
+          isSelected
+            ? 'bg-primary text-primary-foreground font-medium'
+            : 'hover:bg-secondary'
+        }`}
+        style={{ paddingLeft: `${(level * 1) + 0.75}rem` }}
+      >
+        {category.name}
+      </button>
+
+      {hasChildren && (
+        <div className="mt-1 space-y-1">
+          {category.other_categories?.map((subCat) => (
+            <CategoryTree
+              key={subCat.id}
+              category={subCat}
+              level={level + 1}
+              selectedSlug={selectedSlug}
+              onSelect={onSelect}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 export function FilterSidebar({
@@ -32,31 +72,14 @@ export function FilterSidebar({
     })
   }
 
-  function handlePriceChange(values: number[]) {
-    setParams({
-      minPrice: values[0] === 0 ? null : values[0],
-      maxPrice: values[1] === 50000 ? null : values[1],
-      page: null,
-    })
-  }
-
   function handleClearAll() {
     setParams({
       category: null,
-      minPrice: null,
-      maxPrice: null,
-      colors: null,
-      sizes: null,
       page: null,
     })
   }
 
-  const hasActiveFilters =
-    params.category ||
-    params.minPrice > 0 ||
-    params.maxPrice > 0 ||
-    params.colors.length > 0 ||
-    params.sizes.length > 0
+  const hasActiveFilters = params.category
 
 
 
@@ -83,45 +106,17 @@ export function FilterSidebar({
             </h3>
             <div className="space-y-2">
               {categories.map((cat) => (
-                <button
+                <CategoryTree
                   key={cat.id}
-                  onClick={() => handleCategoryChange(cat.slug)}
-                  className={`block w-full text-left px-3 py-2 rounded text-sm transition-colors ${params.category === cat.slug
-                    ? 'bg-primary text-primary-foreground font-medium'
-                    : 'hover:bg-secondary'
-                    }`}
-                >
-                  {cat.name}
-                </button>
+                  category={cat}
+                  level={0}
+                  selectedSlug={params.category}
+                  onSelect={handleCategoryChange}
+                />
               ))}
             </div>
           </div>
         )}
-
-        {/* Price Range Filter */}
-        <div className="border-b pb-6">
-          <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide text-primary">
-            Price Range
-          </h3>
-          <div className="space-y-4">
-            <Slider
-              min={0}
-              max={50000}
-              step={500}
-              value={[params.minPrice, params.maxPrice || 50000]}
-              onValueChange={handlePriceChange}
-              className="w-full"
-            />
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <span>Rs. {params.minPrice.toLocaleString()}</span>
-              <span>
-                Rs. {(params.maxPrice || 50000).toLocaleString()}
-              </span>
-            </div>
-          </div>
-        </div>
-
-
       </div>
     </div>
   )

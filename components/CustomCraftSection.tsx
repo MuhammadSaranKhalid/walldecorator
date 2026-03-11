@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 import { Upload, X, CheckCircle2, Loader2 } from 'lucide-react'
 import { CustomOrderSchema, type CustomOrderFormData } from '@/lib/validations/customize'
 import { submitCustomOrder } from '@/actions/customize'
-import { supabase } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client' // Keep Supabase for file storage only
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'

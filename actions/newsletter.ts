@@ -1,6 +1,13 @@
 'use server'
 
+import { z } from 'zod'
 import { createServerClient } from '@/lib/supabase/server'
+
+// Zod schema for email validation (React 19 + Vercel best practice)
+// Zod v4: Use z.email() instead of z.string().email()
+const newsletterSchema = z.object({
+  email: z.email({ message: 'Please enter a valid email address' }),
+})
 
 type NewsletterResult = {
   success: boolean
@@ -11,33 +18,35 @@ type NewsletterResult = {
 /**
  * Subscribe email to newsletter
  * Server Action for newsletter signup form
+ *
+ * Best practices applied:
+ * - Input validation with Zod
+ * - Proper error handling
+ * - No authentication required (public endpoint)
  */
 export async function subscribeToNewsletter(
   email: string
 ): Promise<NewsletterResult> {
-  // Validate email
-  if (!email || typeof email !== 'string') {
-    return {
-      success: false,
-      error: 'Email is required',
-    }
-  }
+  // Validate input using Zod
+  const validation = newsletterSchema.safeParse({ email })
 
-  // Basic email validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(email)) {
+  if (!validation.success) {
+    const firstError = validation.error.issues[0]?.message
     return {
       success: false,
-      error: 'Please enter a valid email address',
+      error: firstError || 'Invalid email address',
     }
   }
 
   try {
     const supabase = await createServerClient()
 
+    // Sanitize and normalize email
+    const normalizedEmail = validation.data.email.toLowerCase().trim()
+
     const { error } = await supabase
       .from('newsletter_subscribers')
-      .insert({ email: email.toLowerCase().trim() })
+      .insert({ email: normalizedEmail })
 
     if (error) {
       // Handle duplicate email gracefully

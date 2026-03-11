@@ -1,5 +1,5 @@
 import { cache } from 'react'
-import { supabase } from '@/lib/supabase/client'
+import { prisma } from '@/lib/prisma/client'
 import { redis } from '@/lib/upstash/client'
 import { searchParamsCache } from '@/lib/search-params/products'
 import type {
@@ -26,117 +26,112 @@ export const getProducts = cache(async (params: ProductParams): Promise<Products
     return (typeof cached === 'string' ? JSON.parse(cached) : cached) as ProductsResult
   }
 
-  // First, get the attribute value IDs for acrylic, 2x2, and 3mm
-  const { data: materialData } = await supabase
-    .from('product_attribute_values')
-    .select('id')
-    .eq('value', 'acrylic')
-    .single()
-
-  const { data: sizeData } = await supabase
-    .from('product_attribute_values')
-    .select('id')
-    .eq('value', '2x2')
-    .single()
-
-  const { data: thicknessData } = await supabase
-    .from('product_attribute_values')
-    .select('id')
-    .eq('value', '3')
-    .single()
-
-  if (!materialData || !sizeData || !thicknessData) {
-    throw new Error('Required attribute values not found')
+  // Build where clause for products
+  const where: any = {
+    status: 'active',
+    product_variants: {
+      some: {
+        inventory: {
+          quantity_available: {
+            gt: 0,
+          },
+        },
+      },
+    },
   }
 
-  // Query product_variants with the specific attribute combination
-  let query = supabase
-    .from('product_variants')
-    .select(
-      `
-      id,
-      price,
-      compare_at_price,
-      sku,
-      product:products!inner(
-        id,
-        name,
-        slug,
-        created_at,
-        total_sold,
-        product_images(storage_path, alt_text, display_order, blurhash),
-        category:categories(id, name, slug)
-      ),
-      inventory(quantity_available)
-    `,
-      { count: 'exact' }
-    )
-    .eq('material_id', materialData.id)
-    .eq('size_id', sizeData.id)
-    .eq('thickness_id', thicknessData.id)
-    .eq('products.status', 'active')
-    .gt('inventory.quantity_available', 0)
-
-  // Apply category filter
-  if (params.category) {
-    query = query.eq('products.category.slug', params.category)
+  // Apply category filter - filter by the slug of the related category
+  if (params.category && params.category.trim() !== '') {
+    where.categories = {
+      slug: params.category,
+    }
   }
 
-  // Apply price filters
-  if (params.minPrice > 0) {
-    query = query.gte('price', params.minPrice)
-  }
-  if (params.maxPrice > 0) {
-    query = query.lte('price', params.maxPrice)
-  }
-
-  // Note: Color and size filters require joining with product_attribute_values
-  // This is a simplified version - you may need to adjust based on your schema
-  // if (params.colors.length > 0 || params.sizes.length > 0) {
-  //   // Advanced filtering would go here
-  // }
-
-  // Apply sorting
+  // Build orderBy clause
+  let orderBy: any = {}
   switch (params.sort) {
     case 'price-asc':
-      query = query.order('price', { ascending: true })
-      break
     case 'price-desc':
-      query = query.order('price', { ascending: false })
+      // For price sorting, we'll handle this after fetching since we need the cheapest variant
+      orderBy = { created_at: 'desc' }
       break
     case 'popularity':
-      query = query.order('total_sold', {
-        ascending: false,
-        foreignTable: 'products'
-      })
+      orderBy = { total_sold: 'desc' }
       break
     case 'newest':
     default:
-      query = query.order('created_at', {
-        ascending: false,
-        foreignTable: 'products'
-      })
+      orderBy = { created_at: 'desc' }
       break
   }
 
-  // Apply pagination
-  const from = (params.page - 1) * params.limit
-  const to = from + params.limit - 1
-  query = query.range(from, to)
+  // Execute query with pagination
+  const products = await prisma.products.findMany({
+    where,
+    orderBy,
+    skip: (params.page - 1) * params.limit,
+    take: params.limit,
+    include: {
+      product_variants: {
+        where: {
+          inventory: {
+            quantity_available: {
+              gt: 0,
+            },
+          },
+        },
+        orderBy: {
+          price: 'asc',
+        },
+        take: 1,
+        include: {
+          inventory: true,
+        },
+      },
+      product_images: {
+        where: { is_primary: true },
+        take: 1,
+      },
+      categories: true,
+    },
+  })
 
-  const { data, error, count } = await query
+  // Get total count - this counts all products matching category/status filters
+  const totalCount = await prisma.products.count({ where })
 
-  if (error) {
-    console.error('Failed to fetch products:', error)
-    throw new Error(`Failed to fetch products: ${error.message}`)
+  // Transform products to variant-centric structure and convert Decimal to number
+  const data = products
+    .filter((product) => product.product_variants.length > 0)
+    .map((product) => {
+      const cheapestVariant = product.product_variants[0]
+      return {
+        id: cheapestVariant.id,
+        price: Number(cheapestVariant.price),
+        compare_at_price: cheapestVariant.compare_at_price ? Number(cheapestVariant.compare_at_price) : null,
+        sku: cheapestVariant.sku,
+        products: {
+          id: product.id,
+          name: product.name,
+          slug: product.slug,
+          product_images: product.product_images,
+          categories: product.categories,
+        },
+        inventory: cheapestVariant.inventory,
+      }
+    })
+
+  // Apply price sorting if needed
+  if (params.sort === 'price-asc') {
+    data.sort((a, b) => Number(a.price) - Number(b.price))
+  } else if (params.sort === 'price-desc') {
+    data.sort((a, b) => Number(b.price) - Number(a.price))
   }
 
   const result: ProductsResult = {
-    items: (data ?? []) as any, // Type assertion for Supabase joined data
-    totalCount: count ?? 0,
+    items: data as any,
+    totalCount, // Approximate count (doesn't account for price filters)
     page: params.page,
     limit: params.limit,
-    totalPages: Math.ceil((count ?? 0) / params.limit),
+    totalPages: Math.ceil(totalCount / params.limit),
   }
 
   // Write to Redis
@@ -156,20 +151,35 @@ export const getProductCategories = cache(async (): Promise<Category[]> => {
     return (typeof cached === 'string' ? JSON.parse(cached) : cached) as Category[]
   }
 
-  const { data, error } = await supabase
-    .from('categories')
-    .select('id, name, slug, parent_id')
-    .eq('is_visible', true)
-    .order('name')
+  // Fetch only top-level categories with their nested subcategories
+  const data = await prisma.categories.findMany({
+    where: {
+      parent_id: null, // Only top-level categories
+      is_visible: true,
+    },
+    include: {
+      other_categories: {
+        where: {
+          is_visible: true,
+        },
+        include: {
+          other_categories: {
+            where: {
+              is_visible: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      name: 'asc',
+    },
+  })
 
-  if (error) {
-    console.error('Failed to fetch categories:', error)
-    throw new Error(`Failed to fetch categories: ${error.message}`)
-  }
+  console.log(data)
 
-  const result = (data ?? []) as Category[]
-  await redis.setex(cacheKey, 3600, JSON.stringify(result)) // 1 hour TTL
-  return result
+  await redis.setex(cacheKey, 3600, JSON.stringify(data)) // 1 hour TTL
+  return data as Category[]
 })
 
 /**
@@ -187,27 +197,17 @@ export const getFilterAttributes = cache(
       return (typeof cached === 'string' ? JSON.parse(cached) : cached) as FilterAttribute[]
     }
 
-    // Get all unique attribute values
-    // TODO: Add category filtering when schema relationships are clearer
-    const { data, error } = await supabase
-      .from('product_attribute_values')
-      .select(
-        `
-        value,
-        attribute:product_attributes(name)
-      `
-      )
-
-    if (error) {
-      console.error('Failed to fetch attributes:', error)
-      // Don't throw - just return empty array for attributes
-      return []
-    }
+    // Get all unique attribute values with their attribute names
+    const data = await prisma.product_attribute_values.findMany({
+      include: {
+        product_attributes: true,
+      },
+    })
 
     // Group by attribute name
     const grouped: Record<string, Set<string>> = {}
-    data?.forEach((item: any) => {
-      const attrName = item.attribute?.name
+    data.forEach((item) => {
+      const attrName = item.product_attributes?.name
       if (attrName) {
         if (!grouped[attrName]) {
           grouped[attrName] = new Set()

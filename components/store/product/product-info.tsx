@@ -9,7 +9,9 @@ type ProductInfoProps = {
 
 // Server Component
 export function ProductInfo({ product }: ProductInfoProps) {
-  const defaultVariant = product.product_variants[0]
+  // Use the pre-computed price range for initial display or first variant in selection map
+  const firstVariantKey = Object.keys(product.selection_map)[0]
+  const firstVariant = product.selection_map[firstVariantKey]
 
   return (
     <div className="flex flex-col">
@@ -18,14 +20,15 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
       {/* Stock Badge */}
       <div className="mt-3">
-        <StockBadge inventory={defaultVariant?.inventory ?? null} />
+        <StockBadge stock={firstVariant?.stock ?? 0} />
       </div>
 
       {/* Variant Selector — Client Component (needs interactivity) */}
       <div className="mt-6">
         <VariantSelector
           productName={product.name}
-          variants={product.product_variants}
+          availableOptions={product.available_options}
+          selectionMap={product.selection_map}
           productImages={product.product_images}
         />
       </div>

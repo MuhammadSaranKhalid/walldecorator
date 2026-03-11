@@ -1,5 +1,5 @@
 import { cache } from 'react'
-import { supabase } from '@/lib/supabase/client'
+import { prisma } from '@/lib/prisma/client'
 import { redis } from '@/lib/upstash/client'
 import type { ProductDetail, ReviewsResult } from '@/types/products'
 
@@ -19,94 +19,137 @@ export const getProductBySlug = cache(async (slug: string): Promise<ProductDetai
     return (typeof cached === 'string' ? JSON.parse(cached) : cached) as ProductDetail
   }
 
-  const { data, error } = await supabase
-    .from('products')
-    .select(`
-      id,
-      name,
-      slug,
-      description,
-      seo_description,
-      status,
-      category:categories(id, name, slug),
-      product_images(
-        id,
-        storage_path,
-        alt_text,
-        display_order,
-        variant_id,
-        blurhash
-      ),
-      product_variants(
-        id,
-        sku,
-        price,
-        compare_at_price,
-        material:product_attribute_values!product_variants_material_id_fkey(
-          value,
-          attribute:product_attributes(name)
-        ),
-        size:product_attribute_values!product_variants_size_id_fkey(
-          value,
-          attribute:product_attributes(name)
-        ),
-        thickness:product_attribute_values!product_variants_thickness_id_fkey(
-          value,
-          attribute:product_attributes(name)
-        ),
-        inventory(quantity_available)
-      )
-    `)
-    .eq('slug', slug)
-    .single()
+  try {
+    const data = await prisma.products.findUnique({
+      where: { slug },
+      include: {
+        categories: true,
+        product_images: {
+          orderBy: {
+            display_order: 'asc',
+          },
+        },
+        product_variants: {
+          include: {
+            product_attribute_values_product_variants_material_idToproduct_attribute_values: {
+              include: {
+                product_attributes: true,
+              },
+            },
+            product_attribute_values_product_variants_size_idToproduct_attribute_values: {
+              include: {
+                product_attributes: true,
+              },
+            },
+            product_attribute_values_product_variants_thickness_idToproduct_attribute_values: {
+              include: {
+                product_attributes: true,
+              },
+            },
+            inventory: true,
+          },
+        },
+      },
+    })
 
-  // Debug logging
-  if (error) {
+    if (!data) {
+      console.warn('No product found for slug:', slug)
+      return null
+    }
+
+    // ─── Data Transformation ──────────────────────────────────────────────────
+
+    const variants = data.product_variants.map((v) => {
+      const material = v.product_attribute_values_product_variants_material_idToproduct_attribute_values
+      const size = v.product_attribute_values_product_variants_size_idToproduct_attribute_values
+      const thickness = v.product_attribute_values_product_variants_thickness_idToproduct_attribute_values
+
+      return {
+        id: v.id,
+        sku: v.sku,
+        price: Number(v.price),
+        compare_at_price: v.compare_at_price ? Number(v.compare_at_price) : null,
+        stock: v.inventory?.quantity_available ?? 0,
+        attributes: {
+          material: material?.value ?? '',
+          size: size?.value ?? '',
+          thickness: thickness?.value ?? '',
+        },
+        material_display: material?.value ?? '', // For building options tree
+      }
+    })
+
+    // 1. Build Hierarchical Available Options
+    const available_options: any = {}
+    variants.forEach((v) => {
+      const { material, size, thickness } = v.attributes
+
+      if (!available_options[material]) {
+        available_options[material] = {
+          display_name: material.charAt(0).toUpperCase() + material.slice(1),
+          sizes: {}
+        }
+      }
+
+      if (!available_options[material].sizes[size]) {
+        available_options[material].sizes[size] = []
+      }
+
+      if (!available_options[material].sizes[size].includes(thickness)) {
+        available_options[material].sizes[size].push(thickness)
+      }
+    })
+
+    // 2. Build Selection Map (Instant Lookup)
+    const selection_map: any = {}
+    variants.forEach((v) => {
+      const key = `${v.attributes.material}|${v.attributes.size}|${v.attributes.thickness}`
+      selection_map[key] = {
+        id: v.id,
+        price: v.price,
+        compare_at_price: v.compare_at_price,
+        sku: v.sku,
+        stock: v.stock
+      }
+    })
+
+    // 3. Calculate Price Range
+    const prices = variants.map(v => v.price)
+    const price_range = {
+      min: Math.min(...prices),
+      max: Math.max(...prices),
+      has_discount: variants.some(v => v.compare_at_price !== null && v.compare_at_price > v.price)
+    }
+
+    const product: ProductDetail = {
+      id: data.id,
+      name: data.name,
+      slug: data.slug,
+      description: data.description,
+      seo_description: data.seo_description,
+      status: data.status ?? 'active',
+      category: data.categories as any,
+      product_images: data.product_images.map(img => ({
+        id: img.id,
+        storage_path: img.storage_path,
+        alt_text: img.alt_text,
+        display_order: img.display_order ?? 0,
+        variant_id: img.variant_id,
+        blurhash: img.blurhash
+      })),
+      available_options,
+      selection_map,
+      price_range
+    }
+
+    // Cache for 10 minutes
+    await redis.setex(cacheKey, 600, JSON.stringify(product))
+
+    return product
+  } catch (error) {
     console.error('Error fetching product by slug:', slug, error)
     return null
   }
-
-  if (!data) {
-    console.warn('No product found for slug:', slug)
-    return null
-  }
-
-  // Transform the data: combine material, size, thickness into product_attribute_values array
-  const transformedData = {
-    ...data,
-    product_variants: data.product_variants.map((variant: any) => {
-      const product_attribute_values = []
-
-      // Add material
-      if (variant.material) {
-        product_attribute_values.push(variant.material)
-      }
-
-      // Add size
-      if (variant.size) {
-        product_attribute_values.push(variant.size)
-      }
-
-      // Add thickness
-      if (variant.thickness) {
-        product_attribute_values.push(variant.thickness)
-      }
-
-      // Remove individual fields and return variant with combined array
-      const { material, size, thickness, ...rest } = variant
-      return {
-        ...rest,
-        product_attribute_values,
-      }
-    }),
-  }
-
-  const product = transformedData as unknown as ProductDetail
-
-  // Cache for 10 minutes
-  await redis.setex(cacheKey, 600, JSON.stringify(product))
-
-  return product
 })
 
 // ─── Get Top Product Slugs for Static Generation ─────────────────────────────
@@ -114,17 +157,22 @@ export const getProductBySlug = cache(async (slug: string): Promise<ProductDetai
 /**
  * Get slugs of top products for generateStaticParams
  * Only called at build time - no caching needed
- * Uses the client-side Supabase client (no cookies needed at build time)
  */
 export const getTopProductSlugs = cache(async (limit: number): Promise<string[]> => {
-  const { data } = await supabase
-    .from('products')
-    .select('slug')
-    .eq('status', 'active')
-    .order('total_sold', { ascending: false })
-    .limit(limit)
+  const data = await prisma.products.findMany({
+    where: {
+      status: 'active',
+    },
+    select: {
+      slug: true,
+    },
+    orderBy: {
+      total_sold: 'desc',
+    },
+    take: limit,
+  })
 
-  return data?.map((p) => p.slug) ?? []
+  return data.map((p) => p.slug)
 })
 
 // ─── Get Product Reviews ──────────────────────────────────────────────────────
@@ -141,31 +189,36 @@ export const getProductReviews = cache(async (productId: string): Promise<Review
   }
 
   // Fetch both reviews and all ratings in parallel
-  const [reviewsResult, ratingsResult] = await Promise.all([
-    supabase
-      .from('reviews')
-      .select(`
-        id,
-        rating,
-        title,
-        body,
-        created_at,
-        profile:profiles(display_name)
-      `)
-      .eq('product_id', productId)
-      .eq('is_approved', true)
-      .order('created_at', { ascending: false })
-      .limit(10),
+  const [reviews, allRatings] = await Promise.all([
+    prisma.reviews.findMany({
+      where: {
+        product_id: productId,
+        is_approved: true,
+      },
+      select: {
+        id: true,
+        rating: true,
+        title: true,
+        body: true,
+        created_at: true,
+        reviewer_name: true,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+      take: 10,
+    }),
 
-    supabase
-      .from('reviews')
-      .select('rating')
-      .eq('product_id', productId)
-      .eq('is_approved', true),
+    prisma.reviews.findMany({
+      where: {
+        product_id: productId,
+        is_approved: true,
+      },
+      select: {
+        rating: true,
+      },
+    }),
   ])
-
-  const reviews = reviewsResult.data ?? []
-  const allRatings = ratingsResult.data ?? []
 
   // Calculate summary
   const totalCount = allRatings.length
@@ -179,8 +232,14 @@ export const getProductReviews = cache(async (productId: string): Promise<Review
     count: allRatings.filter((r) => r.rating === star).length,
   }))
 
+  // Transform reviews to match expected format (replace profile with reviewer_name)
+  const transformedReviews = reviews.map(review => ({
+    ...review,
+    profile: { display_name: review.reviewer_name },
+  }))
+
   const result: ReviewsResult = {
-    reviews: reviews as any,
+    reviews: transformedReviews as any,
     summary: {
       totalCount,
       averageRating,
@@ -210,29 +269,51 @@ export const getRelatedProducts = cache(
 
     console.log('Fetching related products for category:', categoryId, 'excluding:', excludeProductId)
 
-    const { data, error } = await supabase
-      .from('products')
-      .select(`
-        id,
-        name,
-        slug,
-        product_images(storage_path, alt_text, display_order, blurhash),
-        product_variants(price, compare_at_price)
-      `)
-      .eq('category_id', categoryId)
-      .eq('status', 'active')
-      .neq('id', excludeProductId)
-      .order('total_sold', { ascending: false })
-      .limit(4)
+    try {
+      const data = await prisma.products.findMany({
+        where: {
+          category_id: categoryId,
+          status: 'active',
+          id: {
+            not: excludeProductId,
+          },
+        },
+        include: {
+          product_images: {
+            orderBy: {
+              display_order: 'asc',
+            },
+          },
+          product_variants: {
+            orderBy: {
+              price: 'asc',
+            },
+            take: 1,
+          },
+        },
+        orderBy: {
+          total_sold: 'desc',
+        },
+        take: 4,
+      })
 
-    if (error) {
+      console.log('Related products found:', data.length)
+
+      // Convert Decimal prices to numbers
+      const result = data.map(product => ({
+        ...product,
+        product_variants: product.product_variants.map(variant => ({
+          ...variant,
+          price: Number(variant.price),
+          compare_at_price: variant.compare_at_price ? Number(variant.compare_at_price) : null,
+        })),
+      }))
+
+      await redis.setex(cacheKey, 600, JSON.stringify(result))
+      return result
+    } catch (error) {
       console.error('Error fetching related products:', error)
+      return []
     }
-
-    console.log('Related products found:', data?.length ?? 0)
-
-    const result = data ?? []
-    await redis.setex(cacheKey, 600, JSON.stringify(result))
-    return result
   }
 )
