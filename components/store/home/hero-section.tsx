@@ -84,7 +84,6 @@ export function HeroSection({ data }: HeroProps) {
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover rounded-3xl"
               placeholder="blur"
-              blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
             />
           </div>
         </div>
