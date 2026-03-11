@@ -59,7 +59,7 @@ export async function generateMetadata({
       title: product.name,
       description: product.seo_description || product.description?.slice(0, 160),
       type: 'website',
-      images: firstImage ? [{ url: getStorageUrl(firstImage.storage_path), alt: product.name }] : [],
+      images: firstImage ? [{ url: getStorageUrl(firstImage.image.storage_path), alt: product.name }] : [],
     },
   }
 }
@@ -102,7 +102,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               '@type': 'Brand',
               name: 'Wall Decorator',
             },
-            image: product.product_images.map((img) => getStorageUrl(img.storage_path)),
+            image: product.product_images.map((img) => getStorageUrl(img.image.storage_path)),
             offers: Object.values(product.selection_map).map((v) => ({
               '@type': 'Offer',
               price: v.price,

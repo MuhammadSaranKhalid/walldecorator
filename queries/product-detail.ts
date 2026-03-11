@@ -26,6 +26,9 @@ export const getProductBySlug = cache(async (slug: string): Promise<ProductDetai
         categories: true,
         product_images: {
           orderBy: { display_order: 'asc' },
+          include: {
+            images: true,  // Join with centralized images table
+          },
         },
         product_variants: {
           select: {
@@ -133,12 +136,10 @@ export const getProductBySlug = cache(async (slug: string): Promise<ProductDetai
       status: data.status ?? 'active',
       category: data.categories as any,
       product_images: data.product_images.map(img => ({
-        id: img.id,
-        storage_path: img.storage_path,
-        alt_text: img.alt_text,
         display_order: img.display_order ?? 0,
+        is_primary: img.is_primary ?? false,
         variant_id: img.variant_id,
-        blurhash: img.blurhash
+        image: img.images  // Centralized images table data
       })),
       available_options,
       selection_map,
@@ -287,12 +288,20 @@ export const getRelatedProducts = cache(
           id: true,
           name: true,
           slug: true,
-          // Only fetch the 3 fields actually rendered — saves ~14 columns per image row
+          // Only fetch the 3 fields actually rendered from centralized images table
           product_images: {
             select: {
-              storage_path: true,
-              alt_text: true,
-              blurhash: true,
+              display_order: true,
+              images: {
+                select: {
+                  storage_path: true,
+                  alt_text: true,
+                  blurhash: true,
+                  thumbnail_path: true,
+                  medium_path: true,
+                  large_path: true,
+                },
+              },
             },
             orderBy: { display_order: 'asc' },
             take: 1,

@@ -21,7 +21,7 @@ export function CartItem({ item }: CartItemProps) {
       removeItem: state.removeItem,
     }))
   )
-  const blurUrl = item.image ? blurhashToDataURL(item.image.blurhash) : undefined
+  const blurUrl = item.image?.image?.blurhash ? blurhashToDataURL(item.image.image.blurhash) : undefined
 
   return (
     <div className="flex gap-4">
@@ -29,8 +29,8 @@ export function CartItem({ item }: CartItemProps) {
       <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100 shrink-0">
         {item.image ? (
           <Image
-            src={getStorageUrl(item.image.storage_path)}
-            alt={item.image.alt_text || item.productName}
+            src={getStorageUrl(item.image.image.storage_path)}
+            alt={item.image.image.alt_text || item.productName}
             fill
             sizes="80px"
             className="object-cover"

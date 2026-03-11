@@ -9,7 +9,7 @@ type OrderItemProps = {
 }
 
 export function OrderItem({ item }: OrderItemProps) {
-  const blurUrl = item.image ? blurhashToDataURL(item.image.blurhash) : undefined
+  const blurUrl = item.image?.image?.blurhash ? blurhashToDataURL(item.image.image.blurhash) : undefined
 
   return (
     <div className="flex gap-3 py-3">
@@ -17,8 +17,8 @@ export function OrderItem({ item }: OrderItemProps) {
         <div className="h-full w-full overflow-hidden rounded-md border border-gray-300 bg-white">
           {item.image ? (
             <Image
-              src={getStorageUrl(item.image.storage_path)}
-              alt={item.image.alt_text || item.productName}
+              src={getStorageUrl(item.image.image.storage_path)}
+              alt={item.image.image.alt_text || item.productName}
               fill
               className="object-cover"
               sizes="64px"

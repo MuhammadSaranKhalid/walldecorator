@@ -1,34 +1,61 @@
+// ============================================================
 // Product listing types for products page
+// Updated for centralized images architecture
+// ============================================================
+
+import { Image } from './images'
+import type { Prisma } from '@/lib/generated/prisma/client'
+
+// Junction table data + centralized image data
 export interface ProductImage {
+  display_order: number
+  is_primary: boolean
+  variant_id: string | null
+  image: Image  // From centralized images table
+}
+
+// Simplified version for listings (backward compatible)
+export interface ProductImageSimple {
   storage_path: string
   alt_text: string | null
   display_order: number
   blurhash: string | null
 }
 
-export interface ProductCategory {
-  id: string
-  name: string
-  slug: string
-}
+export type ProductCategory = Prisma.categoriesGetPayload<{}>
 
-export interface ProductInventory {
-  quantity_available: number
-}
+export type ProductInventory = Prisma.inventoryGetPayload<{}>
 
-export interface ProductVariant {
-  id: string
+export type Category = Prisma.categoriesGetPayload<{
+  include: {
+    other_categories: {
+      include: {
+        other_categories: true
+      }
+    }
+  }
+}>
+
+// The mapping function drops some deep relations but keeps a slim object
+export type ProductVariantBase = Prisma.product_variantsGetPayload<{
+  include: {
+    products: {
+      include: {
+        product_images: {
+          include: { images: true }
+        }
+        categories: true
+      }
+    }
+    inventory: true
+  }
+}>
+
+// Cast Prisma's Decimal (which is string/object) to number for JSON
+export type ProductVariant = Omit<ProductVariantBase, 'price' | 'compare_at_price' | 'products'> & {
   price: number
   compare_at_price: number | null
-  sku: string
-  products: {
-    id: string
-    name: string
-    slug: string
-    product_images: ProductImage[]
-    categories: ProductCategory | null
-  }
-  inventory: ProductInventory | null
+  products: Omit<ProductVariantBase['products'], 'product_variants'>
 }
 
 export interface ProductsResult {
@@ -37,14 +64,6 @@ export interface ProductsResult {
   page: number
   limit: number
   totalPages: number
-}
-
-export interface Category {
-  id: string
-  name: string
-  slug: string
-  parent_id: string | null
-  other_categories?: Category[]
 }
 
 export interface AttributeValue {
@@ -82,7 +101,16 @@ export interface AvailableOptions {
   [material: string]: MaterialOptions
 }
 
+// Product detail image (junction table + centralized image)
 export interface ProductDetailImage {
+  display_order: number
+  is_primary: boolean
+  variant_id: string | null
+  image: Image  // From centralized images table
+}
+
+// Simplified version for cart/checkout (backward compatible)
+export interface ProductDetailImageSimple {
   id: string
   storage_path: string
   alt_text: string | null

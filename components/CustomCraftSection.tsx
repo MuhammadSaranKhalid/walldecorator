@@ -151,6 +151,7 @@ export default function CustomCraftSection() {
     try {
       // Step 1 — Upload image directly from browser to Supabase Storage (Client Side)
       // Bypasses Next.js 1MB Server Action limit completely.
+      // Upload to centralized product-images bucket with custom-orders folder
       const file = fileState.file
       const ext = file.name.split('.').pop() ?? 'jpg'
 
@@ -158,10 +159,12 @@ export default function CustomCraftSection() {
       const year = now.getFullYear()
       const month = String(now.getMonth() + 1).padStart(2, '0')
       const uniqueId = crypto.randomUUID()
-      const storagePath = `${year}/${month}/${uniqueId}.${ext}`
+
+      // Temporary path for upload - will be reorganized by entity_id after order creation
+      const storagePath = `custom-orders/original/temp/${year}-${month}/${uniqueId}.${ext}`
 
       const { error: uploadError } = await supabase.storage
-        .from('custom-orders')
+        .from('product-images')  // Centralized bucket
         .upload(storagePath, file, {
           contentType: file.type,
           upsert: false,
@@ -175,9 +178,10 @@ export default function CustomCraftSection() {
       }
 
       // Step 2 — Submit order data to PostgreSQL via Server Action
+      // Server action will create image record and trigger processing
       const orderResult = await submitCustomOrder({
         ...data,
-        image_url: storagePath,
+        storagePath: storagePath,  // Pass storage path, not image_url
       })
 
       if (!orderResult.success) {

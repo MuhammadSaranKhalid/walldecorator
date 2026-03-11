@@ -24,10 +24,13 @@ model categories {
   seo_description  String?
   created_at       DateTime     @default(now()) @db.Timestamptz(6)
   updated_at       DateTime     @default(now()) @db.Timestamptz(6)
+  image_id         String?      @db.Uuid
+  images           images?      @relation(fields: [image_id], references: [id], onUpdate: NoAction)
   categories       categories?  @relation("categoriesTocategories", fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   other_categories categories[] @relation("categoriesTocategories")
   products         products[]
 
+  @@index([image_id], map: "idx_categories_image_id")
   @@index([parent_id], map: "idx_categories_parent_id")
   @@index([slug], map: "idx_categories_slug")
   @@index([is_visible, display_order], map: "idx_categories_visible")
@@ -53,10 +56,13 @@ model custom_orders {
   order_id            String?   @db.Uuid
   created_at          DateTime  @default(now()) @db.Timestamptz(6)
   updated_at          DateTime  @default(now()) @db.Timestamptz(6)
+  image_id            String?   @db.Uuid
+  images              images?   @relation(fields: [image_id], references: [id], onUpdate: NoAction)
   orders              orders?   @relation(fields: [order_id], references: [id], onUpdate: NoAction)
 
   @@index([created_at(sort: Desc)], map: "idx_custom_orders_created_at")
   @@index([customer_email], map: "idx_custom_orders_email")
+  @@index([image_id], map: "idx_custom_orders_image_id")
   @@index([order_id], map: "idx_custom_orders_order_id")
   @@index([status, created_at(sort: Desc)], map: "idx_custom_orders_status")
 }
@@ -142,6 +148,35 @@ model homepage_config {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model images {
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  entity_type       String
+  entity_id         String           @db.Uuid
+  storage_path      String
+  alt_text          String?
+  thumbnail_path    String?
+  medium_path       String?
+  large_path        String?
+  processing_status String?          @default("pending")
+  processing_error  String?
+  blurhash          String?
+  original_width    Int?
+  original_height   Int?
+  file_size_bytes   Int?
+  created_at        DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime         @default(now()) @db.Timestamptz(6)
+  categories        categories[]
+  custom_orders     custom_orders[]
+  product_images    product_images[]
+  review_images     review_images[]
+
+  @@index([entity_type, entity_id], map: "idx_images_entity")
+  @@index([processing_status], map: "idx_images_processing_status", where: raw("(processing_status = 'pending'::text)"))
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model inventory {
   id                  String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   variant_id          String           @unique @db.Uuid
@@ -177,6 +212,19 @@ model inventory_transactions {
   @@index([reference_type, reference_id], map: "idx_inventory_transactions_reference")
   @@index([type, created_at(sort: Desc)], map: "idx_inventory_transactions_type")
   @@index([variant_id, created_at(sort: Desc)], map: "idx_inventory_transactions_variant")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model material_attribute_relationships {
+  id                                                                                                     String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  material_id                                                                                            String                   @db.Uuid
+  attribute_value_id                                                                                     String                   @db.Uuid
+  created_at                                                                                             DateTime                 @default(now()) @db.Timestamptz(6)
+  product_attribute_values_material_attribute_relationships_attribute_value_idToproduct_attribute_values product_attribute_values @relation("material_attribute_relationships_attribute_value_idToproduct_attribute_values", fields: [attribute_value_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  product_attribute_values_material_attribute_relationships_material_idToproduct_attribute_values        product_attribute_values @relation("material_attribute_relationships_material_idToproduct_attribute_values", fields: [material_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([material_id, attribute_value_id], map: "material_attribute_relationsh_material_id_attribute_value_i_key")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -301,16 +349,18 @@ model payments {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model product_attribute_values {
-  id                                                                       String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  attribute_id                                                             String             @db.Uuid
-  value                                                                    String
-  display_name                                                             String
-  display_order                                                            Int?               @default(0)
-  created_at                                                               DateTime           @default(now()) @db.Timestamptz(6)
-  product_attributes                                                       product_attributes @relation(fields: [attribute_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  product_variants_product_variants_material_idToproduct_attribute_values  product_variants[] @relation("product_variants_material_idToproduct_attribute_values")
-  product_variants_product_variants_size_idToproduct_attribute_values      product_variants[] @relation("product_variants_size_idToproduct_attribute_values")
-  product_variants_product_variants_thickness_idToproduct_attribute_values product_variants[] @relation("product_variants_thickness_idToproduct_attribute_values")
+  id                                                                                                             String                             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  attribute_id                                                                                                   String                             @db.Uuid
+  value                                                                                                          String
+  display_name                                                                                                   String
+  display_order                                                                                                  Int?                               @default(0)
+  created_at                                                                                                     DateTime                           @default(now()) @db.Timestamptz(6)
+  material_attribute_relationships_material_attribute_relationships_attribute_value_idToproduct_attribute_values material_attribute_relationships[] @relation("material_attribute_relationships_attribute_value_idToproduct_attribute_values")
+  material_attribute_relationships_material_attribute_relationships_material_idToproduct_attribute_values        material_attribute_relationships[] @relation("material_attribute_relationships_material_idToproduct_attribute_values")
+  product_attributes                                                                                             product_attributes                 @relation(fields: [attribute_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  product_variants_product_variants_material_idToproduct_attribute_values                                        product_variants[]                 @relation("product_variants_material_idToproduct_attribute_values")
+  product_variants_product_variants_size_idToproduct_attribute_values                                            product_variants[]                 @relation("product_variants_size_idToproduct_attribute_values")
+  product_variants_product_variants_thickness_idToproduct_attribute_values                                       product_variants[]                 @relation("product_variants_thickness_idToproduct_attribute_values")
 
   @@unique([attribute_id, value])
 }
@@ -326,34 +376,23 @@ model product_attributes {
   product_attribute_values product_attribute_values[]
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model product_images {
-  id                String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  product_id        String            @db.Uuid
-  variant_id        String?           @db.Uuid
-  storage_path      String
-  alt_text          String?
-  display_order     Int?              @default(0)
-  is_primary        Boolean?          @default(false)
-  thumbnail_path    String?
-  medium_path       String?
-  large_path        String?
-  processing_status String?           @default("pending")
-  processing_error  String?
-  blurhash          String?
-  original_width    Int?
-  original_height   Int?
-  file_size_bytes   Int?
-  created_at        DateTime          @default(now()) @db.Timestamptz(6)
-  updated_at        DateTime          @default(now()) @db.Timestamptz(6)
-  products          products          @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  product_variants  product_variants? @relation(fields: [variant_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  product_id       String            @db.Uuid
+  image_id         String            @db.Uuid
+  variant_id       String?           @db.Uuid
+  display_order    Int?              @default(0)
+  is_primary       Boolean?          @default(false)
+  images           images            @relation(fields: [image_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "product_images_temp_image_id_fkey")
+  products         products          @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "product_images_temp_product_id_fkey")
+  product_variants product_variants? @relation(fields: [variant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "product_images_temp_variant_id_fkey")
 
+  @@id([product_id, image_id], map: "product_images_temp_pkey")
+  @@index([image_id], map: "idx_product_images_image_id")
   @@index([product_id], map: "idx_product_images_primary", where: raw("(is_primary = true)"))
   @@index([product_id, display_order], map: "idx_product_images_product_id")
-  @@index([variant_id, display_order], map: "idx_product_images_variant_id")
+  @@index([variant_id], map: "idx_product_images_variant_id")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -445,25 +484,40 @@ model refunds {
   @@index([stripe_refund_id], map: "idx_refunds_stripe_refund_id")
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model review_images {
+  review_id     String  @db.Uuid
+  image_id      String  @db.Uuid
+  display_order Int?    @default(0)
+  images        images  @relation(fields: [image_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  reviews       reviews @relation(fields: [review_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([review_id, image_id])
+  @@index([image_id], map: "idx_review_images_image_id")
+  @@index([review_id, display_order], map: "idx_review_images_review_id")
+}
+
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model reviews {
-  id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  product_id           String   @db.Uuid
-  order_id             String?  @db.Uuid
+  id                   String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  product_id           String          @db.Uuid
+  order_id             String?         @db.Uuid
   reviewer_name        String
   reviewer_email       String
   rating               Int
   title                String?
   body                 String?
-  is_approved          Boolean? @default(false)
-  is_verified_purchase Boolean? @default(false)
-  helpful_count        Int?     @default(0)
-  created_at           DateTime @default(now()) @db.Timestamptz(6)
-  updated_at           DateTime @default(now()) @db.Timestamptz(6)
-  orders               orders?  @relation(fields: [order_id], references: [id], onUpdate: NoAction)
-  products             products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  is_approved          Boolean?        @default(false)
+  is_verified_purchase Boolean?        @default(false)
+  helpful_count        Int?            @default(0)
+  created_at           DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime        @default(now()) @db.Timestamptz(6)
+  review_images        review_images[]
+  orders               orders?         @relation(fields: [order_id], references: [id], onUpdate: NoAction)
+  products             products        @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([product_id, reviewer_email])
   @@index([product_id, is_approved], map: "idx_reviews_product_approved", where: raw("(is_approved = true)"))

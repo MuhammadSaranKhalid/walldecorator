@@ -6,6 +6,7 @@ import type {
   ProductsResult,
   Category,
   FilterAttribute,
+  ProductVariant,
 } from '@/types/products'
 import type { Prisma } from '@/lib/generated/prisma/client'
 
@@ -72,6 +73,9 @@ export const getProducts = cache(async (params: ProductParams): Promise<Products
         product_images: {
           where: { is_primary: true },
           take: 1,
+          include: {
+            images: true,  // Join with centralized images table
+          },
         },
         categories: true,
       },
@@ -85,19 +89,15 @@ export const getProducts = cache(async (params: ProductParams): Promise<Products
     .map((product) => {
       const cheapestVariant = product.product_variants[0]
       return {
-        id: cheapestVariant.id,
+        ...cheapestVariant,
         price: Number(cheapestVariant.price),
         compare_at_price: cheapestVariant.compare_at_price ? Number(cheapestVariant.compare_at_price) : null,
-        sku: cheapestVariant.sku,
         products: {
-          id: product.id,
-          name: product.name,
-          slug: product.slug,
-          product_images: product.product_images,
-          categories: product.categories,
+          ...product,
+          product_variants: undefined
         },
         inventory: cheapestVariant.inventory,
-      }
+      } as ProductVariant
     })
 
   // Apply price sorting in JS (variants are already ordered by price asc from DB)

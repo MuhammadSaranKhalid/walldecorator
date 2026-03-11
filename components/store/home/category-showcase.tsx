@@ -40,9 +40,9 @@ export function CategoryShowcase({ categories }: CategoryShowcaseProps) {
               href={`/products?category=${category.slug}`}
               className="group relative overflow-hidden rounded-2xl aspect-3/4 bg-muted border border-border"
             >
-              {category.image_path ? (
+              {category.images?.medium_path || category.images?.storage_path ? (
                 <Image
-                  src={getStorageUrl(category.image_path)}
+                  src={getStorageUrl(category.images.medium_path || category.images.storage_path)}
                   alt={category.name}
                   fill
                   // Prioritize first 4 — they're above fold on desktop

@@ -40,7 +40,7 @@ function CategoryTree({ category, level, selectedSlug, onSelect }: CategoryTreeP
           {category.other_categories?.map((subCat) => (
             <CategoryTree
               key={subCat.id}
-              category={subCat}
+              category={subCat as any}
               level={level + 1}
               selectedSlug={selectedSlug}
               onSelect={onSelect}

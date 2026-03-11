@@ -12,19 +12,20 @@ type ProductCardProps = {
 export function ProductCard({ variant, priority = false }: ProductCardProps) {
   const product = variant.products
   const primaryImage = product.product_images[0]
+  console.log("Primary Image : ", primaryImage)
 
   const isOnSale =
     variant.compare_at_price && variant.compare_at_price > variant.price
   const isLowStock =
-    variant.inventory && variant.inventory.quantity_available <= 5
+    variant.inventory && (variant.inventory.quantity_available ?? 0) <= 5
 
   return (
     <Link href={`/products/${product.slug}`} className="group block">
       <div className="relative aspect-square overflow-hidden rounded-lg bg-muted border border-border">
         {primaryImage ? (
           <Image
-            src={getStorageUrl(primaryImage.storage_path)}
-            alt={primaryImage.alt_text || product.name}
+            src={getStorageUrl(primaryImage.images.storage_path)}
+            alt={primaryImage.images.alt_text || product.name}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
             className="object-cover group-hover:scale-105 transition-transform duration-300"

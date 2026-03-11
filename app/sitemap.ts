@@ -14,7 +14,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             updated_at: true,
             product_images: {
                 select: {
-                    storage_path: true,
+                    images: {
+                        select: {
+                            storage_path: true,
+                        }
+                    }
                 },
                 orderBy: {
                     display_order: 'asc',
@@ -36,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const productEntries: MetadataRoute.Sitemap = products.map((product) => {
         // Build the public Supabase storage URL for each product's first image
-        const imageStoragePath = product.product_images[0]?.storage_path
+        const imageStoragePath = product.product_images[0]?.images?.storage_path
         const imageUrl = imageStoragePath
             ? `https://srjfclplxoonrzczpfyz.supabase.co/storage/v1/object/public/product-images/${imageStoragePath}`
             : undefined

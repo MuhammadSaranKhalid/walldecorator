@@ -59,6 +59,33 @@ export const getCategories = cache(async (): Promise<Category[]> => {
       parent_id: null, // Top-level only
       is_visible: true,
     },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      image_id: true,
+      product_count: true,
+      images: {
+        select: {
+          id: true,
+          entity_type: true,
+          entity_id: true,
+          storage_path: true,
+          alt_text: true,
+          thumbnail_path: true,
+          medium_path: true,
+          large_path: true,
+          blurhash: true,
+          processing_status: true,
+          processing_error: true,
+          original_width: true,
+          original_height: true,
+          file_size_bytes: true,
+          created_at: true,
+          updated_at: true,
+        },
+      },
+    },
     orderBy: {
       display_order: 'asc',
     },
@@ -92,10 +119,17 @@ export const getFeaturedProducts = cache(async (): Promise<HomepageProduct[]> =>
       product_images: {
         where: { is_primary: true },
         select: {
-          storage_path: true,
-          alt_text: true,
           display_order: true,
-          blurhash: true,
+          images: {
+            select: {
+              storage_path: true,
+              alt_text: true,
+              blurhash: true,
+              thumbnail_path: true,
+              medium_path: true,
+              large_path: true,
+            },
+          },
         },
         take: 1,
       },
@@ -134,10 +168,17 @@ export const getBestsellers = cache(async (): Promise<HomepageProduct[]> => {
       product_images: {
         where: { is_primary: true },
         select: {
-          storage_path: true,
-          alt_text: true,
           display_order: true,
-          blurhash: true,
+          images: {
+            select: {
+              storage_path: true,
+              alt_text: true,
+              blurhash: true,
+              thumbnail_path: true,
+              medium_path: true,
+              large_path: true,
+            },
+          },
         },
         take: 1,
       },
@@ -157,23 +198,24 @@ export const getBestsellers = cache(async (): Promise<HomepageProduct[]> => {
 })
 
 /**
- * Normalize product data — extract primary image and cheapest variant price
+ * Normalize product data — extract primary image from junction + centralized images and cheapest variant price
  */
 function normalizeProducts(data: any[]): HomepageProduct[] {
   return data.map((product) => {
-    const primaryImage = product.product_images?.[0] ?? null
+    const primaryImageJunction = product.product_images?.[0] ?? null
+    const primaryImageData = primaryImageJunction?.images ?? null
     const cheapestVariant = product.product_variants?.[0]
 
     return {
       id: product.id,
       name: product.name,
       slug: product.slug,
-      image: primaryImage
+      image: primaryImageData
         ? {
-          storage_path: primaryImage.storage_path,
-          alt_text: primaryImage.alt_text,
-          display_order: primaryImage.display_order,
-          blurhash: primaryImage.blurhash,
+          storage_path: primaryImageData.storage_path,
+          alt_text: primaryImageData.alt_text,
+          display_order: primaryImageJunction.display_order,
+          blurhash: primaryImageData.blurhash,
         }
         : null,
       // Decimal fields must be converted to Number before JSON serialization

@@ -81,13 +81,13 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       >
         <Carousel setApi={setApi} className="w-full">
           <CarouselContent className="ml-0">
-            {sorted.map((image, index) => {
+            {sorted.map((item, index) => {
               // blurhash is server-provided data — safe to call outside isMounted guard
-              const blurUrl = image.blurhash ? blurhashToDataURL(image.blurhash) : undefined
+              const blurUrl = item.image.blurhash ? blurhashToDataURL(item.image.blurhash) : undefined
               const isCurrentlyZooming = isZoomed && index === activeIndex
 
               return (
-                <CarouselItem key={image.id} className="pl-0 basis-full">
+                <CarouselItem key={`img-${index}`} className="pl-0 basis-full">
                   <div
                     suppressHydrationWarning
                     className={`relative w-full aspect-square transition-transform duration-200 ${isCurrentlyZooming ? 'scale-150' : 'scale-100'
@@ -99,8 +99,8 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                     }
                   >
                     <Image
-                      src={getStorageUrl(image.storage_path)}
-                      alt={image.alt_text || `${productName} image ${index + 1}`}
+                      src={getStorageUrl(item.image.storage_path)}
+                      alt={item.image.alt_text || `${productName} image ${index + 1}`}
                       fill
                       priority={index === 0}
                       quality={90}
@@ -119,12 +119,12 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       {/* Thumbnail Row */}
       {sorted.length > 1 ? (
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-          {sorted.map((image, index) => {
+          {sorted.map((item, index) => {
             // blurhash is server-provided data — safe to use directly
-            const thumbBlurUrl = image.blurhash ? blurhashToDataURL(image.blurhash) : undefined
+            const thumbBlurUrl = item.image.blurhash ? blurhashToDataURL(item.image.blurhash) : undefined
             return (
               <button
-                key={image.id}
+                key={`thumb-${index}`}
                 onClick={() => handleThumbnailClick(index)}
                 className={`
                   relative shrink-0 w-20 h-20 rounded-lg overflow-hidden
@@ -138,8 +138,8 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                 aria-current={index === activeIndex}
               >
                 <Image
-                  src={getStorageUrl(image.storage_path)}
-                  alt={image.alt_text || `${productName} view ${index + 1}`}
+                  src={getStorageUrl(item.image.storage_path)}
+                  alt={item.image.alt_text || `${productName} view ${index + 1}`}
                   fill
                   sizes="80px"
                   className="object-cover"

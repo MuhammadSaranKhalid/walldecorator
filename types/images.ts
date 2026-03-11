@@ -2,35 +2,13 @@
 // Centralized Image Types
 // =====================================================
 
+import type { Prisma } from '@/lib/generated/prisma/client'
+
 /**
  * Centralized image type
  * All images (products, categories, reviews, custom orders) are stored in this table
  */
-export interface Image {
-  id: string;
-  entity_type: 'product' | 'category' | 'review' | 'custom_order';
-  entity_id: string;
-  storage_path: string;
-  alt_text: string | null;
-
-  // Auto-generated variants
-  thumbnail_path: string | null;
-  medium_path: string | null;
-  large_path: string | null;
-
-  // Processing status
-  processing_status: 'pending' | 'processing' | 'completed' | 'failed';
-  processing_error: string | null;
-
-  // Metadata
-  blurhash: string | null;
-  original_width: number | null;
-  original_height: number | null;
-  file_size_bytes: number | null;
-
-  created_at: string;
-  updated_at: string;
-}
+export type Image = Prisma.imagesGetPayload<{}>
 
 // =====================================================
 // Junction Table Types

@@ -83,7 +83,6 @@ export function HeroSection({ data }: HeroProps) {
               quality={90}
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover rounded-3xl"
-              placeholder="blur"
             />
           </div>
         </div>

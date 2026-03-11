@@ -16,15 +16,21 @@ export interface HomepageData {
   }
 }
 
+import { Image } from './images'
+
 export interface Category {
   id: string
   name: string
   slug: string
-  image_path: string | null
+  image_id: string | null
+  images: Image | null  // From centralized images table (Prisma relation name)
   product_count: number | null
+  // DEPRECATED: Use images instead
+  image_path?: string | null
 }
 
-export interface ProductImage {
+// Simple image structure for homepage display
+export interface ProductImageSimple {
   storage_path: string
   alt_text: string | null
   display_order: number
@@ -35,7 +41,7 @@ export interface HomepageProduct {
   id: string
   name: string
   slug: string
-  image: ProductImage | null
+  image: ProductImageSimple | null
   price: number
   compareAtPrice: number | null
 }
