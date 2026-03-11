@@ -35,6 +35,8 @@ export function ContactSection() {
                   type="email"
                   placeholder="you@example.com"
                   className="pl-10 h-11"
+                  autoComplete="email"
+                  spellCheck={false}
                   aria-invalid={fieldState.invalid}
                 />
               </div>
@@ -62,6 +64,8 @@ export function ContactSection() {
                     type="text"
                     placeholder="Muhammad Ahmed"
                     className="pl-10 h-11"
+                    autoComplete="name"
+                    spellCheck={false}
                     aria-invalid={fieldState.invalid}
                   />
                 </div>
@@ -88,6 +92,9 @@ export function ContactSection() {
                     type="tel"
                     placeholder="03001234567"
                     className="pl-10 h-11"
+                    autoComplete="tel"
+                    inputMode="tel"
+                    spellCheck={false}
                     aria-invalid={fieldState.invalid}
                   />
                 </div>

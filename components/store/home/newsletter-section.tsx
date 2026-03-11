@@ -56,17 +56,22 @@ export function NewsletterSection() {
             onSubmit={handleSubmit}
             className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
           >
+            <label htmlFor="newsletter-email" className="sr-only">Email address</label>
             <input
+              id="newsletter-email"
+              name="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
+              placeholder="Enter your email…"
               required
               disabled={isPending}
+              autoComplete="email"
+              spellCheck={false}
               className="
                 flex-1 px-5 py-4 rounded-full bg-primary-foreground/10 border border-primary-foreground/20
                 text-primary-foreground placeholder-primary-foreground/50
-                focus:outline-none focus:border-accent
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-accent
                 disabled:opacity-50 disabled:cursor-not-allowed
                 transition-colors
               "
@@ -78,10 +83,10 @@ export function NewsletterSection() {
                 px-8 py-4 bg-accent text-accent-foreground font-semibold
                 rounded-full shrink-0 shadow-lg
                 hover:bg-accent/90 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed
-                transition-all
+                transition-[background-color,box-shadow]
               "
             >
-              {isPending ? 'Subscribing...' : 'Subscribe'}
+              {isPending ? 'Subscribing…' : 'Subscribe'}
             </button>
           </form>
         )}

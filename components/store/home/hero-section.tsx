@@ -14,7 +14,7 @@ type HeroProps = {
 
 export function HeroSection({ data }: HeroProps) {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-secondary via-background to-accent/10">
+    <section className="relative overflow-hidden bg-linear-to-br from-secondary via-background to-accent/10">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[85vh] lg:min-h-[75vh] items-center gap-8 py-16">
           {/* Left — Text Content */}
@@ -25,7 +25,7 @@ export function HeroSection({ data }: HeroProps) {
             </span>
 
             {/* Main headline — largest text on page, critical for LCP */}
-            <h1 className="text-5xl lg:text-7xl font-bold text-primary leading-tight">
+            <h1 className="text-5xl lg:text-7xl font-bold text-primary leading-tight text-balance">
               {data.headline}
             </h1>
 
@@ -41,7 +41,7 @@ export function HeroSection({ data }: HeroProps) {
                 className="
                   px-8 py-4 bg-primary text-primary-foreground text-base font-semibold
                   rounded-full hover:bg-primary/90 shadow-lg hover:shadow-xl
-                  transition-all duration-200 hover:scale-105
+                  transition-[background-color,box-shadow,transform] duration-200 hover:scale-105
                   active:scale-100
                 "
               >
@@ -53,7 +53,7 @@ export function HeroSection({ data }: HeroProps) {
                   px-8 py-4 bg-transparent text-accent-foreground text-base font-semibold
                   rounded-full border-2 border-accent
                   hover:bg-accent hover:text-accent-foreground
-                  transition-all duration-200
+                  transition-[background-color,color] duration-200
                 "
               >
                 View All
@@ -77,7 +77,7 @@ export function HeroSection({ data }: HeroProps) {
           <div className="relative order-1 lg:order-2 aspect-4/5 lg:aspect-auto lg:h-[75vh]">
             <Image
               src={data.imagePath ? getStorageUrl(data.imagePath) : '/image_no_gemini.png'}
-              alt="New Collection"
+              alt={data.headline || 'Wall Decorator featured collection'}
               fill
               loading="eager" // LCP element — load immediately
               quality={90}

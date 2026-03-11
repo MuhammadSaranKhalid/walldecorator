@@ -43,6 +43,7 @@ export function ShippingSection() {
                   type="text"
                   placeholder="House 123, Street 456"
                   className="pl-10 h-11"
+                  autoComplete="address-line1"
                   aria-invalid={fieldState.invalid}
                 />
               </div>
@@ -67,6 +68,7 @@ export function ShippingSection() {
                 type="text"
                 placeholder="Near XYZ Landmark"
                 className="h-11"
+                autoComplete="address-line2"
                 aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && (
@@ -91,6 +93,7 @@ export function ShippingSection() {
                   type="text"
                   placeholder="Lahore"
                   className="h-11"
+                  autoComplete="address-level2"
                   aria-invalid={fieldState.invalid}
                 />
                 {fieldState.invalid && (
@@ -150,6 +153,8 @@ export function ShippingSection() {
                 placeholder="54000"
                 maxLength={5}
                 className="h-11"
+                autoComplete="postal-code"
+                inputMode="numeric"
                 aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && (
