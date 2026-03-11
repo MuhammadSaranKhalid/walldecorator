@@ -38,26 +38,42 @@ async function generateBlurhash(imageBuffer: Buffer): Promise<string> {
   return blurhash;
 }
 
+// Folder prefix mapping for entity types
+const FOLDER_PREFIX: Record<string, string> = {
+  product: "products",
+  category: "categories",
+  review: "reviews",
+  custom_order: "custom-orders",
+};
+
 export async function POST(request: Request) {
   const supabase = getAdminClient();
   let currentImageId: string | null = null;
 
   try {
-    const { imageId, storagePath, productId } = await request.json();
+    const { imageId, storagePath, entityType, entityId } = await request.json();
     currentImageId = imageId;
 
-    if (!imageId || !storagePath) {
+    if (!imageId || !storagePath || !entityType || !entityId) {
       return NextResponse.json(
-        { error: "Missing imageId or storagePath" },
+        { error: "Missing required fields: imageId, storagePath, entityType, entityId" },
         { status: 400 }
       );
     }
 
-    console.log(`Processing image: ${imageId} at ${storagePath}`);
+    const folderPrefix = FOLDER_PREFIX[entityType];
+    if (!folderPrefix) {
+      return NextResponse.json(
+        { error: `Invalid entity type: ${entityType}` },
+        { status: 400 }
+      );
+    }
 
-    // Update status to processing
+    console.log(`Processing ${entityType} image: ${imageId} at ${storagePath}`);
+
+    // Update status to processing (centralized images table)
     await supabase
-      .from("product_images")
+      .from("images")
       .update({ processing_status: "processing" })
       .eq("id", imageId);
 
@@ -102,10 +118,10 @@ export async function POST(request: Request) {
         .toBuffer();
 
       // Generate storage path for variant
-      // Example: thumbnail/product-uuid/image-name.webp
+      // Example: products/thumbnail/product-uuid/image-name.webp
       const originalFileName = storagePath.split("/").pop() || "image.jpg";
       const fileNameWithoutExt = originalFileName.replace(/\.[^/.]+$/, "");
-      const variantPath = `${config.folder}/${productId}/${fileNameWithoutExt}.webp`;
+      const variantPath = `${folderPrefix}/${config.folder}/${entityId}/${fileNameWithoutExt}.webp`;
 
       // Upload variant to Supabase Storage
       const { error: uploadError } = await supabase.storage
@@ -124,9 +140,9 @@ export async function POST(request: Request) {
       console.log(`✓ Created ${variantKey} variant at ${variantPath}`);
     }
 
-    // Step 4: Update database with variant paths and blurhash
+    // Step 4: Update database with variant paths and blurhash (centralized images table)
     const { error: updateError } = await supabase
-      .from("product_images")
+      .from("images")
       .update({
         ...variantPaths,
         blurhash,
@@ -142,7 +158,7 @@ export async function POST(request: Request) {
       throw new Error(`Failed to update database: ${updateError.message}`);
     }
 
-    console.log(`✓ Image processing completed for ${imageId}`);
+    console.log(`✓ ${entityType} image processing completed for ${imageId}`);
 
     return NextResponse.json({
       success: true,
@@ -160,10 +176,10 @@ export async function POST(request: Request) {
       error instanceof Error ? error.message : "Unknown error";
     console.error("Image processing error:", error);
 
-    // Update database with error status
+    // Update database with error status (centralized images table)
     if (currentImageId) {
       await supabase
-        .from("product_images")
+        .from("images")
         .update({
           processing_status: "failed",
           processing_error: errorMessage,
