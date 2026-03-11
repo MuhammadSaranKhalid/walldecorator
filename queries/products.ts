@@ -7,6 +7,7 @@ import type {
   Category,
   FilterAttribute,
 } from '@/types/products'
+import type { Prisma } from '@/lib/generated/prisma/client'
 
 type ProductParams = Awaited<ReturnType<typeof searchParamsCache.parse>>
 
@@ -27,76 +28,56 @@ export const getProducts = cache(async (params: ProductParams): Promise<Products
   }
 
   // Build where clause for products
-  const where: any = {
+  const where: Prisma.productsWhereInput = {
     status: 'active',
     product_variants: {
       some: {
         inventory: {
-          quantity_available: {
-            gt: 0,
-          },
+          quantity_available: { gt: 0 },
         },
       },
     },
-  }
-
-  // Apply category filter - filter by the slug of the related category
-  if (params.category && params.category.trim() !== '') {
-    where.categories = {
-      slug: params.category,
-    }
+    // Apply category filter by slug of related category
+    ...(params.category?.trim()
+      ? { categories: { slug: params.category } }
+      : {}),
   }
 
   // Build orderBy clause
-  let orderBy: any = {}
-  switch (params.sort) {
-    case 'price-asc':
-    case 'price-desc':
-      // For price sorting, we'll handle this after fetching since we need the cheapest variant
-      orderBy = { created_at: 'desc' }
-      break
-    case 'popularity':
-      orderBy = { total_sold: 'desc' }
-      break
-    case 'newest':
-    default:
-      orderBy = { created_at: 'desc' }
-      break
-  }
+  // Price sort: push it into the variant sub-query orderBy so the cheapest
+  // variant is selected in the right order; product-level sort falls back to
+  // created_at here and the variant price drives the final order.
+  const isPriceSort = params.sort === 'price-asc' || params.sort === 'price-desc'
+  const orderBy: Prisma.productsOrderByWithRelationInput =
+    params.sort === 'popularity'
+      ? { total_sold: 'desc' }
+      : { created_at: 'desc' }
 
-  // Execute query with pagination
-  const products = await prisma.products.findMany({
-    where,
-    orderBy,
-    skip: (params.page - 1) * params.limit,
-    take: params.limit,
-    include: {
-      product_variants: {
-        where: {
-          inventory: {
-            quantity_available: {
-              gt: 0,
-            },
+  // Execute findMany + count atomically in a single round-trip
+  const [products, totalCount] = await prisma.$transaction([
+    prisma.products.findMany({
+      where,
+      orderBy,
+      skip: (params.page - 1) * params.limit,
+      take: params.limit,
+      include: {
+        product_variants: {
+          where: {
+            inventory: { quantity_available: { gt: 0 } },
           },
+          orderBy: { price: 'asc' },
+          take: 1,
+          include: { inventory: true },
         },
-        orderBy: {
-          price: 'asc',
+        product_images: {
+          where: { is_primary: true },
+          take: 1,
         },
-        take: 1,
-        include: {
-          inventory: true,
-        },
+        categories: true,
       },
-      product_images: {
-        where: { is_primary: true },
-        take: 1,
-      },
-      categories: true,
-    },
-  })
-
-  // Get total count - this counts all products matching category/status filters
-  const totalCount = await prisma.products.count({ where })
+    }),
+    prisma.products.count({ where }),
+  ])
 
   // Transform products to variant-centric structure and convert Decimal to number
   const data = products
@@ -119,11 +100,13 @@ export const getProducts = cache(async (params: ProductParams): Promise<Products
       }
     })
 
-  // Apply price sorting if needed
-  if (params.sort === 'price-asc') {
-    data.sort((a, b) => Number(a.price) - Number(b.price))
-  } else if (params.sort === 'price-desc') {
-    data.sort((a, b) => Number(b.price) - Number(a.price))
+  // Apply price sorting in JS (variants are already ordered by price asc from DB)
+  if (isPriceSort) {
+    data.sort((a, b) =>
+      params.sort === 'price-asc'
+        ? Number(a.price) - Number(b.price)
+        : Number(b.price) - Number(a.price)
+    )
   }
 
   const result: ProductsResult = {
@@ -176,7 +159,6 @@ export const getProductCategories = cache(async (): Promise<Category[]> => {
     },
   })
 
-  console.log(data)
 
   await redis.setex(cacheKey, 3600, JSON.stringify(data)) // 1 hour TTL
   return data as Category[]
@@ -197,11 +179,16 @@ export const getFilterAttributes = cache(
       return (typeof cached === 'string' ? JSON.parse(cached) : cached) as FilterAttribute[]
     }
 
-    // Get all unique attribute values with their attribute names
+    // Get all unique attribute values — use select (not include) to avoid
+    // fetching the entire joined relation when we only need two fields.
     const data = await prisma.product_attribute_values.findMany({
-      include: {
-        product_attributes: true,
+      select: {
+        value: true,
+        product_attributes: {
+          select: { name: true },
+        },
       },
+      orderBy: { display_order: 'asc' },
     })
 
     // Group by attribute name

@@ -25,11 +25,8 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
 
   const [isZoomed, setIsZoomed] = useState(false)
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 })
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
+  // Removed isMounted anti-pattern — blurhash data comes from the server,
+  // not from client-only APIs, so there's no hydration mismatch risk.
 
   // Sync Carousel selection -> Thumbnails
   useEffect(() => {
@@ -53,13 +50,13 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
     [api]
   )
 
-  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!isZoomed) return
     const rect = e.currentTarget.getBoundingClientRect()
     const x = ((e.clientX - rect.left) / rect.width) * 100
     const y = ((e.clientY - rect.top) / rect.height) * 100
     setZoomPosition({ x, y })
-  }
+  }, [isZoomed])
 
   if (sorted.length === 0) {
     return (
@@ -85,7 +82,8 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
         <Carousel setApi={setApi} className="w-full">
           <CarouselContent className="ml-0">
             {sorted.map((image, index) => {
-              const blurUrl = isMounted ? blurhashToDataURL(image.blurhash) : undefined
+              // blurhash is server-provided data — safe to call outside isMounted guard
+              const blurUrl = image.blurhash ? blurhashToDataURL(image.blurhash) : undefined
               const isCurrentlyZooming = isZoomed && index === activeIndex
 
               return (
@@ -122,7 +120,8 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       {sorted.length > 1 ? (
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
           {sorted.map((image, index) => {
-            const thumbBlurUrl = isMounted ? blurhashToDataURL(image.blurhash) : undefined
+            // blurhash is server-provided data — safe to use directly
+            const thumbBlurUrl = image.blurhash ? blurhashToDataURL(image.blurhash) : undefined
             return (
               <button
                 key={image.id}

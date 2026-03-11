@@ -25,28 +25,31 @@ export const getProductBySlug = cache(async (slug: string): Promise<ProductDetai
       include: {
         categories: true,
         product_images: {
-          orderBy: {
-            display_order: 'asc',
-          },
+          orderBy: { display_order: 'asc' },
         },
         product_variants: {
-          include: {
+          select: {
+            id: true,
+            sku: true,
+            price: true,
+            compare_at_price: true,
+            is_default: true,
+            // Only fetch .value — product_attributes name is not used in transform
             product_attribute_values_product_variants_material_idToproduct_attribute_values: {
-              include: {
-                product_attributes: true,
-              },
+              select: { value: true },
             },
             product_attribute_values_product_variants_size_idToproduct_attribute_values: {
-              include: {
-                product_attributes: true,
-              },
+              select: { value: true },
             },
             product_attribute_values_product_variants_thickness_idToproduct_attribute_values: {
-              include: {
-                product_attributes: true,
+              select: { value: true },
+            },
+            inventory: {
+              select: {
+                quantity_available: true,
+                allow_backorder: true,
               },
             },
-            inventory: true,
           },
         },
       },
@@ -188,13 +191,12 @@ export const getProductReviews = cache(async (productId: string): Promise<Review
     return (typeof cached === 'string' ? JSON.parse(cached) : cached) as ReviewsResult
   }
 
-  // Fetch both reviews and all ratings in parallel
-  const [reviews, allRatings] = await Promise.all([
+  // Fetch paginated reviews + rating summary in parallel.
+  // aggregate() computes count/avg on the DB side — no need to load every
+  // rating row into JS memory.
+  const [reviews, ratingAgg, distribution] = await Promise.all([
     prisma.reviews.findMany({
-      where: {
-        product_id: productId,
-        is_approved: true,
-      },
+      where: { product_id: productId, is_approved: true },
       select: {
         id: true,
         rating: true,
@@ -203,37 +205,38 @@ export const getProductReviews = cache(async (productId: string): Promise<Review
         created_at: true,
         reviewer_name: true,
       },
-      orderBy: {
-        created_at: 'desc',
-      },
+      orderBy: { created_at: 'desc' },
       take: 10,
     }),
 
-    prisma.reviews.findMany({
-      where: {
-        product_id: productId,
-        is_approved: true,
-      },
-      select: {
-        rating: true,
-      },
+    // Single aggregate call replaces the full scan with filter loops in JS
+    prisma.reviews.aggregate({
+      where: { product_id: productId, is_approved: true },
+      _count: { id: true },
+      _avg: { rating: true },
+    }),
+
+    // Distribution per star still needs groupBy
+    prisma.reviews.groupBy({
+      by: ['rating'],
+      where: { product_id: productId, is_approved: true },
+      _count: { id: true },
     }),
   ])
 
-  // Calculate summary
-  const totalCount = allRatings.length
-  const averageRating =
-    totalCount > 0
-      ? allRatings.reduce((sum, r) => sum + r.rating, 0) / totalCount
-      : 0
+  const totalCount = ratingAgg._count.id
+  const averageRating = ratingAgg._avg.rating ?? 0
 
-  const distribution = [5, 4, 3, 2, 1].map((star) => ({
+  const distributionMap = Object.fromEntries(
+    distribution.map((d) => [d.rating, d._count.id])
+  )
+  const distributionResult = [5, 4, 3, 2, 1].map((star) => ({
     star,
-    count: allRatings.filter((r) => r.rating === star).length,
+    count: distributionMap[star] ?? 0,
   }))
 
-  // Transform reviews to match expected format (replace profile with reviewer_name)
-  const transformedReviews = reviews.map(review => ({
+  // Transform reviews to match expected format
+  const transformedReviews = reviews.map((review) => ({
     ...review,
     profile: { display_name: review.reviewer_name },
   }))
@@ -243,7 +246,7 @@ export const getProductReviews = cache(async (productId: string): Promise<Review
     summary: {
       totalCount,
       averageRating,
-      distribution,
+      distribution: distributionResult,
     },
   }
 
@@ -267,42 +270,54 @@ export const getRelatedProducts = cache(
       return typeof cached === 'string' ? JSON.parse(cached) : cached
     }
 
-    console.log('Fetching related products for category:', categoryId, 'excluding:', excludeProductId)
-
     try {
       const data = await prisma.products.findMany({
         where: {
           category_id: categoryId,
           status: 'active',
-          id: {
-            not: excludeProductId,
+          id: { not: excludeProductId },
+          // Only include products that have at least one in-stock variant
+          product_variants: {
+            some: {
+              inventory: { quantity_available: { gt: 0 } },
+            },
           },
         },
-        include: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          // Only fetch the 3 fields actually rendered — saves ~14 columns per image row
           product_images: {
-            orderBy: {
-              display_order: 'asc',
+            select: {
+              storage_path: true,
+              alt_text: true,
+              blurhash: true,
             },
+            orderBy: { display_order: 'asc' },
+            take: 1,
           },
           product_variants: {
-            orderBy: {
-              price: 'asc',
+            where: {
+              inventory: { quantity_available: { gt: 0 } },
             },
+            select: {
+              id: true,
+              price: true,
+              compare_at_price: true,
+            },
+            orderBy: { price: 'asc' },
             take: 1,
           },
         },
-        orderBy: {
-          total_sold: 'desc',
-        },
+        orderBy: { total_sold: 'desc' },
         take: 4,
       })
 
-      console.log('Related products found:', data.length)
-
       // Convert Decimal prices to numbers
-      const result = data.map(product => ({
+      const result = data.map((product) => ({
         ...product,
-        product_variants: product.product_variants.map(variant => ({
+        product_variants: product.product_variants.map((variant) => ({
           ...variant,
           price: Number(variant.price),
           compare_at_price: variant.compare_at_price ? Number(variant.compare_at_price) : null,

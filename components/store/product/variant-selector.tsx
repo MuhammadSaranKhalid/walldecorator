@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useMemo, useEffect } from 'react'
+import { useState, useTransition, useCallback, useRef, useEffect } from 'react'
 import { useCartStore } from '@/store/cart.store'
 import { formatPrice } from '@/lib/utils'
 import type {
@@ -24,8 +24,16 @@ export function VariantSelector({
   productImages
 }: VariantSelectorProps) {
   const [isPending, startTransition] = useTransition()
+  const justAddedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [justAdded, setJustAdded] = useState(false)
   const [quantity, setQuantity] = useState(1)
+
+  // Cleanup timer on unmount to prevent state updates on unmounted component
+  useEffect(() => {
+    return () => {
+      if (justAddedTimerRef.current) clearTimeout(justAddedTimerRef.current)
+    }
+  }, [])
 
   const addItem = useCartStore((state) => state.addItem)
   const openCart = useCartStore((state) => state.openCart)
@@ -36,49 +44,36 @@ export function VariantSelector({
   // 2. State for selections
   const [selectedMaterial, setSelectedMaterial] = useState<string>(materials[0])
 
-  // 3. Derived options based on material
-  const currentMaterialOptions = availableOptions[selectedMaterial]
+  // 3. Derive valid sizes for the selected material (computed during render — no effect needed)
+  const currentMaterialOptions = availableOptions[selectedMaterial] ?? availableOptions[materials[0]]
   const availableSizes = Object.keys(currentMaterialOptions.sizes)
 
+  // Derive corrected size: if selectedSize is no longer valid, fall back to first available
   const [selectedSize, setSelectedSize] = useState<string>(availableSizes[0])
+  const validSize = availableSizes.includes(selectedSize) ? selectedSize : availableSizes[0]
 
-  // 4. Derived thicknesses based on size
-  const availableThicknesses = currentMaterialOptions.sizes[selectedSize] || []
+  // 4. Derive thicknesses based on the valid size (computed during render — no effect needed)
+  const availableThicknesses = currentMaterialOptions.sizes[validSize] ?? []
   const [selectedThickness, setSelectedThickness] = useState<string>(availableThicknesses[0])
+  const validThickness = availableThicknesses.includes(selectedThickness)
+    ? selectedThickness
+    : availableThicknesses[0]
 
-  // 5. Reset downstream selections when upstream changes
-  useEffect(() => {
-    const sizes = Object.keys(availableOptions[selectedMaterial].sizes)
-    if (!sizes.includes(selectedSize)) {
-      const nextSize = sizes[0]
-      setSelectedSize(nextSize)
-      const thicknesses = availableOptions[selectedMaterial].sizes[nextSize]
-      setSelectedThickness(thicknesses[0])
-    }
-  }, [selectedMaterial, availableOptions])
-
-  useEffect(() => {
-    const thicknesses = availableOptions[selectedMaterial].sizes[selectedSize] || []
-    if (!thicknesses.includes(selectedThickness)) {
-      setSelectedThickness(thicknesses[0])
-    }
-  }, [selectedSize, selectedMaterial, availableOptions])
-
-  // 6. Instant lookup for selected variant
-  const selectionKey = `${selectedMaterial}|${selectedSize}|${selectedThickness}`
+  // 5. Instant lookup for selected variant
+  const selectionKey = `${selectedMaterial}|${validSize}|${validThickness}`
   const selectedVariant: SelectionVariant | undefined = selectionMap[selectionKey]
 
   const isOutOfStock = !selectedVariant || selectedVariant.stock === 0
   const isLowStock = selectedVariant && selectedVariant.stock > 0 && selectedVariant.stock <= 5
 
-  function handleAddToCart() {
+  const handleAddToCart = useCallback(() => {
     if (!selectedVariant || isOutOfStock) return
 
     startTransition(() => {
       addItem({
         variantId: selectedVariant.id,
         productName,
-        variantDescription: `${selectedMaterial}, ${selectedSize}, ${selectedThickness}mm`,
+        variantDescription: `${selectedMaterial}, ${validSize}, ${validThickness}mm`,
         sku: selectedVariant.sku,
         price: selectedVariant.price,
         quantity,
@@ -87,9 +82,10 @@ export function VariantSelector({
 
       openCart()
       setJustAdded(true)
-      setTimeout(() => setJustAdded(false), 2000)
+      // Store timeout ID so we can cancel it on unmount
+      justAddedTimerRef.current = setTimeout(() => setJustAdded(false), 2000)
     })
-  }
+  }, [selectedVariant, isOutOfStock, addItem, productName, selectedMaterial, validSize, validThickness, quantity, productImages, openCart])
 
   return (
     <div className="flex flex-col gap-5">

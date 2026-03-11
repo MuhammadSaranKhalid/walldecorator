@@ -85,21 +85,27 @@ export const getFeaturedProducts = cache(async (): Promise<HomepageProduct[]> =>
       status: 'active',
       is_featured: true,
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
       product_images: {
         where: { is_primary: true },
-        take: 1,
-      },
-      product_variants: {
-        orderBy: {
-          price: 'asc',
+        select: {
+          storage_path: true,
+          alt_text: true,
+          display_order: true,
+          blurhash: true,
         },
         take: 1,
       },
+      product_variants: {
+        select: { price: true, compare_at_price: true },
+        orderBy: { price: 'asc' },
+        take: 1,
+      },
     },
-    orderBy: {
-      featured_order: 'asc',
-    },
+    orderBy: { featured_order: 'asc' },
     take: 8,
   })
 
@@ -120,24 +126,28 @@ export const getBestsellers = cache(async (): Promise<HomepageProduct[]> => {
   }
 
   const data = await prisma.products.findMany({
-    where: {
-      status: 'active',
-    },
-    include: {
+    where: { status: 'active' },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
       product_images: {
         where: { is_primary: true },
-        take: 1,
-      },
-      product_variants: {
-        orderBy: {
-          price: 'asc',
+        select: {
+          storage_path: true,
+          alt_text: true,
+          display_order: true,
+          blurhash: true,
         },
         take: 1,
       },
+      product_variants: {
+        select: { price: true, compare_at_price: true },
+        orderBy: { price: 'asc' },
+        take: 1,
+      },
     },
-    orderBy: {
-      total_sold: 'desc',
-    },
+    orderBy: { total_sold: 'desc' },
     take: 8,
   })
 
@@ -166,8 +176,11 @@ function normalizeProducts(data: any[]): HomepageProduct[] {
           blurhash: primaryImage.blurhash,
         }
         : null,
-      price: cheapestVariant?.price ?? 0,
-      compareAtPrice: cheapestVariant?.compare_at_price ?? null,
+      // Decimal fields must be converted to Number before JSON serialization
+      price: cheapestVariant ? Number(cheapestVariant.price) : 0,
+      compareAtPrice: cheapestVariant?.compare_at_price
+        ? Number(cheapestVariant.compare_at_price)
+        : null,
     }
   })
 }

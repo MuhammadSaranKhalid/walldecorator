@@ -58,7 +58,7 @@ export function InfiniteProductGrid({
       setProducts((prev) => [...prev, ...result.items])
       setCurrentPage(nextPage)
     })
-  }, [hasMore, isPending, currentPage, searchParams.category, searchParams.sort, searchParams.limit, startTransition])
+  }, [hasMore, isPending, currentPage, searchParams.category, searchParams.sort, searchParams.limit])
 
   // Infinite scroll with IntersectionObserver
   useEffect(() => {
