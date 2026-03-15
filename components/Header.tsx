@@ -10,7 +10,7 @@ import { useCartStore } from '@/store/cart.store'
 const navigation = [
   { name: 'Home', href: '/' },
   { name: 'Shop', href: '/products' },
-  { name: 'About', href: '/about' },
+  { name: 'Custom Order', href: '/custom-order' },
   { name: 'Track Order', href: '/track-order' },
 ]
 

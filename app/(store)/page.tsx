@@ -13,7 +13,7 @@ import { FadeInSection } from '@/components/store/home/fade-in-section'
 import { ProductsSkeleton } from '@/components/store/home/skeletons/products-skeleton'
 import { CategoriesSkeleton } from '@/components/store/home/skeletons/categories-skeleton'
 import { WhatsAppButton } from '@/components/whatsapp-button'
-import { CustomCraftSectionLazy } from '@/components/CustomCraftSectionLazy'
+import { CustomCraftTeaser } from '@/components/store/home/custom-craft-teaser'
 import {
   getHomepageData,
   getFeaturedProducts,
@@ -96,7 +96,7 @@ export default async function HomePage() {
 
       {/* ── 9. CUSTOM CRAFT ─────────────────────────────────────── */}
       <FadeInSection>
-        <CustomCraftSectionLazy />
+        <CustomCraftTeaser />
       </FadeInSection>
 
       {/* ── 10. NEWSLETTER ──────────────────────────────────────── */}

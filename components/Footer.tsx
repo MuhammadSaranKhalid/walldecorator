@@ -4,7 +4,7 @@ const quickLinks = [
   { label: 'Shop All', href: '/products' },
   { label: 'Bestsellers', href: '/products?sort=popularity' },
   { label: 'New Arrivals', href: '/products?sort=newest' },
-  { label: 'Custom Orders', href: '/#custom-craft' },
+  { label: 'Custom Orders', href: '/custom-order' },
 ]
 
 const supportLinks = [
