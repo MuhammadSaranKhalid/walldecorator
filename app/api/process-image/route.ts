@@ -2,17 +2,17 @@ import { NextResponse } from "next/server";
 import sharp from "sharp";
 import { encode } from "blurhash";
 import { getAdminClient } from "@/lib/supabase/admin";
+import { prisma } from "@/lib/prisma/client";
+import { z } from "zod";
 
 const BUCKET_NAME = "product-images";
 
-// Image variant configurations
-const VARIANTS = {
-  thumbnail: { width: 150, height: 150, folder: "thumbnail" },
-  medium: { width: 600, height: 600, folder: "medium" },
-  large: { width: 1200, height: 1200, folder: "large" },
-} as const;
-
-type VariantKey = keyof typeof VARIANTS;
+const webhookPayloadSchema = z.object({
+  imageId: z.uuid("Invalid image ID format"),
+  storagePath: z.string().min(1, "Storage path is required"),
+  entityType: z.enum(["product", "category", "review", "custom_order"]),
+  entityId: z.uuid("Invalid entity ID format"),
+});
 
 /**
  * Generate BlurHash from image buffer
@@ -38,44 +38,54 @@ async function generateBlurhash(imageBuffer: Buffer): Promise<string> {
   return blurhash;
 }
 
-// Folder prefix mapping for entity types
-const FOLDER_PREFIX: Record<string, string> = {
-  product: "products",
-  category: "categories",
-  review: "reviews",
-  custom_order: "custom-orders",
-};
-
 export async function POST(request: Request) {
   const supabase = getAdminClient();
-  let currentImageId: string | null = null;
+
+  let payload: z.infer<typeof webhookPayloadSchema>;
+
+  // Cleaned up payload extraction and validation
+  try {
+    const json = await request.json();
+    const parsed = webhookPayloadSchema.safeParse(json); // Changed to sync safeParse
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid request payload", details: parsed.error.format() },
+        { status: 400 }
+      );
+    }
+    payload = parsed.data;
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid JSON body" },
+      { status: 400 }
+    );
+  }
+
+  const { imageId, storagePath, entityType, entityId } = payload;
 
   try {
-    const { imageId, storagePath, entityType, entityId } = await request.json();
-    currentImageId = imageId;
-
-    if (!imageId || !storagePath || !entityType || !entityId) {
-      return NextResponse.json(
-        { error: "Missing required fields: imageId, storagePath, entityType, entityId" },
-        { status: 400 }
-      );
-    }
-
-    const folderPrefix = FOLDER_PREFIX[entityType];
-    if (!folderPrefix) {
-      return NextResponse.json(
-        { error: `Invalid entity type: ${entityType}` },
-        { status: 400 }
-      );
-    }
 
     console.log(`Processing ${entityType} image: ${imageId} at ${storagePath}`);
 
     // Update status to processing (centralized images table)
-    await supabase
-      .from("images")
-      .update({ processing_status: "processing" })
-      .eq("id", imageId);
+    await prisma.images.update({
+      where: { id: imageId },
+      data: { processing_status: "processing" },
+    });
+
+    // Step 0: Fetch specific configuration for this entity type
+    const configData = await prisma.image_processing_configs.findUnique({
+      where: { entity_type: entityType },
+      select: { variants: true, folder_prefix: true },
+    });
+
+    if (!configData?.variants || !configData?.folder_prefix) {
+      throw new Error(`Failed to fetch image processing config for ${entityType}: No config found`);
+    }
+
+    const variantsConfig = configData.variants as Record<string, { width: number, height: number, folder: string }>;
+    const folderPrefix = configData.folder_prefix as string;
 
     // Step 1: Download original image from Supabase Storage
     const { data: originalFile, error: downloadError } = await supabase.storage
@@ -105,9 +115,7 @@ export async function POST(request: Request) {
     // Step 3: Generate image variants
     const variantPaths: Record<string, string> = {};
 
-    for (const [key, config] of Object.entries(VARIANTS)) {
-      const variantKey = key as VariantKey;
-
+    for (const [variantKey, config] of Object.entries(variantsConfig)) {
       // Process image with Sharp
       const processedImage = await sharp(originalBuffer)
         .resize(config.width, config.height, {
@@ -141,9 +149,9 @@ export async function POST(request: Request) {
     }
 
     // Step 4: Update database with variant paths and blurhash (centralized images table)
-    const { error: updateError } = await supabase
-      .from("images")
-      .update({
+    await prisma.images.update({
+      where: { id: imageId },
+      data: {
         ...variantPaths,
         blurhash,
         processing_status: "completed",
@@ -151,12 +159,8 @@ export async function POST(request: Request) {
         original_width: originalWidth,
         original_height: originalHeight,
         file_size_bytes: fileSize,
-      })
-      .eq("id", imageId);
-
-    if (updateError) {
-      throw new Error(`Failed to update database: ${updateError.message}`);
-    }
+      },
+    });
 
     console.log(`✓ ${entityType} image processing completed for ${imageId}`);
 
@@ -177,14 +181,18 @@ export async function POST(request: Request) {
     console.error("Image processing error:", error);
 
     // Update database with error status (centralized images table)
-    if (currentImageId) {
-      await supabase
-        .from("images")
-        .update({
-          processing_status: "failed",
-          processing_error: errorMessage,
-        })
-        .eq("id", currentImageId);
+    if (imageId) {
+      try {
+        await prisma.images.update({
+          where: { id: imageId },
+          data: {
+            processing_status: "failed",
+            processing_error: errorMessage,
+          },
+        });
+      } catch (dbError) {
+        console.error("Failed to update error status in database:", dbError);
+      }
     }
 
     return NextResponse.json(

@@ -12,7 +12,6 @@ type ProductCardProps = {
 export function ProductCard({ variant, priority = false }: ProductCardProps) {
   const product = variant.products
   const primaryImage = product.product_images[0]
-  console.log("Primary Image : ", primaryImage)
 
   const isOnSale =
     variant.compare_at_price && variant.compare_at_price > variant.price
@@ -57,11 +56,11 @@ export function ProductCard({ variant, priority = false }: ProductCardProps) {
         </h3>
         <div className="flex items-center gap-2 mt-1">
           <span className="text-base font-semibold text-primary">
-            Rs. {variant.price.toLocaleString()}
+            {new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR', maximumFractionDigits: 0 }).format(variant.price)}
           </span>
           {isOnSale && variant.compare_at_price ? (
             <span className="text-sm text-muted-foreground line-through">
-              Rs. {variant.compare_at_price.toLocaleString()}
+              {new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR', maximumFractionDigits: 0 }).format(variant.compare_at_price)}
             </span>
           ) : null}
         </div>

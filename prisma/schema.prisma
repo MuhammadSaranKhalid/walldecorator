@@ -525,3 +525,13 @@ model reviews {
   @@index([product_id, rating], map: "idx_reviews_rating")
   @@index([product_id, is_verified_purchase], map: "idx_reviews_verified", where: raw("(is_verified_purchase = true)"))
 }
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model image_processing_configs {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  entity_type   String   @unique
+  folder_prefix String
+  variants      Json
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+}

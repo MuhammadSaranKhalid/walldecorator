@@ -100,7 +100,7 @@ export function InfiniteProductGrid({
 
   return (
     <div>
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6" style={{ contentVisibility: 'auto' }}>
         {products.map((variant, index) => (
           <ProductCard
             key={variant.id}
@@ -124,7 +124,7 @@ export function InfiniteProductGrid({
             className="px-8"
           >
             {isPending
-              ? 'Loading...'
+              ? 'Loading\u2026'
               : `Load More (${remainingCount} remaining)`}
           </Button>
         </div>

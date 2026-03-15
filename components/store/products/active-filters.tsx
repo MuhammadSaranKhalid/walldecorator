@@ -1,17 +1,12 @@
 'use client'
 
-import { useMemo, useTransition } from 'react'
-import { useQueryStates } from 'nuqs'
+import { useMemo } from 'react'
 import { productSearchParams } from '@/lib/search-params/products'
+import { useProductFilters } from '@/components/store/products/product-filters-provider'
 import { X } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 
 export function ActiveFilters() {
-  const [isPending, startTransition] = useTransition()
-  const [params, setParams] = useQueryStates(productSearchParams, {
-    shallow: false,
-    startTransition,
-  })
+  const { params, setParams } = useProductFilters()
 
   // Memoize — rebuilds only when URL params actually change
   const activeFilters = useMemo(() => [
@@ -29,15 +24,15 @@ export function ActiveFilters() {
   return (
     <div className="flex flex-wrap gap-2 mb-6">
       {activeFilters.map((filter) => (
-        <Badge
+        <button
           key={filter.key}
-          variant="secondary"
-          className="pl-3 pr-2 py-1.5 cursor-pointer hover:bg-gray-200"
           onClick={filter.clear}
+          aria-label={`Remove filter: ${filter.label}`}
+          className="inline-flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm hover:bg-gray-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-colors"
         >
-          <span className="text-sm">{filter.label}</span>
-          <X size={14} className="ml-1.5" />
-        </Badge>
+          {filter.label}
+          <X size={14} aria-hidden="true" />
+        </button>
       ))}
     </div>
   )

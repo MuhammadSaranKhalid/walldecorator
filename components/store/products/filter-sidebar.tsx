@@ -1,8 +1,7 @@
 'use client'
 
-import { useQueryStates } from 'nuqs'
 import { productSearchParams } from '@/lib/search-params/products'
-import { useTransition } from 'react'
+import { useProductFilters } from '@/components/store/products/product-filters-provider'
 import { Button } from '@/components/ui/button'
 import type { Category } from '@/types/products'
 
@@ -25,7 +24,8 @@ function CategoryTree({ category, level, selectedSlug, onSelect }: CategoryTreeP
     <div>
       <button
         onClick={() => onSelect(category.slug)}
-        className={`block w-full text-left px-3 py-2 rounded text-sm transition-colors ${
+        aria-pressed={isSelected}
+        className={`block w-full text-left px-3 py-2 rounded text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
           isSelected
             ? 'bg-primary text-primary-foreground font-medium'
             : 'hover:bg-secondary'
@@ -55,15 +55,7 @@ function CategoryTree({ category, level, selectedSlug, onSelect }: CategoryTreeP
 export function FilterSidebar({
   categories,
 }: FilterSidebarProps) {
-  // useTransition gives us a pending state while the server re-renders
-  const [isPending, startTransition] = useTransition()
-
-  // nuqs hook — syncs all filter state with the URL at once
-  const [params, setParams] = useQueryStates(productSearchParams, {
-    // shallow: false means URL changes trigger a server re-render
-    shallow: false,
-    startTransition,
-  })
+  const { params, setParams, isPending } = useProductFilters()
 
   function handleCategoryChange(slug: string) {
     setParams({

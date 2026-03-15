@@ -18,7 +18,7 @@ const sortLabels: Record<(typeof sortOptions)[number], string> = {
   popularity: 'Most Popular',
 }
 
-export function ProductSort({ currentSort }: { currentSort: string }) {
+export function ProductSort() {
   const [isPending, startTransition] = useTransition()
 
   const [sort, setSort] = useQueryState(
@@ -28,11 +28,12 @@ export function ProductSort({ currentSort }: { currentSort: string }) {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm text-gray-600">Sort by:</span>
+      <label id="sort-label" className="text-sm text-gray-600">Sort by:</label>
       <Select
         value={sort}
         onValueChange={(value) => setSort(value as (typeof sortOptions)[number])}
         disabled={isPending}
+        aria-labelledby="sort-label"
       >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Sort by" />
