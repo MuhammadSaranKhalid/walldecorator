@@ -6,8 +6,10 @@ import { CategoryShowcase } from '@/components/store/home/category-showcase'
 import { FeaturedProducts } from '@/components/store/home/featured-products'
 import { PromoBanner } from '@/components/store/home/promo-banner'
 import { Bestsellers } from '@/components/store/home/bestsellers'
+import { NewArrivals } from '@/components/store/home/new-arrivals'
 import { Testimonials } from '@/components/store/home/testimonials'
 import { NewsletterSection } from '@/components/store/home/newsletter-section'
+import { FadeInSection } from '@/components/store/home/fade-in-section'
 import { ProductsSkeleton } from '@/components/store/home/skeletons/products-skeleton'
 import { CategoriesSkeleton } from '@/components/store/home/skeletons/categories-skeleton'
 import { WhatsAppButton } from '@/components/whatsapp-button'
@@ -16,6 +18,7 @@ import {
   getHomepageData,
   getFeaturedProducts,
   getBestsellers,
+  getNewArrivals,
   getCategories,
 } from '@/queries/home'
 
@@ -43,52 +46,65 @@ export default async function HomePage() {
   return (
     <main>
       {/* ── 1. HERO ─────────────────────────────────────────────── */}
-      {/* Fully static markup + data from homepageData */}
-      {/* Always above the fold — zero loading state */}
+      {/* No FadeInSection — always above the fold, loads instantly */}
       <HeroSection data={homepageData.hero} />
 
       {/* ── 2. TRUST BAR ────────────────────────────────────────── */}
-      {/* Fully static — no data needed */}
-      <TrustBar />
+      <FadeInSection>
+        <TrustBar />
+      </FadeInSection>
 
       {/* ── 3. CATEGORY SHOWCASE ────────────────────────────────── */}
-      {/* Streamed — categories are fast but we don't block hero */}
-      <Suspense fallback={<CategoriesSkeleton />}>
-        <CategoryShowcaseSection />
-      </Suspense>
+      <FadeInSection>
+        <Suspense fallback={<CategoriesSkeleton />}>
+          <CategoryShowcaseSection />
+        </Suspense>
+      </FadeInSection>
 
       {/* ── 4. FEATURED PRODUCTS ────────────────────────────────── */}
-      {/* Streamed — independent of categories */}
-      <Suspense fallback={<ProductsSkeleton title="Featured Products" />}>
-        <FeaturedProductsSection />
-      </Suspense>
+      <FadeInSection>
+        <Suspense fallback={<ProductsSkeleton title="Featured Products" />}>
+          <FeaturedProductsSection />
+        </Suspense>
+      </FadeInSection>
 
       {/* ── 5. PROMO BANNER ─────────────────────────────────────── */}
-      {/* Static markup, data from homepageData (already fetched) */}
       {homepageData.promo.isActive ? (
-        <PromoBanner data={homepageData.promo} />
+        <FadeInSection>
+          <PromoBanner data={homepageData.promo} />
+        </FadeInSection>
       ) : null}
 
       {/* ── 6. BESTSELLERS ──────────────────────────────────────── */}
-      {/* Streamed — independent section */}
-      <Suspense fallback={<ProductsSkeleton title="Bestsellers" />}>
-        <BestsellersSection />
-      </Suspense>
+      <FadeInSection>
+        <Suspense fallback={<ProductsSkeleton title="Bestsellers" />}>
+          <BestsellersSection />
+        </Suspense>
+      </FadeInSection>
 
-      {/* ── 7. TESTIMONIALS ─────────────────────────────────────── */}
-      {/* Fully static — hardcoded or from CMS, no DB needed */}
-      <Testimonials />
+      {/* ── 7. NEW ARRIVALS ─────────────────────────────────────── */}
+      <FadeInSection>
+        <Suspense fallback={<ProductsSkeleton title="New Arrivals" />}>
+          <NewArrivalsSection />
+        </Suspense>
+      </FadeInSection>
 
-      {/* ── 8. CUSTOM CRAFT ─────────────────────────────────────── */}
-      {/* Client Component — lazy loaded below the fold (react-hook-form + zod) */}
-      <CustomCraftSectionLazy />
+      {/* ── 8. TESTIMONIALS ─────────────────────────────────────── */}
+      <FadeInSection>
+        <Testimonials />
+      </FadeInSection>
 
-      {/* ── 9. NEWSLETTER ───────────────────────────────────────── */}
-      {/* Client Component — needs form interactivity */}
-      <NewsletterSection />
+      {/* ── 9. CUSTOM CRAFT ─────────────────────────────────────── */}
+      <FadeInSection>
+        <CustomCraftSectionLazy />
+      </FadeInSection>
 
-      {/* ── 9. WHATSAPP BUTTON ──────────────────────────────────── */}
-      {/* Floating WhatsApp button for customer support */}
+      {/* ── 10. NEWSLETTER ──────────────────────────────────────── */}
+      <FadeInSection>
+        <NewsletterSection />
+      </FadeInSection>
+
+      {/* ── FLOATING WHATSAPP ───────────────────────────────────── */}
       <WhatsAppButton />
     </main>
   )
@@ -100,19 +116,21 @@ export default async function HomePage() {
 // The hero and trust bar are visible instantly while these load.
 
 function CategoryShowcaseSection() {
-  // React 19: use() hook unwraps promises - can be called conditionally
   const categories = use(getCategories())
   return <CategoryShowcase categories={categories} />
 }
 
 function FeaturedProductsSection() {
-  // React 19: use() hook unwraps promises - cleaner than async/await
   const products = use(getFeaturedProducts())
   return <FeaturedProducts products={products} />
 }
 
 function BestsellersSection() {
-  // React 19: use() hook unwraps promises
   const products = use(getBestsellers())
   return <Bestsellers products={products} />
+}
+
+function NewArrivalsSection() {
+  const products = use(getNewArrivals())
+  return <NewArrivals products={products} />
 }

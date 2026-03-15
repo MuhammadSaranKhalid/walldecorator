@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CartDrawer } from '@/components/store/cart/cart-drawer'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { AnnouncementBar } from '@/components/store/home/announcement-bar'
 
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export default function RootLayout({
 }>) {
     return (
         <div className="min-h-screen flex flex-col">
+            <AnnouncementBar />
             <Header />
             <div className="flex-1">
                 {children}

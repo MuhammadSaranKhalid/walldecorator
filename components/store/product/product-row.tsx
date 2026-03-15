@@ -8,13 +8,15 @@ import { blurhashToDataURL } from '@/lib/blurhash'
 type ProductRowProps = {
   products: HomepageProduct[]
   priority?: boolean
+  /** Optional label shown as a badge on every card (e.g. "New", "Bestseller") */
+  badge?: string
 }
 
 /**
  * Reusable product row component
  * Horizontal scroll on mobile, grid on desktop
  */
-export function ProductRow({ products, priority = false }: ProductRowProps) {
+export function ProductRow({ products, priority = false, badge }: ProductRowProps) {
   if (products.length === 0) {
     return (
       <div className="text-center py-12 text-gray-500">
@@ -58,6 +60,15 @@ export function ProductRow({ products, priority = false }: ProductRowProps) {
               {product.compareAtPrice && (
                 <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
                   Sale
+                </span>
+              )}
+              {badge && (
+                <span className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-full font-semibold ${
+                  badge === 'Bestseller'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-accent text-accent-foreground'
+                }`}>
+                  {badge}
                 </span>
               )}
             </div>

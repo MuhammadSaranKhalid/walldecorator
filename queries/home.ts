@@ -198,6 +198,55 @@ export const getBestsellers = cache(async (): Promise<HomepageProduct[]> => {
 })
 
 /**
+ * Get newest products for homepage "New Arrivals" section
+ * Cached in Redis for 30 minutes
+ */
+export const getNewArrivals = cache(async (): Promise<HomepageProduct[]> => {
+  const cacheKey = 'homepage:new-arrivals'
+  const cached = await redis.get<HomepageProduct[]>(cacheKey)
+  if (cached) {
+    return typeof cached === 'string' ? JSON.parse(cached) as HomepageProduct[] : cached
+  }
+
+  const data = await prisma.products.findMany({
+    where: { status: 'active' },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      product_images: {
+        where: { is_primary: true },
+        select: {
+          display_order: true,
+          images: {
+            select: {
+              storage_path: true,
+              alt_text: true,
+              blurhash: true,
+              thumbnail_path: true,
+              medium_path: true,
+              large_path: true,
+            },
+          },
+        },
+        take: 1,
+      },
+      product_variants: {
+        select: { price: true, compare_at_price: true },
+        orderBy: { price: 'asc' },
+        take: 1,
+      },
+    },
+    orderBy: { created_at: 'desc' },
+    take: 8,
+  })
+
+  const result = normalizeProducts(data)
+  await redis.setex(cacheKey, 1800, JSON.stringify(result))
+  return result
+})
+
+/**
  * Normalize product data — extract primary image from junction + centralized images and cheapest variant price
  */
 function normalizeProducts(data: any[]): HomepageProduct[] {
