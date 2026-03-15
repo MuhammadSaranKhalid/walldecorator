@@ -1,24 +1,24 @@
-// Product Grid - Server Component
+'use client'
+
+import { useProductFilters } from '@/components/store/products/product-filters-provider'
 import { ProductCard } from './product-card'
-import { LoadMoreButton } from './load-more-button'
+import { PaginationControls } from './pagination-controls'
 import type { ProductVariant } from '@/types/products'
 
 type ProductGridProps = {
-  products: ProductVariant[]
-  totalCount: number
+  initialProducts: ProductVariant[]
+  totalPages: number
   currentPage: number
-  limit: number
 }
 
 export function ProductGrid({
-  products,
-  totalCount,
+  initialProducts,
+  totalPages,
   currentPage,
-  limit,
 }: ProductGridProps) {
-  const hasMore = currentPage * limit < totalCount
+  const { isPending } = useProductFilters()
 
-  if (products.length === 0) {
+  if (initialProducts.length === 0) {
     return (
       <div className="text-center py-16">
         <p className="text-gray-500 text-lg font-medium">No products found.</p>
@@ -28,25 +28,21 @@ export function ProductGrid({
   }
 
   return (
-    <div>
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-        {products.map((variant, index) => (
+    <div className={isPending ? 'opacity-50 pointer-events-none transition-opacity' : 'transition-opacity'}>
+      <div
+        className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+        style={{ contentVisibility: 'auto' }}
+      >
+        {initialProducts.map((variant, index) => (
           <ProductCard
             key={variant.id}
             variant={variant}
-            priority={index < 4} // Prioritize first 4 images for LCP
+            priority={index < 4}
           />
         ))}
       </div>
 
-      {/* Load more / pagination */}
-      {hasMore && (
-        <LoadMoreButton
-          currentPage={currentPage}
-          totalCount={totalCount}
-          limit={limit}
-        />
-      )}
+      <PaginationControls currentPage={currentPage} totalPages={totalPages} />
     </div>
   )
 }

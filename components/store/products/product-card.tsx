@@ -1,5 +1,11 @@
 // Product Card - Server Component
 import Image from 'next/image'
+
+const pkrFormatter = new Intl.NumberFormat('en-PK', {
+  style: 'currency',
+  currency: 'PKR',
+  maximumFractionDigits: 0,
+})
 import Link from 'next/link'
 import { getStorageUrl } from '@/lib/supabase/storage'
 import type { ProductVariant } from '@/types/products'
@@ -56,11 +62,11 @@ export function ProductCard({ variant, priority = false }: ProductCardProps) {
         </h3>
         <div className="flex items-center gap-2 mt-1">
           <span className="text-base font-semibold text-primary">
-            {new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR', maximumFractionDigits: 0 }).format(variant.price)}
+            {pkrFormatter.format(variant.price)}
           </span>
           {isOnSale && variant.compare_at_price ? (
             <span className="text-sm text-muted-foreground line-through">
-              {new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR', maximumFractionDigits: 0 }).format(variant.compare_at_price)}
+              {pkrFormatter.format(variant.compare_at_price)}
             </span>
           ) : null}
         </div>

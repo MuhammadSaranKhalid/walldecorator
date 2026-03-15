@@ -22,7 +22,7 @@ export const productSearchParams = {
   page: parseAsInteger.withDefault(1),
 
   // Items per page
-  limit: parseAsInteger.withDefault(20),
+  limit: parseAsInteger.withDefault(15),
 }
 
 // Server-side cache — lets deeply nested Server Components

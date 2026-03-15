@@ -2,7 +2,7 @@ import { Suspense, use } from 'react'
 import type { SearchParams } from 'nuqs/server'
 import { searchParamsCache } from '@/lib/search-params/products'
 import { getProducts, getProductCategories } from '@/queries/products'
-import { InfiniteProductGrid } from '@/components/store/products/infinite-product-grid'
+import { ProductGrid } from '@/components/store/products/product-grid'
 import { FilterSidebar } from '@/components/store/products/filter-sidebar'
 import { ProductSort } from '@/components/store/products/product-sort'
 import { ActiveFilters } from '@/components/store/products/active-filters'
@@ -63,7 +63,6 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             <Suspense fallback={<div className="mt-8"><ProductGridSkeleton /></div>}>
               <ProductResultsSection
                 productsPromise={productsPromise}
-                parsedParams={parsedParams}
               />
             </Suspense>
           </main>
@@ -88,10 +87,8 @@ function FilterSidebarSection({
 
 function ProductResultsSection({
   productsPromise,
-  parsedParams,
 }: {
   productsPromise: ReturnType<typeof getProducts>
-  parsedParams: Awaited<ReturnType<typeof searchParamsCache.parse>>
 }) {
   // React 19: use() hook unwraps promises - can be called conditionally
   const products = use(productsPromise)
@@ -103,11 +100,10 @@ function ProductResultsSection({
         <ProductSort />
       </div>
 
-      <InfiniteProductGrid
+      <ProductGrid
         initialProducts={products.items}
-        initialPage={parsedParams.page}
-        totalCount={products.totalCount}
-        limit={parsedParams.limit}
+        totalPages={products.totalPages}
+        currentPage={products.page}
       />
     </>
   )

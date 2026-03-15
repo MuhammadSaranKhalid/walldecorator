@@ -1,8 +1,7 @@
 'use client'
 
-import { useQueryState } from 'nuqs'
-import { productSearchParams, sortOptions } from '@/lib/search-params/products'
-import { useTransition } from 'react'
+import { sortOptions } from '@/lib/search-params/products'
+import { useProductFilters } from '@/components/store/products/product-filters-provider'
 import {
   Select,
   SelectContent,
@@ -19,19 +18,16 @@ const sortLabels: Record<(typeof sortOptions)[number], string> = {
 }
 
 export function ProductSort() {
-  const [isPending, startTransition] = useTransition()
-
-  const [sort, setSort] = useQueryState(
-    'sort',
-    productSearchParams.sort.withOptions({ shallow: false, startTransition })
-  )
+  const { params, setParams, isPending } = useProductFilters()
 
   return (
     <div className="flex items-center gap-2">
       <label id="sort-label" className="text-sm text-gray-600">Sort by:</label>
       <Select
-        value={sort}
-        onValueChange={(value) => setSort(value as (typeof sortOptions)[number])}
+        value={params.sort}
+        onValueChange={(value) =>
+          setParams({ sort: value as (typeof sortOptions)[number], page: null })
+        }
         disabled={isPending}
         aria-labelledby="sort-label"
       >

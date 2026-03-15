@@ -8,7 +8,6 @@ type ProductFiltersContextValue = {
   params: ReturnType<typeof useQueryStates<typeof productSearchParams>>[0]
   setParams: ReturnType<typeof useQueryStates<typeof productSearchParams>>[1]
   isPending: boolean
-  startTransition: React.TransitionStartFunction
 }
 
 const ProductFiltersContext = createContext<ProductFiltersContextValue | null>(null)
@@ -21,7 +20,7 @@ export function ProductFiltersProvider({ children }: { children: React.ReactNode
   })
 
   return (
-    <ProductFiltersContext value={{ params, setParams, isPending, startTransition }}>
+    <ProductFiltersContext value={{ params, setParams, isPending }}>
       {children}
     </ProductFiltersContext>
   )

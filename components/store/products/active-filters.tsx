@@ -1,7 +1,6 @@
 'use client'
 
 import { useMemo } from 'react'
-import { productSearchParams } from '@/lib/search-params/products'
 import { useProductFilters } from '@/components/store/products/product-filters-provider'
 import { X } from 'lucide-react'
 
@@ -16,8 +15,7 @@ export function ActiveFilters() {
       clear: () => setParams({ category: null, page: null }),
     } : null,
   ].filter(Boolean) as Array<{ key: string; label: string; clear: () => void }>,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [params.category])
+    [params.category, setParams])
 
   if (activeFilters.length === 0) return null
 

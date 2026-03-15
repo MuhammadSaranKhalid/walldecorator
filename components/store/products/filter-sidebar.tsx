@@ -1,16 +1,23 @@
 'use client'
 
-import { productSearchParams } from '@/lib/search-params/products'
 import { useProductFilters } from '@/components/store/products/product-filters-provider'
 import { Button } from '@/components/ui/button'
 import type { Category } from '@/types/products'
+
+// Recursive node type that works at every depth of the category tree
+type CategoryNode = {
+  id: string
+  name: string
+  slug: string
+  other_categories?: CategoryNode[] | null
+}
 
 type FilterSidebarProps = {
   categories: Category[]
 }
 
 type CategoryTreeProps = {
-  category: Category
+  category: CategoryNode
   level: number
   selectedSlug: string | null
   onSelect: (slug: string) => void
@@ -40,7 +47,7 @@ function CategoryTree({ category, level, selectedSlug, onSelect }: CategoryTreeP
           {category.other_categories?.map((subCat) => (
             <CategoryTree
               key={subCat.id}
-              category={subCat as any}
+              category={subCat}
               level={level + 1}
               selectedSlug={selectedSlug}
               onSelect={onSelect}
