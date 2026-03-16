@@ -2,35 +2,48 @@ import { cache } from 'react'
 import { db } from '@/lib/db/client'
 import { redis } from '@/lib/upstash/client'
 import { searchParamsCache } from '@/lib/search-params/products'
-import { eq, and, count, asc, desc, isNotNull, inArray } from 'drizzle-orm'
+import { eq, and, count, isNotNull, inArray } from 'drizzle-orm'
 import { products, categories } from '@/lib/db/schema'
 import type {
   ProductsResult,
   Category,
-  ProductVariant,
+  ProductListing,
 } from '@/types/products'
 
 type ProductParams = Awaited<ReturnType<typeof searchParamsCache.parse>>
 
-const PRODUCTS_CACHE_TTL = 60 // matches ISR revalidation interval
+// Product listings change slowly; long TTL reduces cold DB hits across pages.
+const PRODUCTS_CACHE_TTL = 300 // 5 min
+// Count is filter-dependent, not page-dependent — shared across all pages of the same filter.
+const COUNT_CACHE_TTL = 600 // 10 min
 
 /**
  * Get paginated and filtered products.
- * Cached in Redis with TTL based on filter combination.
+ *
+ * Cache strategy:
+ *   pageKey  — full result per page (sort + filter + page) → 5 min
+ *   countKey — total count per filter (sort-independent)   → 10 min
+ *
+ * On page 2+: count is already cached → zero COUNT(*) queries.
+ * Round-trips reduced from 2 sequential to 1 (products + count check in parallel).
  */
 export const getProducts = cache(async (params: ProductParams): Promise<ProductsResult> => {
-  const cacheKey = `products:list:${JSON.stringify(params)}`
+  const categorySlug = params.category?.trim() || null
 
-  const cached = await redis.get(cacheKey)
+  // Count key is sort-independent: same filter = same count on all pages
+  const filterKey = `${categorySlug ?? 'all'}:${params.limit}`
+  const pageKey   = `products:list:${params.sort}:${filterKey}:${params.page}`
+  const countKey  = `products:count:${filterKey}`
+
+  // Fastest path: full page cache hit
+  const cached = await redis.get(pageKey)
   if (cached) {
     return (typeof cached === 'string' ? JSON.parse(cached) : cached) as ProductsResult
   }
 
   const offset = (params.page - 1) * params.limit
-  const categorySlug = params.category?.trim() || null
 
-  // min_price IS NOT NULL means the product has at least one in-stock variant.
-  // The value is maintained by DB triggers (see migration 20260316000001).
+  // COUNT filter — used only when count cache misses
   const stockFilter = and(
     eq(products.status, 'active'),
     isNotNull(products.min_price),
@@ -42,70 +55,57 @@ export const getProducts = cache(async (params: ProductParams): Promise<Products
       : undefined
   )
 
-  // ORDER BY: price columns live on the product itself — no variant join needed
-  const orderByExpr =
-    params.sort === 'price-asc'
-      ? asc(products.min_price)
-      : params.sort === 'price-desc'
-        ? desc(products.min_price)
-        : params.sort === 'popularity'
-          ? desc(products.total_sold)
-          : desc(products.created_at)
-
-  // Step 1: Sorted + paginated IDs and total count — simple single-table queries
-  const [sortedResult, countResult] = await Promise.all([
-    db
-      .select({ id: products.id })
-      .from(products)
-      .where(stockFilter)
-      .orderBy(orderByExpr)
-      .limit(params.limit)
-      .offset(offset),
-    db
-      .select({ cnt: count(products.id) })
-      .from(products)
-      .where(stockFilter),
+  // Run products query + count cache check in parallel.
+  // findMany handles sort/pagination/relations in a single logical operation —
+  // no second "hydrate" round-trip needed because min_price / primary_image_*
+  // are now denormalized onto products (migrations 20260316000001/2).
+  const [rows, cachedCount] = await Promise.all([
+    db.query.products.findMany({
+      where: (p, { eq, and, isNotNull, inArray }) =>
+        and(
+          eq(p.status, 'active'),
+          isNotNull(p.min_price),
+          categorySlug
+            ? inArray(
+                p.category_id,
+                db
+                  .select({ id: categories.id })
+                  .from(categories)
+                  .where(eq(categories.slug, categorySlug))
+              )
+            : undefined
+        ),
+      orderBy: (p, { asc, desc }) => {
+        if (params.sort === 'price-asc')  return [asc(p.min_price)]
+        if (params.sort === 'price-desc') return [desc(p.min_price)]
+        if (params.sort === 'popularity') return [desc(p.total_sold)]
+        return [desc(p.created_at)]
+      },
+      limit: params.limit,
+      offset,
+    }),
+    redis.get<number>(countKey),
   ])
 
-  const ids = sortedResult.map((r) => r.id)
-  const totalCount = countResult[0]?.cnt ?? 0
-
-  // Step 2: Hydrate with full relations, re-applying the sort order from Step 1
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let rows: any[] = []
-
-  if (ids.length > 0) {
-    const unsorted = await db.query.products.findMany({
-      where: (p, { inArray }) => inArray(p.id, ids),
-      with: {
-        product_variants: {
-          with: { inventory: true },
-          orderBy: (pv, { asc }) => [asc(pv.price)],
-          limit: 1,
-        },
-        categories: true,
-      },
-    })
-
-    const byId = new Map(unsorted.map((p) => [p.id, p]))
-    rows = ids.map((id) => byId.get(id)).filter(Boolean)
+  // Fetch count from DB only when not cached (first visit per filter combination)
+  let totalCount: number
+  if (cachedCount !== null) {
+    totalCount = cachedCount
+  } else {
+    const [countResult] = await db
+      .select({ cnt: count(products.id) })
+      .from(products)
+      .where(stockFilter)
+    totalCount = countResult?.cnt ?? 0
+    void redis.setex(countKey, COUNT_CACHE_TTL, totalCount)
   }
 
-  // Transform to variant-centric structure and convert numeric → number
-  const data: ProductVariant[] = rows
-    .filter((product) => product.product_variants.length > 0)
-    .map((product) => {
-      const cheapestVariant = product.product_variants[0]
-      return {
-        ...cheapestVariant,
-        price: Number(product.min_price ?? cheapestVariant.price),
-        compare_at_price: product.min_compare_at_price
-          ? Number(product.min_compare_at_price)
-          : null,
-        products: { ...product, product_variants: undefined },
-        inventory: cheapestVariant.inventory,
-      } as ProductVariant
-    })
+  // Convert numeric (string in Drizzle) price fields to number
+  const data: ProductListing[] = rows.map((product) => ({
+    ...product,
+    price: Number(product.min_price),
+    compare_at_price: product.min_compare_at_price ? Number(product.min_compare_at_price) : null,
+  }))
 
   const result: ProductsResult = {
     items: data,
@@ -115,7 +115,7 @@ export const getProducts = cache(async (params: ProductParams): Promise<Products
     totalPages: Math.ceil(totalCount / params.limit),
   }
 
-  await redis.setex(cacheKey, PRODUCTS_CACHE_TTL, JSON.stringify(result))
+  await redis.setex(pageKey, PRODUCTS_CACHE_TTL, JSON.stringify(result))
   return result
 })
 

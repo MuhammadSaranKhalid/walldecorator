@@ -3,10 +3,10 @@
 import { useProductFilters } from '@/components/store/products/product-filters-provider'
 import { ProductCard } from './product-card'
 import { PaginationControls } from './pagination-controls'
-import type { ProductVariant } from '@/types/products'
+import type { ProductListing } from '@/types/products'
 
 type ProductGridProps = {
-  initialProducts: ProductVariant[]
+  initialProducts: ProductListing[]
   totalPages: number
   currentPage: number
 }
@@ -33,10 +33,10 @@ export function ProductGrid({
         className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
         style={{ contentVisibility: 'auto' }}
       >
-        {initialProducts.map((variant, index) => (
+        {initialProducts.map((product, index) => (
           <ProductCard
-            key={variant.id}
-            variant={variant}
+            key={product.id}
+            product={product}
             priority={index < 4}
           />
         ))}

@@ -6,8 +6,6 @@
 import { Image } from './images'
 import type {
   categories,
-  inventory,
-  product_variants,
   products,
 } from '@/lib/db/schema'
 
@@ -29,7 +27,6 @@ export interface ProductImageSimple {
 
 export type ProductCategory = typeof categories.$inferSelect
 
-export type ProductInventory = typeof inventory.$inferSelect
 
 export type Category = typeof categories.$inferSelect & {
   other_categories: (typeof categories.$inferSelect & {
@@ -37,24 +34,15 @@ export type Category = typeof categories.$inferSelect & {
   })[]
 }
 
-// Product variant row with nested relations for the products listing page
-// primary_image_* columns are inferred from typeof products.$inferSelect (trigger-maintained)
-export type ProductVariantBase = typeof product_variants.$inferSelect & {
-  products: typeof products.$inferSelect & {
-    categories: typeof categories.$inferSelect | null
-  }
-  inventory: typeof inventory.$inferSelect | null
-}
-
-// Cast numeric (string in Drizzle) price fields to number for JSON
-export type ProductVariant = Omit<ProductVariantBase, 'price' | 'compare_at_price' | 'products'> & {
+// Product listing row — product-centric, no variant join needed.
+// min_price / min_compare_at_price are denormalized on products (trigger-maintained).
+export type ProductListing = Omit<typeof products.$inferSelect, 'min_price' | 'min_compare_at_price'> & {
   price: number
   compare_at_price: number | null
-  products: Omit<ProductVariantBase['products'], 'product_variants'>
 }
 
 export interface ProductsResult {
-  items: ProductVariant[]
+  items: ProductListing[]
   totalCount: number
   page: number
   limit: number

@@ -8,21 +8,17 @@ const pkrFormatter = new Intl.NumberFormat('en-PK', {
 })
 import Link from 'next/link'
 import { getStorageUrl } from '@/lib/supabase/storage'
-import type { ProductVariant } from '@/types/products'
+import type { ProductListing } from '@/types/products'
 
 type ProductCardProps = {
-  variant: ProductVariant
+  product: ProductListing
   priority?: boolean
 }
 
-export function ProductCard({ variant, priority = false }: ProductCardProps) {
-  const product = variant.products
+export function ProductCard({ product, priority = false }: ProductCardProps) {
   const imagePath = product.primary_image_medium_path ?? product.primary_image_storage_path
 
-  const isOnSale =
-    variant.compare_at_price && variant.compare_at_price > variant.price
-  const isLowStock =
-    variant.inventory && (variant.inventory.quantity_available ?? 0) <= 5
+  const isOnSale = product.compare_at_price && product.compare_at_price > product.price
 
   return (
     <Link href={`/products/${product.slug}`} className="group block">
@@ -48,12 +44,6 @@ export function ProductCard({ variant, priority = false }: ProductCardProps) {
             Sale
           </span>
         ) : null}
-
-        {isLowStock && variant.inventory ? (
-          <span className="absolute top-2 right-2 bg-accent text-accent-foreground text-xs px-2 py-1 rounded shadow-md font-semibold">
-            Only {variant.inventory.quantity_available} left
-          </span>
-        ) : null}
       </div>
 
       <div className="mt-3">
@@ -62,11 +52,11 @@ export function ProductCard({ variant, priority = false }: ProductCardProps) {
         </h3>
         <div className="flex items-center gap-2 mt-1">
           <span className="text-base font-semibold text-primary">
-            {pkrFormatter.format(variant.price)}
+            {pkrFormatter.format(product.price)}
           </span>
-          {isOnSale && variant.compare_at_price ? (
+          {isOnSale && product.compare_at_price ? (
             <span className="text-sm text-muted-foreground line-through">
-              {pkrFormatter.format(variant.compare_at_price)}
+              {pkrFormatter.format(product.compare_at_price)}
             </span>
           ) : null}
         </div>
