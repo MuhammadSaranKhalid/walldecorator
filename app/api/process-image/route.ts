@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import sharp from "sharp";
 import { encode } from "blurhash";
 import { getAdminClient } from "@/lib/supabase/admin";
-import { prisma } from "@/lib/prisma/client";
+import { db } from "@/lib/db/client";
+import { eq } from "drizzle-orm";
+import { images as imagesTable, image_processing_configs } from "@/lib/db/schema";
 import { z } from "zod";
 
 const BUCKET_NAME = "product-images";
@@ -69,15 +71,15 @@ export async function POST(request: Request) {
     console.log(`Processing ${entityType} image: ${imageId} at ${storagePath}`);
 
     // Update status to processing (centralized images table)
-    await prisma.images.update({
-      where: { id: imageId },
-      data: { processing_status: "processing" },
-    });
+    await db
+      .update(imagesTable)
+      .set({ processing_status: "processing" })
+      .where(eq(imagesTable.id, imageId));
 
     // Step 0: Fetch specific configuration for this entity type
-    const configData = await prisma.image_processing_configs.findUnique({
-      where: { entity_type: entityType },
-      select: { variants: true, folder_prefix: true },
+    const configData = await db.query.image_processing_configs.findFirst({
+      where: (c, { eq }) => eq(c.entity_type, entityType),
+      columns: { variants: true, folder_prefix: true },
     });
 
     if (!configData?.variants || !configData?.folder_prefix) {
@@ -149,9 +151,9 @@ export async function POST(request: Request) {
     }
 
     // Step 4: Update database with variant paths and blurhash (centralized images table)
-    await prisma.images.update({
-      where: { id: imageId },
-      data: {
+    await db
+      .update(imagesTable)
+      .set({
         ...variantPaths,
         blurhash,
         processing_status: "completed",
@@ -159,8 +161,8 @@ export async function POST(request: Request) {
         original_width: originalWidth,
         original_height: originalHeight,
         file_size_bytes: fileSize,
-      },
-    });
+      })
+      .where(eq(imagesTable.id, imageId));
 
     console.log(`✓ ${entityType} image processing completed for ${imageId}`);
 
@@ -183,13 +185,10 @@ export async function POST(request: Request) {
     // Update database with error status (centralized images table)
     if (imageId) {
       try {
-        await prisma.images.update({
-          where: { id: imageId },
-          data: {
-            processing_status: "failed",
-            processing_error: errorMessage,
-          },
-        });
+        await db
+          .update(imagesTable)
+          .set({ processing_status: "failed", processing_error: errorMessage })
+          .where(eq(imagesTable.id, imageId));
       } catch (dbError) {
         console.error("Failed to update error status in database:", dbError);
       }

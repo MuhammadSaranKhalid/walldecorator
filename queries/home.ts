@@ -1,6 +1,8 @@
 import { cache } from 'react'
-import { prisma } from '@/lib/prisma/client'
+import { db } from '@/lib/db/client'
 import { redis } from '@/lib/upstash/client'
+import { desc, isNotNull } from 'drizzle-orm'
+import { homepage_config } from '@/lib/db/schema'
 import type {
   HomepageData,
   Category,
@@ -8,17 +10,23 @@ import type {
 } from '@/types/homepage'
 
 /**
- * Homepage configuration — hero text, promo banner, settings
- * Cached in Redis for 30 minutes
+ * Homepage configuration — hero text, promo banner, settings.
+ * Cached in Redis for 30 minutes.
  */
 export const getHomepageData = cache(async (): Promise<HomepageData> => {
   const cacheKey = 'homepage:data'
   const cached = await redis.get<HomepageData>(cacheKey)
   if (cached) {
-    return typeof cached === 'string' ? JSON.parse(cached) as HomepageData : cached
+    return typeof cached === 'string' ? (JSON.parse(cached) as HomepageData) : cached
   }
 
-  const data = await prisma.homepage_config.findFirst()
+  const rows = await db
+    .select()
+    .from(homepage_config)
+    .orderBy(desc(homepage_config.updated_at))
+    .limit(1)
+
+  const data = rows[0] ?? null
 
   const result: HomepageData = {
     hero: {
@@ -38,109 +46,78 @@ export const getHomepageData = cache(async (): Promise<HomepageData> => {
     },
   }
 
-  // 30 min TTL — matches page revalidate window
   await redis.setex(cacheKey, 1800, JSON.stringify(result))
   return result
 })
 
 /**
- * Get top-level categories for homepage showcase
- * Cached in Redis for 1 hour
+ * Get top-level categories for homepage showcase.
+ * Cached in Redis for 1 hour.
  */
 export const getCategories = cache(async (): Promise<Category[]> => {
   const cacheKey = 'homepage:categories'
   const cached = await redis.get<Category[]>(cacheKey)
   if (cached) {
-    return typeof cached === 'string' ? JSON.parse(cached) as Category[] : cached
+    return typeof cached === 'string' ? (JSON.parse(cached) as Category[]) : cached
   }
 
-  const data = await prisma.categories.findMany({
-    where: {
-      parent_id: null, // Top-level only
-      is_visible: true,
-    },
-    select: {
+  const data = await db.query.categories.findMany({
+    where: (c, { isNull, eq, and }) => and(isNull(c.parent_id), eq(c.is_visible, true)),
+    columns: {
       id: true,
       name: true,
       slug: true,
       image_id: true,
       product_count: true,
+    },
+    with: {
       images: {
-        select: {
+        columns: {
           id: true,
-          entity_type: true,
-          entity_id: true,
           storage_path: true,
           alt_text: true,
           thumbnail_path: true,
           medium_path: true,
           large_path: true,
           blurhash: true,
-          processing_status: true,
-          processing_error: true,
-          original_width: true,
-          original_height: true,
-          file_size_bytes: true,
-          created_at: true,
-          updated_at: true,
         },
       },
     },
-    orderBy: {
-      display_order: 'asc',
-    },
-    take: 8, // Max 8 categories on homepage
+    orderBy: (c, { asc }) => [asc(c.display_order)],
+    limit: 8,
   })
 
   await redis.setex(cacheKey, 3600, JSON.stringify(data))
-  return data as Category[]
+  return data as unknown as Category[]
 })
 
 /**
- * Get featured products for homepage
- * Cached in Redis for 30 minutes
+ * Get featured products for homepage.
+ * Cached in Redis for 30 minutes.
  */
 export const getFeaturedProducts = cache(async (): Promise<HomepageProduct[]> => {
   const cacheKey = 'homepage:featured'
   const cached = await redis.get<HomepageProduct[]>(cacheKey)
   if (cached) {
-    return typeof cached === 'string' ? JSON.parse(cached) as HomepageProduct[] : cached
+    return typeof cached === 'string' ? (JSON.parse(cached) as HomepageProduct[]) : cached
   }
 
-  const data = await prisma.products.findMany({
-    where: {
-      status: 'active',
-      is_featured: true,
-    },
-    select: {
+  const data = await db.query.products.findMany({
+    where: (p, { and, eq }) =>
+      and(eq(p.status, 'active'), eq(p.is_featured, true), isNotNull(p.min_price)),
+    columns: {
       id: true,
       name: true,
       slug: true,
-      product_images: {
-        where: { is_primary: true },
-        select: {
-          display_order: true,
-          images: {
-            select: {
-              storage_path: true,
-              alt_text: true,
-              blurhash: true,
-              thumbnail_path: true,
-              medium_path: true,
-              large_path: true,
-            },
-          },
-        },
-        take: 1,
-      },
-      product_variants: {
-        select: { price: true, compare_at_price: true },
-        orderBy: { price: 'asc' },
-        take: 1,
-      },
+      min_price: true,
+      min_compare_at_price: true,
+      primary_image_medium_path: true,
+      primary_image_storage_path: true,
+      primary_image_blurhash: true,
+      primary_image_alt_text: true,
     },
-    orderBy: { featured_order: 'asc' },
-    take: 8,
+    orderBy: (p, { asc }) => [asc(p.featured_order)],
+    limit: 8,
   })
 
   const result = normalizeProducts(data)
@@ -149,96 +126,64 @@ export const getFeaturedProducts = cache(async (): Promise<HomepageProduct[]> =>
 })
 
 /**
- * Get bestselling products
- * Cached in Redis for 1 hour (changes slowly)
+ * Get bestselling products.
+ * Cached in Redis for 1 hour.
  */
 export const getBestsellers = cache(async (): Promise<HomepageProduct[]> => {
   const cacheKey = 'homepage:bestsellers'
   const cached = await redis.get<HomepageProduct[]>(cacheKey)
   if (cached) {
-    return typeof cached === 'string' ? JSON.parse(cached) as HomepageProduct[] : cached
+    return typeof cached === 'string' ? (JSON.parse(cached) as HomepageProduct[]) : cached
   }
 
-  const data = await prisma.products.findMany({
-    where: { status: 'active' },
-    select: {
+  const data = await db.query.products.findMany({
+    where: (p, { eq, and }) => and(eq(p.status, 'active'), isNotNull(p.min_price)),
+    columns: {
       id: true,
       name: true,
       slug: true,
-      product_images: {
-        where: { is_primary: true },
-        select: {
-          display_order: true,
-          images: {
-            select: {
-              storage_path: true,
-              alt_text: true,
-              blurhash: true,
-              thumbnail_path: true,
-              medium_path: true,
-              large_path: true,
-            },
-          },
-        },
-        take: 1,
-      },
-      product_variants: {
-        select: { price: true, compare_at_price: true },
-        orderBy: { price: 'asc' },
-        take: 1,
-      },
+      min_price: true,
+      min_compare_at_price: true,
+      primary_image_medium_path: true,
+      primary_image_storage_path: true,
+      primary_image_blurhash: true,
+      primary_image_alt_text: true,
     },
-    orderBy: { total_sold: 'desc' },
-    take: 8,
+    orderBy: (p, { desc }) => [desc(p.total_sold)],
+    limit: 8,
   })
 
   const result = normalizeProducts(data)
-  await redis.setex(cacheKey, 3600, JSON.stringify(result)) // 1hr
+  await redis.setex(cacheKey, 3600, JSON.stringify(result))
   return result
 })
 
 /**
- * Get newest products for homepage "New Arrivals" section
- * Cached in Redis for 30 minutes
+ * Get newest products for homepage "New Arrivals" section.
+ * Cached in Redis for 30 minutes.
  */
 export const getNewArrivals = cache(async (): Promise<HomepageProduct[]> => {
   const cacheKey = 'homepage:new-arrivals'
   const cached = await redis.get<HomepageProduct[]>(cacheKey)
   if (cached) {
-    return typeof cached === 'string' ? JSON.parse(cached) as HomepageProduct[] : cached
+    return typeof cached === 'string' ? (JSON.parse(cached) as HomepageProduct[]) : cached
   }
 
-  const data = await prisma.products.findMany({
-    where: { status: 'active' },
-    select: {
+  const data = await db.query.products.findMany({
+    where: (p, { eq, and }) => and(eq(p.status, 'active'), isNotNull(p.min_price)),
+    columns: {
       id: true,
       name: true,
       slug: true,
-      product_images: {
-        where: { is_primary: true },
-        select: {
-          display_order: true,
-          images: {
-            select: {
-              storage_path: true,
-              alt_text: true,
-              blurhash: true,
-              thumbnail_path: true,
-              medium_path: true,
-              large_path: true,
-            },
-          },
-        },
-        take: 1,
-      },
-      product_variants: {
-        select: { price: true, compare_at_price: true },
-        orderBy: { price: 'asc' },
-        take: 1,
-      },
+      min_price: true,
+      min_compare_at_price: true,
+      primary_image_medium_path: true,
+      primary_image_storage_path: true,
+      primary_image_blurhash: true,
+      primary_image_alt_text: true,
     },
-    orderBy: { created_at: 'desc' },
-    take: 8,
+    orderBy: (p, { desc }) => [desc(p.created_at)],
+    limit: 8,
   })
 
   const result = normalizeProducts(data)
@@ -247,30 +192,39 @@ export const getNewArrivals = cache(async (): Promise<HomepageProduct[]> => {
 })
 
 /**
- * Normalize product data — extract primary image from junction + centralized images and cheapest variant price
+ * Normalize product rows into HomepageProduct.
+ * Prices come directly from DB-maintained min_price columns — no JS filtering.
  */
-function normalizeProducts(data: any[]): HomepageProduct[] {
-  return data.map((product) => {
-    const primaryImageJunction = product.product_images?.[0] ?? null
-    const primaryImageData = primaryImageJunction?.images ?? null
-    const cheapestVariant = product.product_variants?.[0]
-
+function normalizeProducts(
+  rows: {
+    id: string
+    name: string
+    slug: string
+    min_price: string | null
+    min_compare_at_price: string | null
+    primary_image_medium_path: string | null
+    primary_image_storage_path: string | null
+    primary_image_blurhash: string | null
+    primary_image_alt_text: string | null
+  }[]
+): HomepageProduct[] {
+  return rows.map((product) => {
+    const imagePath = product.primary_image_medium_path ?? product.primary_image_storage_path
     return {
       id: product.id,
       name: product.name,
       slug: product.slug,
-      image: primaryImageData
+      image: imagePath
         ? {
-          storage_path: primaryImageData.storage_path,
-          alt_text: primaryImageData.alt_text,
-          display_order: primaryImageJunction.display_order,
-          blurhash: primaryImageData.blurhash,
-        }
+            storage_path: imagePath,
+            alt_text: product.primary_image_alt_text,
+            display_order: 0,
+            blurhash: product.primary_image_blurhash,
+          }
         : null,
-      // Decimal fields must be converted to Number before JSON serialization
-      price: cheapestVariant ? Number(cheapestVariant.price) : 0,
-      compareAtPrice: cheapestVariant?.compare_at_price
-        ? Number(cheapestVariant.compare_at_price)
+      price: product.min_price ? Number(product.min_price) : 0,
+      compareAtPrice: product.min_compare_at_price
+        ? Number(product.min_compare_at_price)
         : null,
     }
   })

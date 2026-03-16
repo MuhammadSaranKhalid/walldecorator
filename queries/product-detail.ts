@@ -1,179 +1,156 @@
 import { cache } from 'react'
-import { prisma } from '@/lib/prisma/client'
+import { db } from '@/lib/db/client'
 import { redis } from '@/lib/upstash/client'
-import type { ProductDetail, ReviewsResult } from '@/types/products'
+import { eq, and, count, avg, desc } from 'drizzle-orm'
+import { reviews } from '@/lib/db/schema'
+import type {
+  ProductDetail,
+  ReviewsResult,
+  Review,
+  AvailableOptions,
+  SelectionMap,
+  ProductCategory,
+} from '@/types/products'
+
+const REVIEWS_PAGE_SIZE = 10
 
 // ─── Get Product by Slug ──────────────────────────────────────────────────────
 
 /**
- * Get complete product details by slug for the product detail page
+ * Get complete product details by slug for the product detail page.
  * React cache() ensures this is only called once per render even if used
- * in both generateMetadata and the page component
+ * in both generateMetadata and the page component.
  */
 export const getProductBySlug = cache(async (slug: string): Promise<ProductDetail | null> => {
   const cacheKey = `product:detail:${slug}`
 
-  // Try Redis first
   const cached = await redis.get(cacheKey)
   if (cached) {
     return (typeof cached === 'string' ? JSON.parse(cached) : cached) as ProductDetail
   }
 
-  try {
-    const data = await prisma.products.findUnique({
-      where: { slug },
-      include: {
-        categories: true,
-        product_images: {
-          orderBy: { display_order: 'asc' },
-          include: {
-            images: true,  // Join with centralized images table
-          },
+  const data = await db.query.products.findFirst({
+    where: (p, { eq }) => eq(p.slug, slug),
+    with: {
+      categories: true,
+      product_images: {
+        orderBy: (pi, { asc }) => [asc(pi.display_order)],
+        with: { images: true },
+      },
+      product_variants: {
+        columns: {
+          id: true,
+          sku: true,
+          price: true,
+          compare_at_price: true,
+          is_default: true,
         },
-        product_variants: {
-          select: {
-            id: true,
-            sku: true,
-            price: true,
-            compare_at_price: true,
-            is_default: true,
-            // Only fetch .value — product_attributes name is not used in transform
-            product_attribute_values_product_variants_material_idToproduct_attribute_values: {
-              select: { value: true },
-            },
-            product_attribute_values_product_variants_size_idToproduct_attribute_values: {
-              select: { value: true },
-            },
-            product_attribute_values_product_variants_thickness_idToproduct_attribute_values: {
-              select: { value: true },
-            },
-            inventory: {
-              select: {
-                quantity_available: true,
-                allow_backorder: true,
-              },
-            },
+        with: {
+          // Named relations for material/size/thickness attribute values
+          material_attr: { columns: { value: true } },
+          size_attr: { columns: { value: true } },
+          thickness_attr: { columns: { value: true } },
+          inventory: {
+            columns: { quantity_available: true, allow_backorder: true },
           },
         },
       },
-    })
+    },
+  })
 
-    if (!data) {
-      console.warn('No product found for slug:', slug)
-      return null
+  if (!data) return null
+
+  // ─── Data Transformation ─────────────────────────────────────────────────
+
+  const variants = data.product_variants.map((v) => {
+    return {
+      id: v.id,
+      sku: v.sku,
+      price: Number(v.price),
+      compare_at_price: v.compare_at_price ? Number(v.compare_at_price) : null,
+      stock: v.inventory?.quantity_available ?? 0,
+      attributes: {
+        material: v.material_attr?.value ?? '',
+        size: v.size_attr?.value ?? '',
+        thickness: v.thickness_attr?.value ?? '',
+      },
     }
+  })
 
-    // ─── Data Transformation ──────────────────────────────────────────────────
-
-    const variants = data.product_variants.map((v) => {
-      const material = v.product_attribute_values_product_variants_material_idToproduct_attribute_values
-      const size = v.product_attribute_values_product_variants_size_idToproduct_attribute_values
-      const thickness = v.product_attribute_values_product_variants_thickness_idToproduct_attribute_values
-
-      return {
-        id: v.id,
-        sku: v.sku,
-        price: Number(v.price),
-        compare_at_price: v.compare_at_price ? Number(v.compare_at_price) : null,
-        stock: v.inventory?.quantity_available ?? 0,
-        attributes: {
-          material: material?.value ?? '',
-          size: size?.value ?? '',
-          thickness: thickness?.value ?? '',
-        },
-        material_display: material?.value ?? '', // For building options tree
+  // 1. Build hierarchical available options
+  const available_options: AvailableOptions = {}
+  variants.forEach((v) => {
+    const { material, size, thickness } = v.attributes
+    if (!available_options[material]) {
+      available_options[material] = {
+        display_name: material.charAt(0).toUpperCase() + material.slice(1),
+        sizes: {},
       }
-    })
-
-    // 1. Build Hierarchical Available Options
-    const available_options: any = {}
-    variants.forEach((v) => {
-      const { material, size, thickness } = v.attributes
-
-      if (!available_options[material]) {
-        available_options[material] = {
-          display_name: material.charAt(0).toUpperCase() + material.slice(1),
-          sizes: {}
-        }
-      }
-
-      if (!available_options[material].sizes[size]) {
-        available_options[material].sizes[size] = []
-      }
-
-      if (!available_options[material].sizes[size].includes(thickness)) {
-        available_options[material].sizes[size].push(thickness)
-      }
-    })
-
-    // 2. Build Selection Map (Instant Lookup)
-    const selection_map: any = {}
-    variants.forEach((v) => {
-      const key = `${v.attributes.material}|${v.attributes.size}|${v.attributes.thickness}`
-      selection_map[key] = {
-        id: v.id,
-        price: v.price,
-        compare_at_price: v.compare_at_price,
-        sku: v.sku,
-        stock: v.stock
-      }
-    })
-
-    // 3. Calculate Price Range
-    const prices = variants.map(v => v.price)
-    const price_range = {
-      min: Math.min(...prices),
-      max: Math.max(...prices),
-      has_discount: variants.some(v => v.compare_at_price !== null && v.compare_at_price > v.price)
     }
-
-    const product: ProductDetail = {
-      id: data.id,
-      name: data.name,
-      slug: data.slug,
-      description: data.description,
-      seo_description: data.seo_description,
-      status: data.status ?? 'active',
-      category: data.categories as any,
-      product_images: data.product_images.map(img => ({
-        display_order: img.display_order ?? 0,
-        is_primary: img.is_primary ?? false,
-        variant_id: img.variant_id,
-        image: img.images  // Centralized images table data
-      })),
-      available_options,
-      selection_map,
-      price_range
+    if (!available_options[material].sizes[size]) {
+      available_options[material].sizes[size] = []
     }
+    if (!available_options[material].sizes[size].includes(thickness)) {
+      available_options[material].sizes[size].push(thickness)
+    }
+  })
 
-    // Cache for 10 minutes
-    await redis.setex(cacheKey, 600, JSON.stringify(product))
+  // 2. Build selection map for instant client-side lookup
+  const selection_map: SelectionMap = {}
+  variants.forEach((v) => {
+    const key = `${v.attributes.material}|${v.attributes.size}|${v.attributes.thickness}`
+    selection_map[key] = {
+      id: v.id,
+      price: v.price,
+      compare_at_price: v.compare_at_price,
+      sku: v.sku,
+      stock: v.stock,
+    }
+  })
 
-    return product
-  } catch (error) {
-    console.error('Error fetching product by slug:', slug, error)
-    return null
+  // 3. Calculate price range
+  const prices = variants.map((v) => v.price)
+  const price_range = {
+    min: prices.reduce((min, p) => (p < min ? p : min), prices[0] ?? 0),
+    max: prices.reduce((max, p) => (p > max ? p : max), prices[0] ?? 0),
+    has_discount: variants.some((v) => v.compare_at_price !== null && v.compare_at_price > v.price),
   }
+
+  const product: ProductDetail = {
+    id: data.id,
+    name: data.name,
+    slug: data.slug,
+    description: data.description,
+    seo_description: data.seo_description,
+    status: data.status ?? 'active',
+    category: data.categories as ProductCategory,
+    product_images: data.product_images.map((img) => ({
+      display_order: img.display_order ?? 0,
+      is_primary: img.is_primary ?? false,
+      variant_id: img.variant_id,
+      image: img.images,
+    })),
+    available_options,
+    selection_map,
+    price_range,
+  }
+
+  await redis.setex(cacheKey, 600, JSON.stringify(product))
+  return product
 })
 
 // ─── Get Top Product Slugs for Static Generation ─────────────────────────────
 
 /**
- * Get slugs of top products for generateStaticParams
- * Only called at build time - no caching needed
+ * Get slugs of top products for generateStaticParams.
+ * Only called at build time — no caching needed.
  */
 export const getTopProductSlugs = cache(async (limit: number): Promise<string[]> => {
-  const data = await prisma.products.findMany({
-    where: {
-      status: 'active',
-    },
-    select: {
-      slug: true,
-    },
-    orderBy: {
-      total_sold: 'desc',
-    },
-    take: limit,
+  const data = await db.query.products.findMany({
+    where: (p, { eq }) => eq(p.status, 'active'),
+    columns: { slug: true },
+    orderBy: (p, { desc }) => [desc(p.total_sold)],
+    limit,
   })
 
   return data.map((p) => p.slug)
@@ -182,8 +159,8 @@ export const getTopProductSlugs = cache(async (limit: number): Promise<string[]>
 // ─── Get Product Reviews ──────────────────────────────────────────────────────
 
 /**
- * Get reviews and rating summary for a product
- * Used in the streamed ReviewSection
+ * Get reviews and rating summary for a product.
+ * Used in the streamed ReviewSection.
  */
 export const getProductReviews = cache(async (productId: string): Promise<ReviewsResult> => {
   const cacheKey = `product:${productId}:reviews`
@@ -192,152 +169,164 @@ export const getProductReviews = cache(async (productId: string): Promise<Review
     return (typeof cached === 'string' ? JSON.parse(cached) : cached) as ReviewsResult
   }
 
-  // Fetch paginated reviews + rating summary in parallel.
-  // aggregate() computes count/avg on the DB side — no need to load every
-  // rating row into JS memory.
-  const [reviews, ratingAgg, distribution] = await Promise.all([
-    prisma.reviews.findMany({
-      where: { product_id: productId, is_approved: true },
-      select: {
-        id: true,
-        rating: true,
-        title: true,
-        body: true,
-        created_at: true,
-        reviewer_name: true,
-      },
-      orderBy: { created_at: 'desc' },
-      take: 10,
-    }),
+  const reviewWhere = and(eq(reviews.product_id, productId), eq(reviews.is_approved, true))
 
-    // Single aggregate call replaces the full scan with filter loops in JS
-    prisma.reviews.aggregate({
-      where: { product_id: productId, is_approved: true },
-      _count: { id: true },
-      _avg: { rating: true },
-    }),
+  const [reviewRows, [aggRow], distribution] = await Promise.all([
+    // Page of reviews
+    db
+      .select({
+        id: reviews.id,
+        rating: reviews.rating,
+        title: reviews.title,
+        body: reviews.body,
+        created_at: reviews.created_at,
+        reviewer_name: reviews.reviewer_name,
+      })
+      .from(reviews)
+      .where(reviewWhere)
+      .orderBy(desc(reviews.created_at))
+      .limit(REVIEWS_PAGE_SIZE),
 
-    // Distribution per star still needs groupBy
-    prisma.reviews.groupBy({
-      by: ['rating'],
-      where: { product_id: productId, is_approved: true },
-      _count: { id: true },
-    }),
+    // DB-side aggregate for count + average
+    db
+      .select({
+        total: count(reviews.id),
+        average: avg(reviews.rating),
+      })
+      .from(reviews)
+      .where(reviewWhere),
+
+    // Rating distribution
+    db
+      .select({
+        rating: reviews.rating,
+        cnt: count(reviews.id),
+      })
+      .from(reviews)
+      .where(reviewWhere)
+      .groupBy(reviews.rating),
   ])
 
-  const totalCount = ratingAgg._count.id
-  const averageRating = ratingAgg._avg.rating ?? 0
+  const totalCount = aggRow?.total ?? 0
+  const averageRating = aggRow?.average ? Number(aggRow.average) : 0
 
-  const distributionMap = Object.fromEntries(
-    distribution.map((d) => [d.rating, d._count.id])
-  )
+  const distributionMap = Object.fromEntries(distribution.map((d) => [d.rating, d.cnt]))
   const distributionResult = [5, 4, 3, 2, 1].map((star) => ({
     star,
     count: distributionMap[star] ?? 0,
   }))
 
-  // Transform reviews to match expected format
-  const transformedReviews = reviews.map((review) => ({
-    ...review,
+  const transformedReviews: Review[] = reviewRows.map((review) => ({
+    id: review.id,
+    rating: review.rating,
+    title: review.title,
+    body: review.body,
+    created_at: review.created_at.toISOString(),
     profile: { display_name: review.reviewer_name },
   }))
 
   const result: ReviewsResult = {
-    reviews: transformedReviews as any,
-    summary: {
-      totalCount,
-      averageRating,
-      distribution: distributionResult,
-    },
+    reviews: transformedReviews,
+    summary: { totalCount, averageRating, distribution: distributionResult },
   }
 
-  // Cache for 15 minutes
   await redis.setex(cacheKey, 900, JSON.stringify(result))
-
   return result
 })
 
 // ─── Get Related Products ─────────────────────────────────────────────────────
 
+type RelatedProduct = {
+  id: string
+  name: string
+  slug: string
+  product_images: {
+    storage_path: string
+    alt_text: string | null
+    display_order: number
+    blurhash: string | null
+  }[]
+  product_variants: {
+    id: string
+    price: number
+    compare_at_price: number | null
+  }[]
+}
+
 /**
- * Get related products from the same category
- * Used in the streamed RelatedProductsSection
+ * Get related products from the same category.
+ * Used in the streamed RelatedProductsSection.
  */
 export const getRelatedProducts = cache(
-  async (categoryId: string, excludeProductId: string) => {
+  async (categoryId: string, excludeProductId: string): Promise<RelatedProduct[]> => {
     const cacheKey = `related:${categoryId}:${excludeProductId}`
     const cached = await redis.get(cacheKey)
     if (cached) {
-      return typeof cached === 'string' ? JSON.parse(cached) : cached
+      return (typeof cached === 'string' ? JSON.parse(cached) : cached) as RelatedProduct[]
     }
 
-    try {
-      const data = await prisma.products.findMany({
-        where: {
-          category_id: categoryId,
-          status: 'active',
-          id: { not: excludeProductId },
-          // Only include products that have at least one in-stock variant
-          product_variants: {
-            some: {
-              inventory: { quantity_available: { gt: 0 } },
-            },
-          },
-        },
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          // Only fetch the 3 fields actually rendered from centralized images table
-          product_images: {
-            select: {
-              display_order: true,
-              images: {
-                select: {
-                  storage_path: true,
-                  alt_text: true,
-                  blurhash: true,
-                  thumbnail_path: true,
-                  medium_path: true,
-                  large_path: true,
-                },
+    // Fetch products in the same category, excluding the current product.
+    // We fetch more than needed to ensure 4 in-stock products after filtering.
+    const data = await db.query.products.findMany({
+      where: (p, { and, eq, ne }) =>
+        and(eq(p.category_id, categoryId), eq(p.status, 'active'), ne(p.id, excludeProductId)),
+      columns: { id: true, name: true, slug: true },
+      with: {
+        product_images: {
+          where: (pi, { eq }) => eq(pi.is_primary, true),
+          columns: { display_order: true },
+          with: {
+            images: {
+              columns: {
+                storage_path: true,
+                alt_text: true,
+                blurhash: true,
+                thumbnail_path: true,
+                medium_path: true,
+                large_path: true,
               },
             },
-            orderBy: { display_order: 'asc' },
-            take: 1,
           },
-          product_variants: {
-            where: {
-              inventory: { quantity_available: { gt: 0 } },
-            },
-            select: {
-              id: true,
-              price: true,
-              compare_at_price: true,
-            },
-            orderBy: { price: 'asc' },
-            take: 1,
-          },
+          limit: 1,
         },
-        orderBy: { total_sold: 'desc' },
-        take: 4,
-      })
+        product_variants: {
+          columns: { id: true, price: true, compare_at_price: true },
+          with: { inventory: { columns: { quantity_available: true } } },
+        },
+      },
+      orderBy: (p, { desc }) => [desc(p.total_sold)],
+      limit: 8,
+    })
 
-      // Convert Decimal prices to numbers
-      const result = data.map((product) => ({
-        ...product,
-        product_variants: product.product_variants.map((variant) => ({
-          ...variant,
-          price: Number(variant.price),
-          compare_at_price: variant.compare_at_price ? Number(variant.compare_at_price) : null,
+    // Filter to products that have at least one in-stock variant, then take 4
+    const filtered = data
+      .filter((p) => p.product_variants.some((v) => (v.inventory?.quantity_available ?? 0) > 0))
+      .slice(0, 4)
+
+    const result: RelatedProduct[] = filtered.map((product) => ({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      product_images: product.product_images
+        .filter((pi) => pi.images != null)
+        .map((pi) => ({
+          storage_path: pi.images!.storage_path,
+          alt_text: pi.images!.alt_text,
+          display_order: pi.display_order ?? 0,
+          blurhash: pi.images!.blurhash,
         })),
-      }))
+      product_variants: product.product_variants
+        .filter((v) => (v.inventory?.quantity_available ?? 0) > 0)
+        .sort((a, b) => Number(a.price) - Number(b.price))
+        .slice(0, 1)
+        .map((v) => ({
+          id: v.id,
+          price: Number(v.price),
+          compare_at_price: v.compare_at_price ? Number(v.compare_at_price) : null,
+        })),
+    }))
 
-      await redis.setex(cacheKey, 600, JSON.stringify(result))
-      return result
-    } catch (error) {
-      console.error('Error fetching related products:', error)
-      return []
-    }
+    await redis.setex(cacheKey, 600, JSON.stringify(result))
+    return result
   }
 )

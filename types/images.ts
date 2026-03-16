@@ -2,13 +2,12 @@
 // Centralized Image Types
 // =====================================================
 
-import type { Prisma } from '@/lib/generated/prisma/client'
+import type { images } from '@/lib/db/schema'
 
 /**
- * Centralized image type
- * All images (products, categories, reviews, custom orders) are stored in this table
+ * Centralized image type — mirrors the `images` table row.
  */
-export type Image = Prisma.imagesGetPayload<{}>
+export type Image = typeof images.$inferSelect
 
 // =====================================================
 // Junction Table Types

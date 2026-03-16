@@ -1,10 +1,15 @@
 // ============================================================
 // Product listing types for products page
-// Updated for centralized images architecture
+// Updated for Drizzle ORM (was Prisma)
 // ============================================================
 
 import { Image } from './images'
-import type { Prisma } from '@/lib/generated/prisma/client'
+import type {
+  categories,
+  inventory,
+  product_variants,
+  products,
+} from '@/lib/db/schema'
 
 // Junction table data + centralized image data
 export interface ProductImage {
@@ -22,36 +27,26 @@ export interface ProductImageSimple {
   blurhash: string | null
 }
 
-export type ProductCategory = Prisma.categoriesGetPayload<{}>
+export type ProductCategory = typeof categories.$inferSelect
 
-export type ProductInventory = Prisma.inventoryGetPayload<{}>
+export type ProductInventory = typeof inventory.$inferSelect
 
-export type Category = Prisma.categoriesGetPayload<{
-  include: {
-    other_categories: {
-      include: {
-        other_categories: true
-      }
-    }
+export type Category = typeof categories.$inferSelect & {
+  other_categories: (typeof categories.$inferSelect & {
+    other_categories: (typeof categories.$inferSelect)[]
+  })[]
+}
+
+// Product variant row with nested relations for the products listing page
+// primary_image_* columns are inferred from typeof products.$inferSelect (trigger-maintained)
+export type ProductVariantBase = typeof product_variants.$inferSelect & {
+  products: typeof products.$inferSelect & {
+    categories: typeof categories.$inferSelect | null
   }
-}>
+  inventory: typeof inventory.$inferSelect | null
+}
 
-// The mapping function drops some deep relations but keeps a slim object
-export type ProductVariantBase = Prisma.product_variantsGetPayload<{
-  include: {
-    products: {
-      include: {
-        product_images: {
-          include: { images: true }
-        }
-        categories: true
-      }
-    }
-    inventory: true
-  }
-}>
-
-// Cast Prisma's Decimal (which is string/object) to number for JSON
+// Cast numeric (string in Drizzle) price fields to number for JSON
 export type ProductVariant = Omit<ProductVariantBase, 'price' | 'compare_at_price' | 'products'> & {
   price: number
   compare_at_price: number | null

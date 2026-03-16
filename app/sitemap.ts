@@ -1,41 +1,28 @@
 import { MetadataRoute } from 'next'
-import { prisma } from '@/lib/prisma/client'
+import { db } from '@/lib/db/client'
+import { eq } from 'drizzle-orm'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
     // Fetch all active products with their first image
-    const products = await prisma.products.findMany({
-        where: {
-            status: 'active',
-        },
-        select: {
-            slug: true,
-            updated_at: true,
+    const products = await db.query.products.findMany({
+        where: (p, { eq }) => eq(p.status, 'active'),
+        columns: { slug: true, updated_at: true },
+        with: {
             product_images: {
-                select: {
-                    images: {
-                        select: {
-                            storage_path: true,
-                        }
-                    }
-                },
-                orderBy: {
-                    display_order: 'asc',
-                },
-                take: 1,
+                columns: {},
+                with: { images: { columns: { storage_path: true } } },
+                orderBy: (pi, { asc }) => [asc(pi.display_order)],
+                limit: 1,
             },
         },
     })
 
-    // Fetch all categories
-    const categories = await prisma.categories.findMany({
-        where: {
-            is_visible: true,
-        },
-        select: {
-            slug: true,
-        },
+    // Fetch all visible categories
+    const categories = await db.query.categories.findMany({
+        where: (c, { eq }) => eq(c.is_visible, true),
+        columns: { slug: true },
     })
 
     const productEntries: MetadataRoute.Sitemap = products.map((product) => {

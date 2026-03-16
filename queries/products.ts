@@ -1,115 +1,106 @@
 import { cache } from 'react'
-import { prisma } from '@/lib/prisma/client'
+import { db } from '@/lib/db/client'
 import { redis } from '@/lib/upstash/client'
 import { searchParamsCache } from '@/lib/search-params/products'
+import { eq, and, count, asc, desc, isNotNull, inArray } from 'drizzle-orm'
+import { products, categories } from '@/lib/db/schema'
 import type {
   ProductsResult,
   Category,
   ProductVariant,
 } from '@/types/products'
-import { Prisma } from '@/lib/generated/prisma/client'
 
 type ProductParams = Awaited<ReturnType<typeof searchParamsCache.parse>>
 
 const PRODUCTS_CACHE_TTL = 60 // matches ISR revalidation interval
 
 /**
- * Get paginated and filtered products
- * Cached in Redis with TTL based on filter combination
+ * Get paginated and filtered products.
+ * Cached in Redis with TTL based on filter combination.
  */
 export const getProducts = cache(async (params: ProductParams): Promise<ProductsResult> => {
-  // Build a deterministic cache key from the params
   const cacheKey = `products:list:${JSON.stringify(params)}`
 
-  // Try Redis first
   const cached = await redis.get(cacheKey)
   if (cached) {
     return (typeof cached === 'string' ? JSON.parse(cached) : cached) as ProductsResult
   }
 
-  const where: Prisma.productsWhereInput = {
-    status: 'active',
-    product_variants: {
-      some: { inventory: { quantity_available: { gt: 0 } } },
-    },
-    ...(params.category?.trim() ? { categories: { slug: params.category } } : {}),
-  }
-
-  // Shared include for both query paths
-  const include = {
-    product_variants: {
-      where: { inventory: { quantity_available: { gt: 0 } } },
-      orderBy: { price: 'asc' as const },
-      take: 1,
-      include: { inventory: true },
-    },
-    product_images: {
-      where: { is_primary: true },
-      take: 1,
-      include: { images: true },
-    },
-    categories: true,
-  }
-
-  const isPriceSort = params.sort === 'price-asc' || params.sort === 'price-desc'
   const offset = (params.page - 1) * params.limit
+  const categorySlug = params.category?.trim() || null
 
+  // min_price IS NOT NULL means the product has at least one in-stock variant.
+  // The value is maintained by DB triggers (see migration 20260316000001).
+  const stockFilter = and(
+    eq(products.status, 'active'),
+    isNotNull(products.min_price),
+    categorySlug
+      ? inArray(
+          products.category_id,
+          db.select({ id: categories.id }).from(categories).where(eq(categories.slug, categorySlug))
+        )
+      : undefined
+  )
+
+  // ORDER BY: price columns live on the product itself — no variant join needed
+  const orderByExpr =
+    params.sort === 'price-asc'
+      ? asc(products.min_price)
+      : params.sort === 'price-desc'
+        ? desc(products.min_price)
+        : params.sort === 'popularity'
+          ? desc(products.total_sold)
+          : desc(products.created_at)
+
+  // Step 1: Sorted + paginated IDs and total count — simple single-table queries
+  const [sortedResult, countResult] = await Promise.all([
+    db
+      .select({ id: products.id })
+      .from(products)
+      .where(stockFilter)
+      .orderBy(orderByExpr)
+      .limit(params.limit)
+      .offset(offset),
+    db
+      .select({ cnt: count(products.id) })
+      .from(products)
+      .where(stockFilter),
+  ])
+
+  const ids = sortedResult.map((r) => r.id)
+  const totalCount = countResult[0]?.cnt ?? 0
+
+  // Step 2: Hydrate with full relations, re-applying the sort order from Step 1
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let rows: any[]
-  let totalCount: number
+  let rows: any[] = []
 
-  if (isPriceSort) {
-    // Prisma's orderByRelation aggregate is not enabled in this project, so use a
-    // raw query to get globally sorted + paginated product IDs, then hydrate them.
-    const direction = params.sort === 'price-asc' ? Prisma.sql`ASC` : Prisma.sql`DESC`
-    const categoryFilter = params.category?.trim()
-      ? Prisma.sql`AND p.category_id = (SELECT id FROM categories WHERE slug = ${params.category} LIMIT 1)`
-      : Prisma.empty
+  if (ids.length > 0) {
+    const unsorted = await db.query.products.findMany({
+      where: (p, { inArray }) => inArray(p.id, ids),
+      with: {
+        product_variants: {
+          with: { inventory: true },
+          orderBy: (pv, { asc }) => [asc(pv.price)],
+          limit: 1,
+        },
+        categories: true,
+      },
+    })
 
-    const [sortedIds, count] = await Promise.all([
-      prisma.$queryRaw<{ id: string }[]>`
-        SELECT p.id
-        FROM products p
-        INNER JOIN product_variants pv ON pv.product_id = p.id
-        INNER JOIN inventory i ON i.variant_id = pv.id
-        WHERE p.status = 'active'
-          AND i.quantity_available > 0
-          ${categoryFilter}
-        GROUP BY p.id
-        ORDER BY MIN(pv.price) ${direction}
-        LIMIT ${params.limit} OFFSET ${offset}
-      `,
-      prisma.products.count({ where }),
-    ])
-
-    const ids = sortedIds.map((r) => r.id)
-    const unsorted = await prisma.products.findMany({ where: { id: { in: ids } }, include })
-    // Re-apply raw query order — findMany does not preserve IN-list order
     const byId = new Map(unsorted.map((p) => [p.id, p]))
     rows = ids.map((id) => byId.get(id)).filter(Boolean)
-    totalCount = count
-  } else {
-    const orderBy: Prisma.productsOrderByWithRelationInput =
-      params.sort === 'popularity' ? { total_sold: 'desc' } : { created_at: 'desc' }
-
-    const result = await prisma.$transaction([
-      prisma.products.findMany({ where, orderBy, skip: offset, take: params.limit, include }),
-      prisma.products.count({ where }),
-    ])
-    rows = result[0]
-    totalCount = result[1]
   }
 
-  // Transform to variant-centric structure and convert Decimal → number
+  // Transform to variant-centric structure and convert numeric → number
   const data: ProductVariant[] = rows
     .filter((product) => product.product_variants.length > 0)
     .map((product) => {
       const cheapestVariant = product.product_variants[0]
       return {
         ...cheapestVariant,
-        price: Number(cheapestVariant.price),
-        compare_at_price: cheapestVariant.compare_at_price
-          ? Number(cheapestVariant.compare_at_price)
+        price: Number(product.min_price ?? cheapestVariant.price),
+        compare_at_price: product.min_compare_at_price
+          ? Number(product.min_compare_at_price)
           : null,
         products: { ...product, product_variants: undefined },
         inventory: cheapestVariant.inventory,
@@ -129,8 +120,8 @@ export const getProducts = cache(async (params: ProductParams): Promise<Products
 })
 
 /**
- * Get all categories for filter sidebar
- * Cached in Redis for 1 hour
+ * Get all categories for filter sidebar.
+ * Cached in Redis for 1 hour.
  */
 export const getProductCategories = cache(async (): Promise<Category[]> => {
   const cacheKey = 'products:categories'
@@ -139,33 +130,21 @@ export const getProductCategories = cache(async (): Promise<Category[]> => {
     return (typeof cached === 'string' ? JSON.parse(cached) : cached) as Category[]
   }
 
-  // Fetch only top-level categories with their nested subcategories
-  const data = await prisma.categories.findMany({
-    where: {
-      parent_id: null, // Only top-level categories
-      is_visible: true,
-    },
-    include: {
+  const data = await db.query.categories.findMany({
+    where: (c, { isNull, eq, and }) => and(isNull(c.parent_id), eq(c.is_visible, true)),
+    with: {
       other_categories: {
-        where: {
-          is_visible: true,
-        },
-        include: {
+        where: (c, { eq }) => eq(c.is_visible, true),
+        with: {
           other_categories: {
-            where: {
-              is_visible: true,
-            },
+            where: (c, { eq }) => eq(c.is_visible, true),
           },
         },
       },
     },
-    orderBy: {
-      name: 'asc',
-    },
+    orderBy: (c, { asc }) => [asc(c.name)],
   })
 
-
-  await redis.setex(cacheKey, 3600, JSON.stringify(data)) // 1 hour TTL
-  return data as Category[]
+  await redis.setex(cacheKey, 3600, JSON.stringify(data))
+  return data as unknown as Category[]
 })
-

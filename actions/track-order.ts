@@ -1,6 +1,8 @@
 'use server'
 
-import { prisma } from '@/lib/prisma/client'
+import { db } from '@/lib/db/client'
+import { eq, and, sql } from 'drizzle-orm'
+import { orders, order_items } from '@/lib/db/schema'
 
 export type OrderItem = {
   id: string
@@ -57,12 +59,14 @@ export async function trackOrder(
   }
 
   try {
-    const order = await prisma.orders.findFirst({
-      where: {
-        order_number: sanitizedOrder,
-        customer_email: { equals: sanitizedEmail, mode: 'insensitive' },
-      },
-      select: {
+    const order = await db.query.orders.findFirst({
+      where: (o, { eq, and, sql }) =>
+        and(
+          eq(o.order_number, sanitizedOrder),
+          // Case-insensitive email match
+          sql`LOWER(${o.customer_email}) = ${sanitizedEmail}`
+        ),
+      columns: {
         order_number: true,
         status: true,
         payment_status: true,
@@ -75,8 +79,10 @@ export async function trackOrder(
         confirmed_at: true,
         shipped_at: true,
         delivered_at: true,
+      },
+      with: {
         order_items: {
-          select: {
+          columns: {
             id: true,
             product_name: true,
             variant_description: true,
