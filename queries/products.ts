@@ -2,7 +2,7 @@ import { cache } from 'react'
 import { db } from '@/lib/db/client'
 import { redis } from '@/lib/upstash/client'
 import { searchParamsCache } from '@/lib/search-params/products'
-import { eq, and, count, isNotNull, inArray } from 'drizzle-orm'
+import { eq, and, count, isNotNull } from 'drizzle-orm'
 import { products, categories } from '@/lib/db/schema'
 import type {
   ProductsResult,
@@ -43,38 +43,61 @@ export const getProducts = cache(async (params: ProductParams): Promise<Products
 
   const offset = (params.page - 1) * params.limit
 
-  // COUNT filter — used only when count cache misses
-  const stockFilter = and(
-    eq(products.status, 'active'),
-    isNotNull(products.min_price),
-    categorySlug
-      ? inArray(
-          products.category_id,
-          db.select({ id: categories.id }).from(categories).where(eq(categories.slug, categorySlug))
-        )
-      : undefined
-  )
+  // Build WHERE clause for category filtering
+  let categoryCondition: any = undefined
+  if (categorySlug) {
+    // Get category ID first
+    const category = await db.query.categories.findFirst({
+      where: (c, { eq }) => eq(c.slug, categorySlug),
+      columns: { id: true },
+    })
+    if (category) {
+      categoryCondition = eq(products.category_id, category.id)
+    }
+  }
 
   // Run products query + count cache check in parallel.
-  // findMany handles sort/pagination/relations in a single logical operation —
-  // no second "hydrate" round-trip needed because min_price / primary_image_*
-  // are now denormalized onto products (migrations 20260316000001/2).
+  // Explicitly select all columns including denormalized fields
   const [rows, cachedCount] = await Promise.all([
     db.query.products.findMany({
-      where: (p, { eq, and, isNotNull, inArray }) =>
+      where: (p, { eq, and, isNotNull }) =>
         and(
           eq(p.status, 'active'),
           isNotNull(p.min_price),
-          categorySlug
-            ? inArray(
-                p.category_id,
-                db
-                  .select({ id: categories.id })
-                  .from(categories)
-                  .where(eq(categories.slug, categorySlug))
-              )
-            : undefined
+          categoryCondition
         ),
+      columns: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        status: true,
+        category_id: true,
+        is_featured: true,
+        total_sold: true,
+        view_count: true,
+        seo_title: true,
+        seo_description: true,
+        // Denormalized price fields (trigger-maintained)
+        min_price: true,
+        min_compare_at_price: true,
+        // Denormalized image fields (trigger-maintained)
+        primary_image_storage_path: true,
+        primary_image_medium_path: true,
+        primary_image_blurhash: true,
+        primary_image_alt_text: true,
+        created_at: true,
+        updated_at: true,
+      },
+      with: {
+        categories: {
+          columns: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+      },
       orderBy: (p, { asc, desc }) => {
         if (params.sort === 'price-asc')  return [asc(p.min_price)]
         if (params.sort === 'price-desc') return [desc(p.min_price)]
@@ -92,6 +115,13 @@ export const getProducts = cache(async (params: ProductParams): Promise<Products
   if (cachedCount !== null) {
     totalCount = cachedCount
   } else {
+    // Build count filter with same conditions
+    const stockFilter = and(
+      eq(products.status, 'active'),
+      isNotNull(products.min_price),
+      categoryCondition
+    )
+
     const [countResult] = await db
       .select({ cnt: count(products.id) })
       .from(products)

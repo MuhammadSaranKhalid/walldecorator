@@ -1,17 +1,20 @@
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Cormorant_Garamond, DM_Sans } from "next/font/google"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 import "./globals.css"
 import { JsonLd } from "@/components/seo/json-ld"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const cormorantGaramond = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
+  weight: ["300", "400", "600"],
+  style: ["normal", "italic"],
 })
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
+  weight: ["300", "400", "500"],
 })
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://walldecorator.com"
@@ -108,8 +111,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="en" className="obsidian-scrollbar">
+      <body className={`${cormorantGaramond.variable} ${dmSans.variable} font-[family-name:var(--font-dm-sans)] antialiased bg-[var(--obsidian-bg)] text-[var(--obsidian-text)] min-h-screen overflow-x-hidden obsidian-noise`}>
         <NuqsAdapter>
           <JsonLd data={websiteSchema} />
           <JsonLd data={organizationSchema} />

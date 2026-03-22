@@ -1,0 +1,2365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OBSIDIAN — Wall Art & Decor</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080808;--surface:#111111;--surface2:#1a1a1a;
+  --border:#252525;--gold:#c9a84c;--gold-light:#e8c96e;
+  --text:#f0ece4;--text-muted:#7a7570;--text-dim:#3d3a36;
+  --white:#fff;--red:#c94c4c;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity:.025;}
+.z1{position:relative;z-index:1;}
+
+/* ══ NAV ══ */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:20px 48px;background:rgba(8,8,8,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.nav-logo{display:flex;flex-direction:column;cursor:pointer;}
+.nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;letter-spacing:6px;color:var(--gold);text-transform:uppercase;line-height:1;}
+.nav-logo-sub{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);margin-top:3px;}
+.nav-links{display:flex;gap:36px;}
+.nav-links a{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-muted);text-decoration:none;transition:color .25s;cursor:pointer;}
+.nav-links a:hover,.nav-links a.active{color:var(--text);}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.search-wrap{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:2px;padding:8px 14px;}
+.search-wrap input{background:none;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:1px;width:180px;}
+.search-wrap input::placeholder{color:var(--text-dim);}
+.icon-btn{position:relative;background:none;border:1px solid var(--border);color:var(--text);padding:8px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:1px;transition:all .25s;white-space:nowrap;}
+.icon-btn:hover{border-color:var(--gold);color:var(--gold);}
+.icon-badge{position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;font-size:9px;font-weight:500;display:flex;align-items:center;justify-content:center;background:var(--gold);color:var(--bg);}
+.icon-badge.hidden{display:none;}.icon-badge.red{background:var(--red);}
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px;}
+.hamburger span{display:block;width:22px;height:1px;background:var(--text);transition:all .3s;}
+.hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+
+/* ══ MOBILE MENU ══ */
+.mobile-menu{position:fixed;inset:0;background:var(--bg);z-index:99;display:flex;flex-direction:column;justify-content:center;align-items:center;transform:translateX(-100%);transition:transform .4s cubic-bezier(.4,0,.2,1);}
+.mobile-menu.open{transform:translateX(0);}
+.mob-eyebrow{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);margin-bottom:28px;}
+.mob-links{display:flex;flex-direction:column;align-items:center;width:100%;}
+.mob-link{font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:300;color:var(--text-muted);text-decoration:none;padding:14px 0;width:100%;text-align:center;border-bottom:1px solid var(--border);transition:color .2s;cursor:pointer;}
+.mob-link:hover{color:var(--gold);}
+.mob-search{margin-top:36px;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);padding:12px 20px;width:280px;}
+.mob-search input{background:none;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;width:100%;}
+.mob-btns{display:flex;gap:12px;margin-top:36px;}
+
+/* ══ HERO ══ */
+.hero{padding-top:80px;min-height:96vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;overflow:hidden;}
+.hero-left{padding:80px 56px;}
+.hero-eyebrow{font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:28px;display:flex;align-items:center;gap:14px;}
+.hero-eyebrow::before{content:'';width:40px;height:1px;background:var(--gold);}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(52px,6.5vw,92px);font-weight:300;line-height:.95;margin-bottom:32px;}
+.hero-title em{font-style:italic;color:var(--gold);}
+.hero-sub{font-size:13px;line-height:1.9;color:var(--text-muted);max-width:400px;margin-bottom:40px;}
+.hero-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:44px;}
+.hero-pill{font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:6px 14px;border:1px solid var(--border);color:var(--text-dim);cursor:pointer;transition:all .2s;}
+.hero-pill:hover{border-color:var(--gold);color:var(--gold);}
+.hero-cta{display:inline-flex;align-items:center;gap:16px;background:var(--gold);color:var(--bg);padding:16px 36px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:500;transition:all .3s;}
+.hero-cta:hover{background:var(--gold-light);transform:translateX(4px);}
+.hero-cta-ghost{display:inline-flex;align-items:center;gap:10px;background:none;border:1px solid var(--border);color:var(--text-muted);padding:16px 28px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;transition:all .3s;margin-left:12px;}
+.hero-cta-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.hero-cta-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;}
+.hero-right{height:96vh;background:var(--surface);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+
+/* Wall art showcase SVG */
+.hero-art-stage{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+.hero-art-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,#1e1508 0%,#080808 100%);}
+.hero-art-wall{position:absolute;inset:0;background:linear-gradient(180deg,#181410 0%,#0f0d0a 100%);}
+.hero-art-shadow{
+  position:absolute;bottom:60px;left:50%;transform:translateX(-50%);
+  width:200px;height:24px;
+  background:radial-gradient(ellipse,rgba(0,0,0,.8) 0%,transparent 70%);
+  filter:blur(8px);
+}
+.hero-svg-wrap{position:relative;z-index:2;animation:heroFloat 5s ease-in-out infinite;}
+@keyframes heroFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
+.hero-art-label{
+  position:absolute;bottom:100px;left:50%;transform:translateX(-50%);
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);
+  white-space:nowrap;z-index:3;
+}
+.hero-art-glow{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-54%);
+  width:280px;height:280px;
+  background:radial-gradient(ellipse,rgba(201,168,76,.06) 0%,transparent 70%);
+  border-radius:50%;z-index:1;
+}
+.hero-stat-box{
+  position:absolute;bottom:48px;left:-20px;z-index:4;
+  background:var(--bg);border:1px solid var(--border);padding:18px 24px;
+}
+.hero-stat-num{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--gold);}
+.hero-stat-label{font-size:9px;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;}
+.hero-stat-box2{
+  position:absolute;top:80px;right:-16px;z-index:4;
+  background:var(--bg);border:1px solid var(--border);padding:16px 20px;
+}
+
+/* ══ MATERIAL STRIP ══ */
+.material-strip{
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:20px 48px;display:flex;align-items:center;gap:0;overflow-x:auto;
+}
+.mat-item{
+  display:flex;align-items:center;gap:12px;padding:0 32px;
+  border-right:1px solid var(--border);white-space:nowrap;
+  font-size:11px;color:var(--text-muted);letter-spacing:1px;
+}
+.mat-item:first-child{padding-left:0;}
+.mat-item:last-child{border-right:none;}
+.mat-icon{font-size:16px;}
+
+/* ══ CATEGORIES BAR ══ */
+.categories-bar{display:flex;align-items:center;border-bottom:1px solid var(--border);padding:0 48px;overflow-x:auto;}
+.cat-btn{background:none;border:none;border-bottom:2px solid transparent;color:var(--text-muted);padding:18px 24px;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all .2s;margin-bottom:-1px;}
+.cat-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+.cat-btn:hover:not(.active){color:var(--text);}
+
+/* ══ PRODUCTS ══ */
+.products-section{padding:60px 48px;}
+.section-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:40px;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:300;line-height:1.1;}
+.section-title span{color:var(--text-muted);font-style:italic;font-size:28px;}
+.sort-select{background:var(--surface);border:1px solid var(--border);color:var(--text-muted);padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;outline:none;}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:2px;}
+
+
+/* ══ PRODUCT CARD ══ */
+.product-card{background:var(--surface);cursor:pointer;position:relative;overflow:hidden;animation:fadeUp .5s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.product-card:hover .card-actions{opacity:1;transform:translateY(0);}
+.product-card:hover .card-art{transform:scale(1.04) translateY(-4px);}
+.product-img-wrap{aspect-ratio:3/4;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
+.card-art{transition:transform .5s ease;position:relative;z-index:2;}
+.card-art-bg{position:absolute;inset:0;background:var(--surface2);}
+.card-art-glow{position:absolute;inset:0;opacity:0;transition:opacity .4s;background:radial-gradient(ellipse at center,rgba(201,168,76,.08) 0%,transparent 70%);}
+.product-card:hover .card-art-glow{opacity:1;}
+.product-badge{position:absolute;top:16px;left:16px;font-size:8px;letter-spacing:2.5px;text-transform:uppercase;padding:5px 10px;font-weight:500;z-index:3;}
+.badge-new{background:var(--gold);color:var(--bg);}.badge-sale{background:var(--red);color:var(--white);}.badge-hot{background:#1a1a1a;border:1px solid var(--border);color:var(--text-muted);}.badge-ltd{background:#1e1218;border:1px solid #3d1e30;color:#c94c8a;}
+.wish-heart{position:absolute;top:14px;right:14px;z-index:3;background:rgba(8,8,8,.65);border:1px solid var(--border);width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;transition:all .2s;backdrop-filter:blur(4px);}
+.wish-heart:hover{border-color:var(--red);transform:scale(1.12);}
+.wish-heart.active{background:rgba(201,76,76,.2);border-color:var(--red);color:var(--red);}
+.card-material{position:absolute;bottom:14px;right:14px;z-index:3;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:4px 8px;background:rgba(8,8,8,.75);border:1px solid var(--border);color:var(--text-dim);backdrop-filter:blur(4px);}
+.card-actions{position:absolute;bottom:0;left:0;right:0;padding:10px;background:rgba(8,8,8,.92);opacity:0;transform:translateY(8px);transition:all .25s;display:flex;gap:8px;z-index:4;}
+.add-cart-btn{flex:1;background:var(--gold);color:var(--bg);border:none;padding:11px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:500;transition:background .2s;}
+.add-cart-btn:hover{background:var(--gold-light);}
+.view-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:11px 14px;cursor:pointer;font-size:13px;transition:all .2s;}
+.view-btn:hover{border-color:var(--gold);color:var(--gold);}
+.product-info{padding:18px 20px 22px;border-top:1px solid var(--border);}
+.product-cat{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;}
+.product-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;margin-bottom:6px;line-height:1.3;}
+.product-sub{font-size:11px;color:var(--text-dim);margin-bottom:10px;letter-spacing:.5px;}
+.product-price-row{display:flex;align-items:center;gap:10px;}
+.product-price{font-size:14px;color:var(--gold);}
+.product-price-old{font-size:12px;color:var(--text-dim);text-decoration:line-through;}
+.product-rating{display:flex;gap:2px;margin-top:8px;color:var(--gold);font-size:10px;}
+.star-empty{color:var(--text-dim);}
+
+/* ══ TOAST ══ */
+.toast-container{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);z-index:600;display:flex;flex-direction:column;gap:10px;pointer-events:none;align-items:center;}
+.toast{background:rgba(17,17,17,.96);border:1px solid var(--border);backdrop-filter:blur(16px);padding:14px 22px;display:flex;align-items:center;gap:14px;min-width:280px;pointer-events:all;position:relative;overflow:hidden;animation:toastIn .3s cubic-bezier(.4,0,.2,1) both;}
+.toast.out{animation:toastOut .3s ease forwards;}
+@keyframes toastIn{from{opacity:0;transform:translateY(16px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes toastOut{from{opacity:1;}to{opacity:0;transform:translateY(10px) scale(.96);}}
+.toast-icon{font-size:20px;flex-shrink:0;}.toast-body{flex:1;}
+.toast-title{font-size:12px;font-weight:500;letter-spacing:.5px;margin-bottom:2px;}
+.toast-sub{font-size:11px;color:var(--text-muted);}
+.toast-bar{position:absolute;bottom:0;left:0;height:2px;animation:toastBar 3s linear forwards;}
+@keyframes toastBar{from{width:100%;}to{width:0%;}}
+.toast-gold .toast-bar{background:var(--gold);}.toast-red .toast-bar{background:var(--red);}
+
+/* ══ WISHLIST / CART DRAWERS ══ */
+.wish-overlay,.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px);}
+.wish-overlay.open,.cart-overlay.open{opacity:1;pointer-events:all;}
+.wish-drawer,.cart-drawer{position:fixed;top:0;right:0;bottom:0;width:420px;background:var(--surface);border-left:1px solid var(--border);z-index:201;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;}
+.wish-drawer.open,.cart-drawer.open{transform:translateX(0);}
+.wish-header,.cart-header{padding:28px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.wish-title,.cart-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;}
+.wish-title span,.cart-title span{color:var(--text-muted);font-size:16px;margin-left:8px;}
+.close-btn{background:none;border:1px solid var(--border);color:var(--text-muted);width:36px;height:36px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.close-btn:hover{border-color:var(--text);color:var(--text);}
+.wish-items,.cart-items{flex:1;overflow-y:auto;padding:24px 32px;}
+.wish-empty,.cart-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);gap:12px;}
+.wish-empty-icon,.cart-empty-icon{font-size:48px;opacity:.3;}
+.wish-empty p,.cart-empty p{font-size:12px;letter-spacing:1px;text-transform:uppercase;}
+.wish-item,.cart-item{display:flex;gap:16px;padding:18px 0;border-bottom:1px solid var(--border);animation:slideIn .25s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateX(10px);}to{opacity:1;transform:translateX(0);}}
+.wish-item-img,.cart-item-img{width:72px;height:72px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;}
+.wish-item-info,.cart-item-info{flex:1;}
+.wish-item-name,.cart-item-name{font-family:'Cormorant Garamond',serif;font-size:16px;margin-bottom:2px;}
+.wish-item-sub{font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px;}
+.wish-item-price,.cart-item-price{color:var(--gold);font-size:13px;margin-bottom:10px;}
+.wish-item-actions{display:flex;gap:8px;}
+.wish-add-btn{background:var(--gold);color:var(--bg);border:none;padding:8px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:500;transition:background .2s;}
+.wish-add-btn:hover{background:var(--gold-light);}
+.wish-rm-btn{background:none;border:1px solid var(--border);color:var(--text-muted);padding:8px 10px;cursor:pointer;font-size:14px;transition:all .2s;}
+.wish-rm-btn:hover{border-color:var(--red);color:var(--red);}
+.qty-ctrl{display:flex;align-items:center;gap:12px;}
+.qty-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);width:26px;height:26px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.qty-btn:hover{border-color:var(--gold);color:var(--gold);}
+.qty-num{font-size:13px;min-width:20px;text-align:center;}
+.remove-btn{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:18px;padding:4px;transition:color .2s;align-self:flex-start;}
+.remove-btn:hover{color:var(--red);}
+.cart-footer{padding:24px 32px;border-top:1px solid var(--border);}
+.cart-summary{margin-bottom:20px;}
+.cart-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);padding:6px 0;letter-spacing:.5px;}
+.cart-row.total{font-size:20px;color:var(--text);padding-top:14px;border-top:1px solid var(--border);margin-top:8px;font-family:'Cormorant Garamond',serif;}
+.cart-row.total .val{color:var(--gold);}
+.checkout-btn{width:100%;background:var(--gold);color:var(--bg);border:none;padding:18px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:500;transition:all .25s;}
+.checkout-btn:hover{background:var(--gold-light);}
+.checkout-btn:disabled{background:var(--border);color:var(--text-dim);cursor:not-allowed;}
+
+/* ══ CHECKOUT MODAL ══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(8px);}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border:1px solid var(--border);width:580px;max-width:95vw;max-height:90vh;overflow-y:auto;transform:translateY(20px);transition:transform .35s;}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal-header{padding:32px 40px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:2;}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;}
+.steps-indicator{display:flex;align-items:center;margin:24px 40px;}
+.step-dot{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-muted);transition:all .3s;flex-shrink:0;}
+.step-dot.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.1);}
+.step-dot.done{background:var(--gold);border-color:var(--gold);color:var(--bg);}
+.step-line{flex:1;height:1px;background:var(--border);transition:background .3s;}
+.step-line.done{background:var(--gold);}
+.steps-labels{display:flex;justify-content:space-between;padding:0 40px;margin-bottom:8px;}
+.step-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);}
+.modal-body{padding:8px 40px 40px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-group{display:flex;flex-direction:column;gap:8px;}
+.form-group.full{grid-column:span 2;}
+.form-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);}
+.form-input{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+.form-input:focus{border-color:var(--gold);}
+.form-input::placeholder{color:var(--text-dim);}
+.modal-footer{padding:24px 40px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;bottom:0;background:var(--surface);}
+.btn-back{background:none;border:1px solid var(--border);color:var(--text-muted);padding:12px 24px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;transition:all .2s;}
+.btn-back:hover{border-color:var(--text);color:var(--text);}
+.btn-next{background:var(--gold);color:var(--bg);border:none;padding:14px 36px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:500;transition:all .2s;}
+.btn-next:hover{background:var(--gold-light);}
+.order-item-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.order-item-price{color:var(--gold);}
+.order-total-row{display:flex;justify-content:space-between;padding:16px 0 0;font-family:'Cormorant Garamond',serif;font-size:22px;}
+.order-total-row .val{color:var(--gold);}
+.success-state{padding:60px 40px;text-align:center;}
+.success-icon{font-size:56px;margin-bottom:24px;}
+.success-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;margin-bottom:12px;}
+.success-sub{color:var(--text-muted);font-size:13px;line-height:1.8;}
+.success-order{margin:28px 0;padding:18px;background:var(--surface2);border:1px solid var(--border);}
+.success-order-num{font-size:10px;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;}
+.success-order-val{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold);}
+
+/* ══ PRODUCT DETAIL PAGE ══ */
+#detailPage{display:none;position:fixed;inset:0;background:var(--bg);z-index:150;overflow-y:auto;}
+#detailPage.open{display:block;animation:pageIn .35s ease;}
+@keyframes pageIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.detail-nav{position:sticky;top:0;background:rgba(8,8,8,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:20px 48px;display:flex;align-items:center;gap:20px;z-index:10;}
+.back-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:8px;transition:color .2s;}
+.back-btn:hover{color:var(--gold);}
+.breadcrumb{font-size:11px;color:var(--text-dim);}
+.breadcrumb span{color:var(--text-muted);}
+.detail-body{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 70px);}
+.detail-gallery{position:sticky;top:70px;height:calc(100vh - 70px);overflow:hidden;background:var(--surface);display:flex;align-items:center;justify-content:center;}
+.detail-gallery-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;}
+.detail-art-bg{position:absolute;inset:0;}
+.detail-art-glow{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(201,168,76,.07) 0%,transparent 70%);}
+.detail-art-svg{position:relative;z-index:2;animation:heroFloat 5s ease-in-out infinite;filter:drop-shadow(0 40px 60px rgba(0,0,0,.8));}
+/* Material selector */
+.detail-info{padding:56px 52px;}
+.detail-cat{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+.detail-cat::before{content:'';width:24px;height:1px;background:var(--gold);}
+.detail-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,4vw,52px);font-weight:300;line-height:1.1;margin-bottom:8px;}
+.detail-subtitle{font-size:12px;color:var(--text-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px;}
+.detail-rating{display:flex;align-items:center;gap:10px;margin-bottom:24px;}
+.detail-stars{color:var(--gold);font-size:13px;}
+.detail-review-count{font-size:11px;color:var(--text-dim);}
+.detail-price-row{display:flex;align-items:baseline;gap:16px;margin-bottom:28px;}
+.detail-price{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:300;color:var(--gold);}
+.detail-price-old{font-size:20px;color:var(--text-dim);text-decoration:line-through;}
+.detail-divider{height:1px;background:var(--border);margin-bottom:28px;}
+.detail-desc{font-size:13px;line-height:2.0;color:var(--text-muted);margin-bottom:28px;max-width:440px;}
+/* Material selector */
+.option-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px;}
+.material-options{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap;}
+.mat-opt{
+  background:none;border:1px solid var(--border);color:var(--text-muted);
+  padding:8px 16px;cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:10px;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s;
+}
+.mat-opt.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.05);}
+.mat-opt:hover:not(.active){border-color:var(--text-muted);}
+.size-options{display:flex;gap:8px;margin-bottom:28px;}
+.size-opt{
+  background:none;border:1px solid var(--border);color:var(--text-muted);
+  width:52px;height:44px;cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:10px;letter-spacing:1px;text-transform:uppercase;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;
+}
+.size-opt.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.05);}
+.detail-specs{margin-bottom:28px;}
+.detail-spec-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px;}
+.detail-spec-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.detail-spec-key{color:var(--text-muted);}.detail-spec-val{color:var(--text);}
+.detail-actions{display:flex;gap:10px;margin-bottom:24px;}
+.detail-add-btn{flex:1;background:var(--gold);color:var(--bg);border:none;padding:18px 28px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:500;transition:all .25s;}
+.detail-add-btn:hover{background:var(--gold-light);}
+.detail-wish-btn{background:none;border:1px solid var(--border);color:var(--text-muted);padding:18px 20px;cursor:pointer;font-size:20px;transition:all .25s;}
+.detail-wish-btn:hover{border-color:var(--red);color:var(--red);}
+.detail-wish-btn.active{background:rgba(201,76,76,.12);border-color:var(--red);color:var(--red);}
+.detail-trust{display:flex;gap:14px;flex-wrap:wrap;}
+.trust-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text-dim);}
+
+/* ══ REVIEWS SECTION ══ */
+.reviews-section{
+  padding:72px 56px 80px;
+  border-top:1px solid var(--border);
+  background:var(--bg);
+}
+.reviews-section-header{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  margin-bottom:52px;flex-wrap:wrap;gap:20px;
+}
+.reviews-section-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:38px;font-weight:300;line-height:1;
+}
+.reviews-section-title em{font-style:italic;color:var(--gold);}
+
+/* ── Rating Summary Block ── */
+.reviews-summary{
+  display:grid;grid-template-columns:200px 1fr;gap:48px;
+  padding-bottom:52px;border-bottom:1px solid var(--border);margin-bottom:48px;
+  align-items:center;
+}
+.reviews-score{text-align:center;}
+.reviews-score-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:80px;font-weight:300;line-height:1;color:var(--gold);
+}
+.reviews-score-stars{color:var(--gold);font-size:18px;letter-spacing:3px;margin:8px 0 6px;}
+.reviews-score-count{font-size:11px;color:var(--text-muted);letter-spacing:1px;}
+
+.reviews-bars{display:flex;flex-direction:column;gap:10px;}
+.reviews-bar-row{
+  display:flex;align-items:center;gap:12px;
+}
+.bar-label{
+  font-size:10px;color:var(--text-muted);letter-spacing:1px;
+  white-space:nowrap;width:36px;text-align:right;flex-shrink:0;
+}
+.bar-label span{color:var(--gold);}
+.bar-track{
+  flex:1;height:4px;background:var(--border);
+  position:relative;overflow:hidden;
+}
+.bar-fill{
+  position:absolute;left:0;top:0;height:100%;
+  background:var(--gold);
+  transition:width .8s cubic-bezier(.4,0,.2,1);
+  width:0%;
+}
+.bar-count{font-size:10px;color:var(--text-dim);width:28px;flex-shrink:0;}
+
+/* ── Reviews Controls ── */
+.reviews-controls{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:36px;flex-wrap:wrap;gap:14px;
+}
+.reviews-filter-pills{display:flex;gap:8px;flex-wrap:wrap;}
+.filter-pill{
+  background:none;border:1px solid var(--border);
+  color:var(--text-dim);padding:6px 16px;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:9px;
+  letter-spacing:2px;text-transform:uppercase;transition:all .2s;
+}
+.filter-pill.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.05);}
+.filter-pill:hover:not(.active){border-color:var(--text-muted);color:var(--text-muted);}
+.reviews-sort{
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text-muted);padding:7px 14px;
+  font-family:'DM Sans',sans-serif;font-size:10px;cursor:pointer;outline:none;
+  letter-spacing:1px;
+}
+
+/* ── Review Cards List ── */
+.reviews-list{display:flex;flex-direction:column;gap:0;}
+.review-card{
+  padding:32px 0;border-bottom:1px solid var(--border);
+  animation:fadeUp .4s ease both;
+}
+.review-card:last-child{border-bottom:none;}
+.review-top{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:14px;gap:16px;flex-wrap:wrap;
+}
+.review-author-block{display:flex;align-items:center;gap:14px;}
+.review-avatar{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-family:'Cormorant Garamond',serif;font-weight:400;
+  color:var(--gold);flex-shrink:0;
+  letter-spacing:1px;text-transform:uppercase;
+}
+.review-author-info{}
+.review-author-name{font-size:13px;font-weight:500;letter-spacing:.5px;margin-bottom:3px;}
+.review-author-meta{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.review-date{font-size:10px;color:var(--text-dim);}
+.review-verified{
+  font-size:8px;letter-spacing:1.5px;text-transform:uppercase;
+  color:#4caa6a;border:1px solid rgba(76,170,106,.3);
+  padding:2px 7px;
+}
+.review-material-tag{
+  font-size:8px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text-dim);border:1px solid var(--border);
+  padding:2px 7px;
+}
+.review-stars-row{
+  display:flex;align-items:center;gap:3px;
+  color:var(--gold);font-size:13px;
+}
+.review-star-empty{color:var(--text-dim);}
+.review-body-block{margin-bottom:18px;}
+.review-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:19px;font-weight:400;margin-bottom:10px;line-height:1.2;
+}
+.review-text{
+  font-size:13px;line-height:1.9;color:var(--text-muted);max-width:680px;
+}
+.review-text.clamped{
+  display:-webkit-box;-webkit-line-clamp:3;
+  -webkit-box-orient:vertical;overflow:hidden;
+}
+.review-read-more{
+  background:none;border:none;color:var(--gold);
+  font-size:11px;letter-spacing:1px;cursor:pointer;
+  padding:0;margin-top:6px;display:inline-block;
+  transition:opacity .2s;font-family:'DM Sans',sans-serif;
+}
+.review-read-more:hover{opacity:.7;}
+.review-footer{display:flex;align-items:center;gap:20px;}
+.review-helpful{
+  display:flex;align-items:center;gap:8px;
+  font-size:10px;color:var(--text-dim);letter-spacing:.5px;
+}
+.helpful-btn{
+  background:none;border:1px solid var(--border);
+  color:var(--text-dim);padding:5px 12px;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:9px;
+  letter-spacing:1.5px;text-transform:uppercase;
+  transition:all .2s;display:flex;align-items:center;gap:5px;
+}
+.helpful-btn:hover{border-color:var(--gold);color:var(--gold);}
+.helpful-btn.voted{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.05);}
+.review-report{
+  background:none;border:none;color:var(--text-dim);
+  font-size:9px;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;transition:color .2s;padding:0;margin-left:auto;
+  font-family:'DM Sans',sans-serif;
+}
+.review-report:hover{color:var(--text-muted);}
+
+/* ── No Reviews State ── */
+.reviews-empty{
+  text-align:center;padding:48px 0;
+  color:var(--text-muted);
+}
+.reviews-empty-icon{font-size:40px;opacity:.3;margin-bottom:14px;}
+.reviews-empty-text{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px;}
+
+/* ── Write Review Button (collapsed) ── */
+.write-review-toggle{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:24px 28px;background:var(--surface);border:1px solid var(--border);
+  cursor:pointer;transition:border-color .25s;margin-bottom:0;
+}
+.write-review-toggle:hover{border-color:var(--gold);}
+.write-review-toggle-left{
+  display:flex;align-items:center;gap:14px;
+}
+.write-review-icon{
+  width:36px;height:36px;background:rgba(201,168,76,.08);
+  border:1px solid rgba(201,168,76,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:var(--gold);
+}
+.write-review-label{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text);}
+.write-review-sublabel{font-size:10px;color:var(--text-dim);margin-top:2px;letter-spacing:.5px;}
+.write-review-chevron{
+  font-size:18px;color:var(--text-muted);
+  transition:transform .3s;
+}
+.write-review-toggle.open .write-review-chevron{transform:rotate(180deg);}
+
+/* ── Write Review Form ── */
+.write-review-form{
+  background:var(--surface);
+  border:1px solid var(--border);border-top:none;
+  padding:32px 28px;
+  display:none;
+}
+.write-review-form.open{display:block;animation:fadeUp .3s ease;}
+.review-form-section{margin-bottom:28px;}
+.review-form-label{
+  font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:12px;display:block;
+}
+/* Star Picker */
+.star-picker{
+  display:flex;gap:6px;margin-bottom:6px;
+}
+.star-pick{
+  font-size:28px;cursor:pointer;color:var(--border);
+  transition:color .15s,transform .15s;line-height:1;
+  -webkit-tap-highlight-color:transparent;
+}
+.star-pick.lit{color:var(--gold);}
+.star-pick:hover{transform:scale(1.15);}
+.star-picker-label{
+  font-size:10px;color:var(--text-dim);letter-spacing:1px;
+  margin-top:4px;min-height:16px;
+  transition:color .2s;
+}
+.review-form-input{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);padding:12px 16px;font-family:'DM Sans',sans-serif;
+  font-size:13px;outline:none;transition:border-color .2s;
+}
+.review-form-input:focus{border-color:var(--gold);}
+.review-form-input::placeholder{color:var(--text-dim);}
+.review-form-textarea{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);padding:14px 16px;font-family:'DM Sans',sans-serif;
+  font-size:13px;outline:none;transition:border-color .2s;
+  resize:vertical;min-height:110px;line-height:1.7;
+}
+.review-form-textarea:focus{border-color:var(--gold);}
+.review-form-textarea::placeholder{color:var(--text-dim);}
+.review-form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.review-form-submit{
+  width:100%;background:var(--gold);color:var(--bg);border:none;
+  padding:16px;cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:11px;letter-spacing:3px;text-transform:uppercase;
+  font-weight:500;transition:all .25s;
+}
+.review-form-submit:hover{background:var(--gold-light);}
+.review-form-submit:disabled{background:var(--border);color:var(--text-dim);cursor:not-allowed;}
+.review-form-note{
+  font-size:10px;color:var(--text-dim);text-align:center;
+  margin-top:12px;letter-spacing:.5px;line-height:1.6;
+}
+
+/* ── Load More Reviews ── */
+.reviews-load-more{
+  text-align:center;padding:36px 0 0;
+}
+.reviews-load-btn{
+  background:none;border:1px solid var(--border);color:var(--text-muted);
+  padding:13px 40px;cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:10px;letter-spacing:2.5px;text-transform:uppercase;
+  transition:all .3s;
+}
+.reviews-load-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+/* Responsive reviews */
+@media(max-width:900px){
+  .reviews-section{padding:48px 20px 56px;}
+  .reviews-summary{grid-template-columns:1fr;gap:28px;}
+  .reviews-score{display:flex;align-items:center;gap:20px;text-align:left;}
+  .reviews-score-num{font-size:60px;}
+  .reviews-controls{flex-direction:column;align-items:flex-start;}
+  .review-form-row{grid-template-columns:1fr;}
+  .write-review-form{padding:24px 20px;}
+  .write-review-toggle{padding:18px 20px;}
+  .reviews-section-header{flex-direction:column;align-items:flex-start;gap:12px;}
+}
+@media(max-width:600px){
+  .reviews-section{padding:36px 12px 44px;}
+  .reviews-section-title{font-size:28px;}
+  .review-card{padding:24px 0;}
+  .review-title{font-size:17px;}
+  .review-text{font-size:12px;}
+  .review-stars-row{font-size:12px;}
+  .star-pick{font-size:24px;}
+}
+
+/* ══ COLLECTIONS PAGE ══ */
+#collectionsPage{display:none;position:fixed;inset:0;background:var(--bg);z-index:140;overflow-y:auto;}
+#collectionsPage.open{display:block;animation:pageIn .4s ease;}
+.col-nav{position:sticky;top:0;background:rgba(8,8,8,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:20px 48px;display:flex;align-items:center;justify-content:space-between;z-index:10;}
+.col-nav-left{display:flex;align-items:center;gap:20px;}
+.col-nav-logo{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;letter-spacing:5px;color:var(--gold);text-transform:uppercase;}
+/* Collections Hero */
+.col-hero{min-height:68vh;display:flex;align-items:flex-end;padding:0 48px 80px;position:relative;overflow:hidden;border-bottom:1px solid var(--border);}
+.col-hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0d0905 0%,#180e05 40%,#080a0d 100%);}
+.col-hero-particles{position:absolute;inset:0;overflow:hidden;}
+.col-hero-particle{position:absolute;width:1px;height:1px;background:var(--gold);border-radius:50%;opacity:0;animation:particleDrift var(--dur,8s) var(--delay,0s) infinite ease-in-out;}
+@keyframes particleDrift{0%{opacity:0;transform:translateY(0);}20%{opacity:.6;}80%{opacity:.3;}100%{opacity:0;transform:translateY(-100px);}}
+.col-hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:80px 80px;opacity:.25;}
+.col-hero-art{position:absolute;right:80px;bottom:0;opacity:.12;font-size:320px;line-height:1;pointer-events:none;filter:blur(2px);}
+.col-hero-content{position:relative;z-index:2;max-width:640px;}
+.col-hero-season{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:24px;display:flex;align-items:center;gap:14px;}
+.col-hero-season::before{content:'';width:40px;height:1px;background:var(--gold);}
+.col-hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(56px,8vw,112px);font-weight:300;line-height:.9;color:var(--text);margin-bottom:28px;letter-spacing:-2px;}
+.col-hero-title em{font-style:italic;color:var(--gold);}
+.col-hero-sub{font-size:13px;line-height:1.9;color:var(--text-muted);max-width:500px;margin-bottom:36px;}
+.col-hero-stats{display:flex;gap:44px;}
+.col-stat-num{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:var(--gold);line-height:1;}
+.col-stat-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-top:4px;}
+.col-hero-scroll{position:absolute;right:48px;bottom:80px;z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-dim);font-size:9px;letter-spacing:2px;text-transform:uppercase;}
+.col-hero-scroll-line{width:1px;height:56px;background:linear-gradient(to bottom,var(--gold),transparent);animation:scrollDrop 2s ease-in-out infinite;}
+@keyframes scrollDrop{0%,100%{opacity:.4;transform:scaleY(.7);}50%{opacity:1;transform:scaleY(1);}}
+/* Grid */
+.col-grid-section{padding:72px 48px;}
+.col-grid-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:48px;}
+.col-grid-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;}
+.col-grid-title em{font-style:italic;color:var(--text-muted);font-size:22px;margin-left:12px;}
+.col-filter-row{display:flex;gap:8px;}
+.col-filter-btn{background:none;border:1px solid var(--border);color:var(--text-muted);padding:8px 18px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;transition:all .2s;}
+.col-filter-btn.active,.col-filter-btn:hover{border-color:var(--gold);color:var(--gold);}
+.col-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:2px;}
+.col-card{position:relative;overflow:hidden;cursor:pointer;background:var(--surface);}
+.col-card.large{grid-column:span 8;grid-row:span 2;}
+.col-card.tall{grid-column:span 4;grid-row:span 2;}
+.col-card.wide{grid-column:span 6;}
+.col-card.small{grid-column:span 4;}
+.col-card-inner{width:100%;height:100%;min-height:320px;position:relative;display:flex;align-items:flex-end;transition:transform .6s cubic-bezier(.4,0,.2,1);}
+.col-card.large .col-card-inner{min-height:600px;}
+.col-card.tall .col-card-inner{min-height:600px;}
+.col-card.wide .col-card-inner{min-height:320px;}
+.col-card:hover .col-card-inner{transform:scale(1.02);}
+.col-card-bg{position:absolute;inset:0;}
+.col-card-art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:100px;opacity:.18;transition:opacity .4s;}
+.col-card.large .col-card-art{font-size:160px;}
+.col-card:hover .col-card-art{opacity:.28;}
+.col-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.93) 0%,rgba(0,0,0,.25) 55%,rgba(0,0,0,.05) 100%);transition:background .4s;}
+.col-card:hover .col-card-overlay{background:linear-gradient(to top,rgba(0,0,0,.97) 0%,rgba(0,0,0,.45) 60%,rgba(0,0,0,.12) 100%);}
+.col-card-content{position:relative;z-index:2;padding:28px;width:100%;}
+.col-card-tag{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:inline-flex;align-items:center;gap:8px;}
+.col-card-tag::before{content:'';width:16px;height:1px;background:var(--gold);}
+.col-card-name{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,3vw,38px);font-weight:300;line-height:1.1;margin-bottom:8px;color:var(--text);}
+.col-card.large .col-card-name{font-size:clamp(32px,4vw,50px);}
+.col-card-meta{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.col-card-count{font-size:11px;color:var(--text-muted);}
+.col-card-type{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);padding:4px 8px;border:1px solid var(--border);}
+.col-card-desc{font-size:12px;color:var(--text-muted);line-height:1.7;max-width:380px;margin-bottom:20px;opacity:0;transform:translateY(8px);transition:all .3s .05s;}
+.col-card:hover .col-card-desc{opacity:1;transform:translateY(0);}
+.col-card-cta{display:inline-flex;align-items:center;gap:10px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);opacity:0;transform:translateY(6px);transition:all .3s .1s;}
+.col-card:hover .col-card-cta{opacity:1;transform:translateY(0);}
+.col-card-cta-arrow{width:28px;height:1px;background:var(--gold);position:relative;transition:width .3s;}
+.col-card-cta-arrow::after{content:'›';position:absolute;right:-2px;top:-8px;font-size:16px;}
+.col-card:hover .col-card-cta-arrow{width:40px;}
+/* Collection Detail */
+#colDetailView{display:none;}
+#colDetailView.open{display:block;animation:pageIn .3s ease;}
+.col-detail-hero{min-height:58vh;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:0 48px 60px;}
+.col-detail-bg{position:absolute;inset:0;}
+.col-detail-art{position:absolute;right:60px;top:50%;transform:translateY(-50%);font-size:200px;opacity:.14;pointer-events:none;}
+.col-detail-overlay{position:absolute;inset:0;background:linear-gradient(100deg,rgba(0,0,0,.95) 35%,rgba(0,0,0,.25) 100%);}
+.col-detail-content{position:relative;z-index:2;max-width:580px;}
+.col-detail-back{display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);cursor:pointer;background:none;border:none;margin-bottom:32px;transition:color .2s;}
+.col-detail-back:hover{color:var(--gold);}
+.col-detail-season{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+.col-detail-season::before{content:'';width:24px;height:1px;background:var(--gold);}
+.col-detail-title{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,7vw,84px);font-weight:300;line-height:.9;margin-bottom:22px;letter-spacing:-1px;}
+.col-detail-desc{font-size:13px;line-height:1.9;color:var(--text-muted);margin-bottom:28px;max-width:460px;}
+.col-detail-tags{display:flex;gap:8px;flex-wrap:wrap;}
+.col-detail-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:6px 14px;border:1px solid var(--border);color:var(--text-dim);}
+.col-products-section{padding:60px 48px;}
+.col-products-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;padding-bottom:22px;border-bottom:1px solid var(--border);}
+.col-products-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;}
+.col-products-count{font-size:12px;color:var(--text-muted);letter-spacing:1px;}
+.col-products-sort{background:var(--surface);border:1px solid var(--border);color:var(--text-muted);padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;outline:none;}
+.col-products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:2px;}
+.more-collections{padding:0 48px 72px;}
+.more-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;margin-bottom:28px;padding-top:44px;border-top:1px solid var(--border);}
+.more-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:2px;}
+.more-card{background:var(--surface);padding:24px;cursor:pointer;border:1px solid transparent;transition:border-color .25s;display:flex;align-items:center;gap:18px;}
+.more-card:hover{border-color:var(--border);}
+.more-card-icon{width:60px;height:60px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;}
+.more-card-name{font-family:'Cormorant Garamond',serif;font-size:17px;margin-bottom:3px;}
+.more-card-count{font-size:11px;color:var(--text-muted);}
+
+/* ══ FOOTER ══ */
+footer{margin-top:80px;padding:48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:16px;letter-spacing:5px;color:var(--text-dim);text-transform:uppercase;}
+.footer-right{font-size:11px;color:var(--text-dim);}
+
+/* ══ SUB-CATEGORIES BAR ══ */
+.subcategories-bar{
+  display:none; /* shown via JS when a main cat is active */
+  align-items:center;gap:0;
+  border-bottom:1px solid var(--border);
+  padding:0 48px;
+  background:rgba(17,17,17,.6);
+  overflow-x:auto;
+}
+.subcategories-bar.visible{display:flex;}
+.subcat-btn{
+  background:none;border:none;border-bottom:2px solid transparent;
+  color:var(--text-dim);padding:12px 18px;
+  font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:1.5px;
+  text-transform:uppercase;cursor:pointer;white-space:nowrap;
+  transition:all .2s;margin-bottom:-1px;
+}
+.subcat-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+.subcat-btn:hover:not(.active){color:var(--text-muted);}
+
+/* ══ RESULTS BAR ══ */
+.results-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 48px;border-bottom:1px solid var(--border);
+  background:rgba(8,8,8,.4);
+}
+.results-info{font-size:11px;color:var(--text-muted);letter-spacing:.5px;}
+.results-info strong{color:var(--text);}
+.results-breadcrumb{
+  display:flex;align-items:center;gap:8px;
+  font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;
+}
+.results-breadcrumb span{color:var(--gold);}
+.results-breadcrumb-sep{color:var(--text-dim);}
+
+/* ══ PAGINATION / LOAD MORE ══ */
+.pagination-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  padding:48px 48px 0;gap:16px;
+}
+.load-more-btn{
+  background:none;border:1px solid var(--border);color:var(--text-muted);
+  padding:16px 48px;cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:11px;letter-spacing:3px;text-transform:uppercase;
+  transition:all .3s;position:relative;overflow:hidden;
+}
+.load-more-btn:hover{border-color:var(--gold);color:var(--gold);}
+.load-more-btn:disabled{opacity:.3;cursor:not-allowed;border-color:var(--border);color:var(--text-dim);}
+.load-more-progress{
+  font-size:10px;color:var(--text-dim);letter-spacing:1px;text-align:center;
+}
+.load-more-bar{
+  width:200px;height:1px;background:var(--border);position:relative;overflow:hidden;
+}
+.load-more-bar-fill{
+  position:absolute;left:0;top:0;height:100%;
+  background:var(--gold);transition:width .4s ease;
+}
+
+/* ════════════════════════════════════════
+   FULLY RESPONSIVE — 4 BREAKPOINTS
+   1200 · 900 · 600 · 375
+════════════════════════════════════════ */
+
+/* ── Tablet Landscape (≤1200px) ── */
+@media(max-width:1200px){
+  nav{padding:18px 32px;}
+  .nav-links{gap:24px;}
+  .search-wrap input{width:140px;}
+  .hero-left{padding:60px 36px;}
+  .hero-right{height:88vh;}
+  .products-section,.col-grid-section,.col-products-section,.more-collections{padding:48px 32px;}
+  .categories-bar{padding:0 32px;}
+  .material-strip{padding:18px 32px;}
+  .detail-info{padding:48px 40px;}
+  .col-hero{padding:0 32px 64px;}
+  .col-detail-hero{padding:0 32px 52px;}
+  .col-grid{grid-template-columns:repeat(12,1fr);}
+  footer{padding:36px 32px;}
+}
+
+/* ── Tablet Portrait (≤900px) ── */
+@media(max-width:900px){
+  /* Nav */
+  nav{padding:14px 20px;}
+  .nav-links,.search-wrap{display:none;}
+  .hamburger{display:flex;}
+  .icon-btn{padding:8px 12px;font-size:11px;}
+
+  /* Hero */
+  .hero{grid-template-columns:1fr;min-height:auto;padding-top:64px;}
+  .hero-left{padding:44px 24px 36px;}
+  .hero-title{font-size:clamp(44px,10vw,72px);margin-bottom:20px;}
+  .hero-sub{font-size:13px;max-width:100%;margin-bottom:28px;}
+  .hero-pills{gap:6px;margin-bottom:28px;}
+  .hero-pill{font-size:8px;padding:5px 10px;}
+  .hero-right{height:72vw;min-height:280px;}
+  .hero-stat-box{bottom:20px;left:12px;padding:12px 16px;}
+  .hero-stat-num{font-size:24px;}
+  .hero-stat-box2{top:16px;right:8px;padding:10px 14px;}
+  .hero-svg-wrap svg{width:180px;height:240px;}
+  .hero-art-label{font-size:8px;bottom:52px;}
+  .hero-cta-row{flex-direction:column;align-items:flex-start;}
+  .hero-cta-ghost{margin-left:0;}
+
+  /* Material strip */
+  .material-strip{padding:14px 20px;gap:0;overflow-x:auto;}
+  .mat-item{padding:0 20px;font-size:10px;}
+
+  /* Shop */
+  .categories-bar{padding:0 20px;}
+  .cat-btn{padding:14px 16px;font-size:10px;letter-spacing:1.5px;}
+  .subcategories-bar{padding:0 20px;}
+  .results-bar{padding:10px 20px;flex-direction:column;align-items:flex-start;gap:6px;}
+  .products-section{padding:32px 16px;}
+  .pagination-wrap{padding:32px 16px 0;}
+  .section-header{flex-direction:column;align-items:flex-start;gap:14px;margin-bottom:28px;}
+  .section-title{font-size:32px;}
+  .section-title span{font-size:22px;}
+  .products-grid{grid-template-columns:repeat(2,1fr);}
+
+  /* Drawers */
+  .cart-drawer,.wish-drawer{width:100%;max-width:100%;}
+
+  /* Modal */
+  .modal{width:100%;max-width:100%;max-height:100vh;border-radius:0;margin:0;}
+  .modal-overlay{align-items:flex-end;}
+  .modal-body{padding:8px 20px 24px;}
+  .form-grid{grid-template-columns:1fr;}
+  .form-group.full{grid-column:span 1;}
+  .modal-footer{padding:16px 20px;}
+  .steps-indicator{margin:20px 20px;}
+  .steps-labels{padding:0 20px;}
+
+  /* Detail page */
+  .detail-nav{padding:14px 20px;}
+  .detail-body{grid-template-columns:1fr;}
+  .detail-gallery{position:relative;top:0;height:72vw;min-height:260px;}
+  .detail-art-svg{font-size:clamp(80px,18vw,130px)!important;}
+  .detail-info{padding:28px 20px;}
+  .detail-title{font-size:clamp(28px,6vw,44px);}
+  .detail-price{font-size:32px;}
+  .material-options{flex-wrap:wrap;}
+  .size-options{flex-wrap:wrap;}
+
+  /* Collections page */
+  .col-nav{padding:14px 20px;}
+  .col-hero{padding:0 20px 44px;min-height:auto;}
+  .col-hero-art{display:none;}
+  .col-hero-title{font-size:clamp(48px,12vw,80px);letter-spacing:-1px;}
+  .col-hero-stats{gap:24px;}
+  .col-stat-num{font-size:30px;}
+  .col-grid-section{padding:40px 20px;}
+  .col-grid-header{flex-direction:column;align-items:flex-start;gap:16px;margin-bottom:32px;}
+  .col-filter-row{flex-wrap:wrap;}
+  .col-grid{grid-template-columns:repeat(6,1fr);}
+  .col-card.large,.col-card.tall,.col-card.wide{grid-column:span 6;}
+  .col-card.small{grid-column:span 3;}
+  .col-card-inner{min-height:240px!important;}
+  .col-card.large .col-card-inner{min-height:340px!important;}
+  .col-detail-hero{padding:0 20px 40px;min-height:auto;}
+  .col-detail-art{display:none;}
+  .col-detail-title{font-size:clamp(36px,9vw,64px);}
+  .col-products-section{padding:36px 20px;}
+  .col-products-header{flex-direction:column;align-items:flex-start;gap:14px;}
+  .more-collections{padding:0 20px 48px;}
+  .more-grid{grid-template-columns:1fr 1fr;}
+
+  footer{flex-direction:column;align-items:flex-start;gap:12px;padding:28px 20px;}
+}
+
+/* ── Mobile (≤600px) ── */
+@media(max-width:600px){
+  /* Nav */
+  nav{padding:12px 16px;}
+  .nav-logo-main{font-size:16px;letter-spacing:4px;}
+  .nav-logo-sub{display:none;}
+
+  /* Mobile menu */
+  .mob-link{font-size:36px;padding:12px 0;}
+  .mob-search{width:260px;}
+  .mob-btns{gap:8px;}
+
+  /* Hero */
+  .hero{padding-top:58px;}
+  .hero-left{padding:36px 16px 28px;}
+  .hero-eyebrow{font-size:8px;letter-spacing:3px;margin-bottom:20px;}
+  .hero-eyebrow::before{width:24px;}
+  .hero-title{font-size:clamp(38px,12vw,60px);line-height:1.0;margin-bottom:16px;}
+  .hero-sub{font-size:12px;margin-bottom:22px;}
+  .hero-pills{margin-bottom:22px;}
+  .hero-cta{padding:14px 24px;font-size:10px;letter-spacing:2px;}
+  .hero-cta-ghost{padding:14px 20px;font-size:10px;}
+  .hero-right{height:80vw;}
+  .hero-svg-wrap svg{width:140px;height:186px;}
+  .hero-stat-box{padding:10px 14px;left:8px;bottom:14px;}
+  .hero-stat-num{font-size:20px;}
+  .hero-stat-label{font-size:7px;}
+  .hero-stat-box2{display:none;}
+  .hero-art-label{font-size:7px;bottom:44px;}
+
+  /* Material strip */
+  .mat-item{padding:0 14px;font-size:9px;}
+  .mat-item:nth-child(n+5){display:none;}
+
+  /* Categories */
+  .categories-bar{padding:0 12px;}
+  .cat-btn{padding:12px 12px;font-size:9px;letter-spacing:1px;}
+  .subcategories-bar{padding:0 12px;}
+  .subcat-btn{padding:10px 10px;font-size:9px;}
+  .results-bar{padding:8px 12px;}
+  .results-info{font-size:10px;}
+  .load-more-btn{padding:14px 32px;font-size:10px;}
+  .pagination-wrap{padding:24px 12px 0;}
+  /* Mobile pill tweaks for small phones */
+  .mob-cart-pill{padding:0 8px;height:30px;gap:4px;}
+  .mob-cart-pill-label{font-size:7px;letter-spacing:1.5px;}
+  .mob-cart-pill-icon{font-size:11px;}
+  .mob-view-pill{width:30px;height:30px;font-size:12px;}
+  .mob-action-pills{bottom:10px;left:10px;gap:5px;}
+
+  /* Products */
+  .products-section{padding:24px 12px;}
+  .section-title{font-size:28px;}
+  .products-grid{grid-template-columns:repeat(2,1fr);gap:1px;}
+  .product-name{font-size:16px;}
+  .product-sub{font-size:10px;}
+
+  /* Drawers */
+  .cart-header,.wish-header{padding:20px 20px;}
+  .cart-items,.wish-items{padding:16px 20px;}
+  .cart-footer{padding:16px 20px;}
+  .cart-item,.wish-item{gap:12px;}
+  .cart-item-img,.wish-item-img{width:56px;height:56px;font-size:24px;}
+
+  /* Checkout modal */
+  .modal-header{padding:20px 20px 16px;}
+  .modal-title{font-size:22px;}
+  .btn-next{padding:12px 24px;font-size:9px;letter-spacing:2px;}
+  .btn-back{padding:10px 18px;font-size:9px;}
+
+  /* Detail page */
+  .detail-nav{padding:12px 16px;}
+  .breadcrumb{font-size:10px;}
+  .detail-gallery{height:80vw;}
+  .detail-info{padding:24px 16px;}
+  .detail-title{font-size:clamp(24px,7vw,36px);}
+  .detail-subtitle{font-size:10px;}
+  .detail-price{font-size:28px;}
+  .detail-price-old{font-size:16px;}
+  .detail-desc{font-size:12px;line-height:1.8;}
+  .detail-divider{margin-bottom:20px;}
+  .detail-actions{flex-direction:column;}
+  .detail-wish-btn{padding:14px;text-align:center;}
+  .detail-trust{gap:10px;}
+  .trust-item{font-size:10px;}
+  .detail-spec-row{font-size:11px;}
+
+  /* Collections */
+  .col-nav{padding:12px 16px;}
+  .col-nav-logo{font-size:15px;letter-spacing:3px;}
+  .col-hero{padding:0 16px 36px;}
+  .col-hero-season{font-size:8px;letter-spacing:3px;}
+  .col-hero-title{font-size:clamp(40px,13vw,68px);}
+  .col-hero-sub{font-size:12px;}
+  .col-hero-stats{gap:18px;}
+  .col-stat-num{font-size:26px;}
+  .col-hero-scroll{display:none;}
+  .col-grid-section{padding:28px 12px;}
+  .col-grid-title{font-size:26px;}
+  .col-grid-title em{font-size:17px;}
+  .col-filter-row{gap:6px;}
+  .col-filter-btn{padding:6px 12px;font-size:9px;}
+  .col-grid{grid-template-columns:1fr;}
+  .col-card.large,.col-card.tall,.col-card.wide,.col-card.small{grid-column:span 1;}
+  .col-card-inner{min-height:220px!important;}
+  .col-card.large .col-card-inner{min-height:280px!important;}
+  .col-card-name{font-size:22px!important;}
+  .col-detail-hero{padding:0 16px 32px;}
+  .col-detail-back{font-size:9px;margin-bottom:20px;}
+  .col-detail-title{font-size:clamp(32px,10vw,52px);}
+  .col-detail-desc{font-size:12px;}
+  .col-products-section{padding:28px 12px;}
+  .col-products-title{font-size:24px;}
+  .col-products-grid{grid-template-columns:repeat(2,1fr);gap:1px;}
+  .more-collections{padding:0 12px 40px;}
+  .more-title{font-size:24px;}
+  .more-grid{grid-template-columns:1fr;}
+  .more-card{padding:18px 16px;}
+
+  footer{padding:24px 16px;}
+  .footer-right{display:none;}
+}
+
+/* ── Small Mobile (≤375px) ── */
+@media(max-width:375px){
+  nav{padding:10px 12px;}
+  .nav-logo-main{font-size:14px;letter-spacing:3px;}
+  .hero-left{padding:28px 12px 24px;}
+  .hero-title{font-size:36px;}
+  .hero-cta{padding:12px 18px;font-size:9px;letter-spacing:2px;width:100%;}
+  .hero-cta-ghost{padding:12px 16px;font-size:9px;width:100%;justify-content:center;}
+  .hero-right{height:88vw;}
+  .hero-svg-wrap svg{width:120px;height:160px;}
+  .products-section{padding:20px 10px;}
+  .products-grid{grid-template-columns:repeat(2,1fr);gap:1px;}
+  .product-name{font-size:14px;}
+  .product-price{font-size:13px;}
+  .mob-cart-pill{padding:0 6px;height:28px;}
+  .mob-cart-pill-label{display:none;}
+  .mob-view-pill{width:28px;height:28px;font-size:11px;}
+  .categories-bar{padding:0 8px;}
+  .cat-btn{padding:10px 8px;font-size:8px;letter-spacing:.5px;}
+  .detail-info{padding:20px 12px;}
+  .detail-title{font-size:24px;}
+  .col-hero{padding:0 12px 28px;}
+  .col-hero-title{font-size:38px;}
+  .col-grid-section,.col-products-section{padding:24px 10px;}
+  .col-products-grid{grid-template-columns:repeat(2,1fr);gap:1px;}
+  .modal-body{padding:6px 14px 20px;}
+  .modal-footer{padding:14px 16px;}
+  .modal-header{padding:16px 16px 12px;}
+  .btn-next,.btn-back{padding:10px 14px;}
+  .cart-header,.wish-header{padding:16px 16px;}
+  .cart-items,.wish-items{padding:12px 16px;}
+  .cart-footer{padding:12px 16px;}
+}
+
+/* ══════════════════════════════════════
+   MOBILE CARD SYSTEM
+   Desktop  (hover:hover) → hover overlay fades in
+   Mobile   (≤900px)      → elegant floating icon pills
+══════════════════════════════════════ */
+
+/* Touch & tap: remove flicker highlight on all interactive elements */
+.cat-btn,.icon-btn,.wish-heart,.qty-btn,.remove-btn,.add-cart-btn,
+.view-btn,.mat-opt,.size-opt,.hero-pill,.mob-link,.col-filter-btn,
+.more-card,.hero-cta,.hero-cta-ghost,.checkout-btn,
+.mob-cart-pill,.mob-view-pill{
+  -webkit-tap-highlight-color:transparent;
+}
+button,select,input{touch-action:manipulation;}
+
+/* ── Desktop hover overlay (pointer devices only) ── */
+@media(hover:hover){
+  .card-actions{opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s;}
+  .product-card:hover .card-actions{opacity:1;transform:translateY(0);}
+  /* Keep mobile pills hidden on desktop */
+  .mob-action-pills{display:none!important;}
+}
+
+/* ── Mobile: hide the hover overlay, show floating icon pills ── */
+@media(max-width:900px){
+
+  /* 1 — Kill the hover overlay entirely */
+  .card-actions{display:none!important;}
+
+  /* 2 — Restore square image ratio for compact 2-col grid */
+  .product-img-wrap{aspect-ratio:1/1;}
+
+  /* 3 — Floating pill container: bottom-left of the image */
+  .mob-action-pills{
+    position:absolute;
+    bottom:12px;
+    left:12px;
+    z-index:4;
+    display:flex;
+    gap:7px;
+    align-items:center;
+  }
+
+  /* 4 — Shared pill base */
+  .mob-cart-pill,
+  .mob-view-pill{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:none;
+    cursor:pointer;
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    transition:transform .15s,background .15s,border-color .15s;
+  }
+
+  /* 5 — Cart pill: gold accent, wider to accommodate icon + micro-label */
+  .mob-cart-pill{
+    background:rgba(201,168,76,.18);
+    border:1px solid rgba(201,168,76,.55);
+    border-radius:2px;
+    padding:0 10px;
+    height:34px;
+    gap:6px;
+    color:var(--gold);
+  }
+  .mob-cart-pill-icon{
+    font-size:13px;
+    line-height:1;
+  }
+  .mob-cart-pill-label{
+    font-family:'DM Sans',sans-serif;
+    font-size:7.5px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    font-weight:500;
+    color:var(--gold);
+    white-space:nowrap;
+  }
+
+  /* 6 — View pill: minimal, ghost */
+  .mob-view-pill{
+    background:rgba(8,8,8,.6);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:2px;
+    width:34px;
+    height:34px;
+    font-size:14px;
+    color:var(--text-muted);
+  }
+
+  /* 7 — Active states (finger press) */
+  .mob-cart-pill:active{
+    transform:scale(.94);
+    background:rgba(201,168,76,.32);
+    border-color:var(--gold);
+  }
+  .mob-view-pill:active{
+    transform:scale(.94);
+    color:var(--gold);
+    border-color:rgba(201,168,76,.4);
+  }
+
+  /* 8 — Tighten product-info */
+  .product-info{padding:14px 14px 16px;}
+  .product-name{font-size:15px;margin-bottom:4px;}
+  .product-sub{font-size:10px;margin-bottom:7px;}
+  .product-rating{margin-top:5px;}
+
+  /* 9 — Move material chip into info area on mobile */
+  .card-material{
+    bottom:auto;right:auto;
+    position:static;
+    display:inline-block;
+    margin-bottom:6px;
+    font-size:7.5px;
+    padding:3px 7px;
+  }
+
+  /* 10 — Collections: always show desc/cta (no hover on touch) */
+  .col-card-desc{opacity:1!important;transform:translateY(0)!important;}
+  .col-card-cta{opacity:1!important;transform:translateY(0)!important;}
+  .col-card-inner{transform:none!important;}
+}
+</style>
+</head>
+<body>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mob-eyebrow">Navigation</div>
+  <div class="mob-links">
+    <div class="mob-link" onclick="closeMobile();goHome()">Shop</div>
+    <div class="mob-link" onclick="closeMobile();openCollections()">Collections</div>
+    <div class="mob-link" onclick="closeMobile()">Custom Order</div>
+    <div class="mob-link" onclick="closeMobile()">About</div>
+  </div>
+  <div class="mob-search">
+    <span style="color:var(--text-muted)">⌕</span>
+    <input type="text" placeholder="Search wall art…" oninput="mobileSearch(this.value)"/>
+  </div>
+  <div class="mob-btns">
+    <button class="icon-btn" onclick="closeMobile();openWishlist()">♡ Wishlist</button>
+    <button class="icon-btn" onclick="closeMobile();openCart()">⊠ Cart</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="z1">
+  <div class="nav-logo" onclick="goHome()">
+    <div class="nav-logo-main">Obsidian</div>
+    <div class="nav-logo-sub">Wall Art & Decor</div>
+  </div>
+  <div class="nav-links">
+    <a id="navShop" class="active" onclick="goHome()">Shop</a>
+    <a id="navCollections" onclick="openCollections()">Collections</a>
+    <a>Custom Order</a>
+    <a>About</a>
+  </div>
+  <div class="nav-right">
+    <div class="search-wrap">
+      <span style="color:var(--text-muted);font-size:14px">⌕</span>
+      <input type="text" id="searchInput" placeholder="Search wall art…" oninput="filterProducts()"/>
+    </div>
+    <button class="icon-btn" onclick="openWishlist()">♡<span class="icon-badge red hidden" id="wishCount">0</span></button>
+    <button class="icon-btn" onclick="openCart()">Cart<span class="icon-badge hidden" id="cartCount">0</span></button>
+    <button class="hamburger" id="hamburger" onclick="toggleMobile()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero z1" id="heroSection">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Laser-Cut Wall Art Decorator Pieces</div>
+    <h1 class="hero-title">Where<br/><em>Passion</em><br/>Meets Wall</h1>
+    <p class="hero-sub">Premium metal & wood silhouette art spanning anime, cinema, nature, and life. Each piece is precision laser-cut and ready to transform your space.</p>
+    <div class="hero-pills">
+      <div class="hero-pill" onclick="jumpCat('Anime')">Anime</div>
+      <div class="hero-pill" onclick="jumpCat('Movies')">Movies</div>
+      <div class="hero-pill" onclick="jumpCat('Gaming')">Gaming</div>
+      <div class="hero-pill" onclick="jumpCat('Nature')">Nature</div>
+      <div class="hero-pill" onclick="jumpCat('Sports')">Sports</div>
+      <div class="hero-pill" onclick="jumpCat('Abstract')">Abstract</div>
+    </div>
+    <div class="hero-cta-row">
+      <button class="hero-cta" onclick="scrollToShop()">Browse All Pieces <span>→</span></button>
+      <button class="hero-cta-ghost" onclick="openCollections()">View Collections</button>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-art-stage">
+      <div class="hero-art-wall"></div>
+      <div class="hero-art-bg"></div>
+      <div class="hero-art-glow"></div>
+      <!-- Goku SVG silhouette -->
+      <div class="hero-svg-wrap">
+        <svg viewBox="0 0 300 400" width="260" height="346" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="artGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.15"/>
+              <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="150" cy="380" rx="90" ry="12" fill="rgba(0,0,0,0.5)"/>
+          <!-- Body silhouette - fighter stance -->
+          <g fill="#c9a84c" opacity="0.92">
+            <!-- Hair spikes -->
+            <polygon points="130,60 120,15 140,50" />
+            <polygon points="145,55 132,8 155,45" />
+            <polygon points="158,52 148,5 165,42" />
+            <polygon points="170,58 162,12 178,50" />
+            <polygon points="115,70 102,28 125,62" />
+            <!-- Head -->
+            <ellipse cx="150" cy="85" rx="32" ry="35" />
+            <!-- Neck -->
+            <rect x="138" y="115" width="24" height="18" rx="4"/>
+            <!-- Torso -->
+            <path d="M110,130 Q108,185 112,220 L188,220 Q192,185 190,130 Q170,125 150,126 Q130,125 110,130Z" />
+            <!-- Gi details -->
+            <path d="M135,128 L150,175 L165,128" fill="#080808" opacity="0.5"/>
+            <!-- Belt -->
+            <rect x="112" y="210" width="76" height="14" rx="2" fill="#080808" opacity="0.7"/>
+            <rect x="140" y="208" width="20" height="18" rx="2" fill="#080808" opacity="0.8"/>
+            <!-- Left arm raised -->
+            <path d="M110,135 Q80,145 68,125 Q60,110 72,98 Q82,90 95,100 Q100,120 110,130Z"/>
+            <!-- Left fist -->
+            <ellipse cx="68" cy="115" rx="16" ry="14"/>
+            <!-- Right arm -->
+            <path d="M190,135 Q215,145 224,165 Q230,180 218,188 Q208,192 200,180 Q195,165 188,148Z"/>
+            <!-- Right fist -->
+            <ellipse cx="222" cy="175" rx="14" ry="13"/>
+            <!-- Left leg -->
+            <path d="M118,222 Q108,270 112,310 Q116,330 128,332 Q140,330 142,308 Q142,275 148,222Z"/>
+            <!-- Right leg -->
+            <path d="M182,222 Q192,270 188,310 Q184,330 172,332 Q160,330 158,308 Q158,275 152,222Z"/>
+            <!-- Left shoe -->
+            <ellipse cx="118" cy="338" rx="22" ry="12"/>
+            <!-- Right shoe -->
+            <ellipse cx="182" cy="338" rx="22" ry="12"/>
+            <!-- Tail -->
+            <path d="M185,210 Q220,205 240,185 Q255,168 245,155 Q238,148 228,158 Q218,172 200,175" fill="none" stroke="#c9a84c" stroke-width="12" stroke-linecap="round"/>
+            <path d="M240,180 Q252,170 248,158" fill="none" stroke="#c9a84c" stroke-width="8" stroke-linecap="round"/>
+            <!-- Symbol on chest -->
+            <circle cx="150" cy="170" r="10" fill="#080808" opacity="0.6"/>
+          </g>
+          <!-- Gold glow under -->
+          <ellipse cx="150" cy="360" rx="60" ry="8" fill="url(#artGlow)"/>
+        </svg>
+      </div>
+      <div class="hero-art-label">Kid Goku — Dragon Ball Series</div>
+      <div class="hero-art-shadow"></div>
+      <div class="hero-stat-box">
+        <div class="hero-stat-num">500+</div>
+        <div class="hero-stat-label">Unique Designs</div>
+      </div>
+      <div class="hero-stat-box2">
+        <div style="font-size:9px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;margin-bottom:4px">Materials</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);">Metal · Wood</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MATERIAL STRIP -->
+<div class="material-strip z1">
+  <div class="mat-item"><span class="mat-icon">⚙️</span> Precision Laser-Cut</div>
+  <div class="mat-item"><span class="mat-icon">🔩</span> Powder-Coated Steel</div>
+  <div class="mat-item"><span class="mat-icon">🪵</span> Solid Hardwood</div>
+  <div class="mat-item"><span class="mat-icon">💎</span> Acrylic & Resin</div>
+  <div class="mat-item"><span class="mat-icon">📦</span> Free Gift Packaging</div>
+  <div class="mat-item"><span class="mat-icon">✈️</span> Worldwide Shipping</div>
+</div>
+
+<!-- MAIN CATEGORIES BAR -->
+<div class="categories-bar z1" id="shop">
+  <button class="cat-btn active" onclick="filterCat('All',this)">All</button>
+  <button class="cat-btn" onclick="filterCat('Anime',this)">Anime</button>
+  <button class="cat-btn" onclick="filterCat('Movies',this)">Movies & TV</button>
+  <button class="cat-btn" onclick="filterCat('Gaming',this)">Gaming</button>
+  <button class="cat-btn" onclick="filterCat('Nature',this)">Nature</button>
+  <button class="cat-btn" onclick="filterCat('Sports',this)">Sports</button>
+  <button class="cat-btn" onclick="filterCat('Abstract',this)">Abstract</button>
+  <button class="cat-btn" onclick="filterCat('Life',this)">Life & Family</button>
+</div>
+
+<!-- SUB-CATEGORIES BAR (shown when a main cat is selected) -->
+<div class="subcategories-bar z1" id="subcatBar"></div>
+
+<!-- RESULTS BAR -->
+<div class="results-bar z1" id="resultsBar">
+  <div class="results-info" id="resultsInfo"></div>
+  <div class="results-breadcrumb" id="resultsBreadcrumb"></div>
+</div>
+
+<!-- PRODUCTS -->
+<section class="products-section z1">
+  <div class="section-header">
+    <div class="section-title">Wall Art <span id="productCount"></span></div>
+    <select class="sort-select" onchange="sortProducts(this.value)">
+      <option value="default">Featured</option>
+      <option value="price-asc">Price: Low → High</option>
+      <option value="price-desc">Price: High → Low</option>
+      <option value="name">Name A–Z</option>
+    </select>
+  </div>
+  <div class="products-grid" id="productsGrid"></div>
+  <!-- PAGINATION -->
+  <div class="pagination-wrap" id="paginationWrap" style="display:none;">
+    <div class="load-more-bar"><div class="load-more-bar-fill" id="loadMoreFill"></div></div>
+    <div class="load-more-progress" id="loadMoreProgress"></div>
+    <button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()">Load More Pieces</button>
+  </div>
+</section>
+
+<footer class="z1">
+  <div class="footer-logo">Obsidian · Wall Art & Decor</div>
+  <div class="footer-right">© 2026 Obsidian. All rights reserved. Handcrafted with precision.</div>
+</footer>
+
+<!-- ══ COLLECTIONS PAGE ══ -->
+<div id="collectionsPage">
+  <div class="col-nav">
+    <div class="col-nav-left">
+      <button class="back-btn" onclick="closeCollections()">← Shop</button>
+      <div class="col-nav-logo">Collections</div>
+    </div>
+    <div style="display:flex;gap:12px;">
+      <button class="icon-btn" onclick="openWishlist()">♡<span class="icon-badge red hidden" id="wishCount2">0</span></button>
+      <button class="icon-btn" onclick="openCart()">Cart<span class="icon-badge hidden" id="cartCount2">0</span></button>
+    </div>
+  </div>
+  <div id="colOverview">
+    <div class="col-hero">
+      <div class="col-hero-bg"></div>
+      <div class="col-hero-grid"></div>
+      <div class="col-hero-particles" id="colParticles"></div>
+      <div class="col-hero-art">🌿</div>
+      <div class="col-hero-content">
+        <div class="col-hero-season">Curated Worlds — 2026 Edit</div>
+        <h1 class="col-hero-title">The<br/><em>Collections</em></h1>
+        <p class="col-hero-sub">Six universes. From the electric worlds of anime to the quiet power of nature — each collection is a carefully considered point of view in laser-cut form.</p>
+        <div class="col-hero-stats">
+          <div><div class="col-stat-num">6</div><div class="col-stat-label">Collections</div></div>
+          <div><div class="col-stat-num">24</div><div class="col-stat-label">Pieces</div></div>
+          <div><div class="col-stat-num">3</div><div class="col-stat-label">Materials</div></div>
+        </div>
+      </div>
+      <div class="col-hero-scroll"><span>Scroll</span><div class="col-hero-scroll-line"></div></div>
+    </div>
+    <div class="col-grid-section">
+      <div class="col-grid-header">
+        <div class="col-grid-title">All Collections <em>— Browse</em></div>
+        <div class="col-filter-row">
+          <button class="col-filter-btn active" onclick="setColFilter('all',this)">All</button>
+          <button class="col-filter-btn" onclick="setColFilter('anime',this)">Anime</button>
+          <button class="col-filter-btn" onclick="setColFilter('pop',this)">Pop Culture</button>
+          <button class="col-filter-btn" onclick="setColFilter('nature',this)">Nature</button>
+        </div>
+      </div>
+      <div class="col-grid" id="colGrid"></div>
+    </div>
+  </div>
+  <div id="colDetailView">
+    <div class="col-detail-hero" id="colDetailHero">
+      <div class="col-detail-bg" id="colDetailBg"></div>
+      <div class="col-detail-overlay"></div>
+      <div class="col-detail-art" id="colDetailArt"></div>
+      <div class="col-detail-content">
+        <button class="col-detail-back" onclick="closeColDetail()">← All Collections</button>
+        <div class="col-detail-season" id="colDetailSeason"></div>
+        <h1 class="col-detail-title" id="colDetailTitle"></h1>
+        <p class="col-detail-desc" id="colDetailDesc"></p>
+        <div class="col-detail-tags" id="colDetailTags"></div>
+      </div>
+    </div>
+    <div class="col-products-section">
+      <div class="col-products-header">
+        <div>
+          <div class="col-products-title" id="colDetailProductsTitle"></div>
+          <div class="col-products-count" id="colDetailProductsCount"></div>
+        </div>
+        <select class="col-products-sort" onchange="sortColProducts(this.value)">
+          <option value="default">Featured</option>
+          <option value="price-asc">Price: Low → High</option>
+          <option value="price-desc">Price: High → Low</option>
+        </select>
+      </div>
+      <div class="col-products-grid" id="colProductsGrid"></div>
+    </div>
+    <div class="more-collections"><div class="more-title">More Collections</div><div class="more-grid" id="moreCollectionsGrid"></div></div>
+  </div>
+</div>
+
+<!-- PRODUCT DETAIL PAGE -->
+<div id="detailPage">
+  <div class="detail-nav">
+    <button class="back-btn" onclick="closeDetail()">← Back</button>
+    <div class="breadcrumb">Wall Art / <span id="dCat"></span> / <span id="dName"></span></div>
+  </div>
+  <div class="detail-body">
+    <div class="detail-gallery">
+      <div class="detail-gallery-inner">
+        <div class="detail-art-bg" id="dBg"></div>
+        <div class="detail-art-glow"></div>
+        <div class="detail-art-svg" id="dSvg"></div>
+      </div>
+    </div>
+    <div class="detail-info">
+      <div class="detail-cat" id="dCatLabel"></div>
+      <h1 class="detail-title" id="dTitle"></h1>
+      <div class="detail-subtitle" id="dSubtitle"></div>
+      <div class="detail-rating"><div class="detail-stars" id="dStars"></div><div class="detail-review-count" id="dReviews"></div></div>
+      <div class="detail-price-row">
+        <div class="detail-price" id="dPrice"></div>
+        <div class="detail-price-old" id="dOldPrice"></div>
+      </div>
+      <div class="detail-divider"></div>
+      <p class="detail-desc" id="dDesc"></p>
+      <div class="option-label">Material</div>
+      <div class="material-options">
+        <button class="mat-opt active">Powder Steel</button>
+        <button class="mat-opt" onclick="this.parentNode.querySelectorAll('.mat-opt').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Hardwood</button>
+        <button class="mat-opt" onclick="this.parentNode.querySelectorAll('.mat-opt').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Acrylic</button>
+      </div>
+      <div class="option-label">Size</div>
+      <div class="size-options">
+        <button class="size-opt" onclick="this.parentNode.querySelectorAll('.size-opt').forEach(b=>b.classList.remove('active'));this.classList.add('active')">S</button>
+        <button class="size-opt active" onclick="this.parentNode.querySelectorAll('.size-opt').forEach(b=>b.classList.remove('active'));this.classList.add('active')">M</button>
+        <button class="size-opt" onclick="this.parentNode.querySelectorAll('.size-opt').forEach(b=>b.classList.remove('active'));this.classList.add('active')">L</button>
+        <button class="size-opt" onclick="this.parentNode.querySelectorAll('.size-opt').forEach(b=>b.classList.remove('active'));this.classList.add('active')">XL</button>
+      </div>
+      <div class="detail-specs" id="dSpecs"></div>
+      <div class="detail-actions">
+        <button class="detail-add-btn" onclick="addToCartDetail()">Add to Cart</button>
+        <button class="detail-wish-btn" id="dWishBtn" onclick="toggleWishDetail()">♡</button>
+      </div>
+      <div class="detail-trust">
+        <div class="trust-item">⚙️ Precision laser-cut</div>
+        <div class="trust-item">📦 Gift-boxed</div>
+        <div class="trust-item">✈️ Global shipping</div>
+        <div class="trust-item">↩️ 30-day returns</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ REVIEWS SECTION ══ -->
+  <div class="reviews-section" id="reviewsSection">
+
+    <!-- Header -->
+    <div class="reviews-section-header">
+      <div class="reviews-section-title">Customer <em>Reviews</em></div>
+      <div id="reviewsHeaderCount" style="font-size:11px;color:var(--text-muted);letter-spacing:1px;"></div>
+    </div>
+
+    <!-- Rating Summary -->
+    <div class="reviews-summary" id="reviewsSummary">
+      <div class="reviews-score">
+        <div class="reviews-score-num" id="scoreNum">0.0</div>
+        <div class="reviews-score-stars" id="scoreStars">☆☆☆☆☆</div>
+        <div class="reviews-score-count" id="scoreCount">0 reviews</div>
+      </div>
+      <div class="reviews-bars" id="reviewsBars"></div>
+    </div>
+
+    <!-- Controls -->
+    <div class="reviews-controls">
+      <div class="reviews-filter-pills" id="reviewsFilterPills">
+        <button class="filter-pill active" onclick="setReviewFilter('all',this)">All</button>
+        <button class="filter-pill" onclick="setReviewFilter(5,this)">5 ★</button>
+        <button class="filter-pill" onclick="setReviewFilter(4,this)">4 ★</button>
+        <button class="filter-pill" onclick="setReviewFilter(3,this)">3 ★</button>
+        <button class="filter-pill" onclick="setReviewFilter(2,this)">2 ★</button>
+        <button class="filter-pill" onclick="setReviewFilter(1,this)">1 ★</button>
+      </div>
+      <select class="reviews-sort" onchange="setReviewSort(this.value)">
+        <option value="recent">Most Recent</option>
+        <option value="helpful">Most Helpful</option>
+        <option value="highest">Highest Rated</option>
+        <option value="lowest">Lowest Rated</option>
+      </select>
+    </div>
+
+    <!-- Reviews List -->
+    <div class="reviews-list" id="reviewsList"></div>
+    <div class="reviews-load-more" id="reviewsLoadMore" style="display:none;">
+      <button class="reviews-load-btn" onclick="loadMoreReviews()">Load More Reviews</button>
+    </div>
+
+    <!-- Write a Review -->
+    <div style="margin-top:48px;">
+      <div class="write-review-toggle" id="writeReviewToggle" onclick="toggleReviewForm()">
+        <div class="write-review-toggle-left">
+          <div class="write-review-icon">✦</div>
+          <div>
+            <div class="write-review-label">Write a Review</div>
+            <div class="write-review-sublabel">Share your experience with this piece</div>
+          </div>
+        </div>
+        <div class="write-review-chevron">∨</div>
+      </div>
+      <div class="write-review-form" id="writeReviewForm">
+        <div class="review-form-section">
+          <label class="review-form-label">Your Rating</label>
+          <div class="star-picker" id="starPicker">
+            <span class="star-pick" data-val="1" onclick="setReviewRating(1)">★</span>
+            <span class="star-pick" data-val="2" onclick="setReviewRating(2)">★</span>
+            <span class="star-pick" data-val="3" onclick="setReviewRating(3)">★</span>
+            <span class="star-pick" data-val="4" onclick="setReviewRating(4)">★</span>
+            <span class="star-pick" data-val="5" onclick="setReviewRating(5)">★</span>
+          </div>
+          <div class="star-picker-label" id="starPickerLabel">Tap a star to rate</div>
+        </div>
+        <div class="review-form-section">
+          <label class="review-form-label">Review Title</label>
+          <input class="review-form-input" id="reviewTitle" placeholder="Sum it up in a sentence…" maxlength="80"/>
+        </div>
+        <div class="review-form-section">
+          <label class="review-form-label">Your Review</label>
+          <textarea class="review-form-textarea" id="reviewBody" placeholder="What did you love about this piece? How does it look on your wall? Any tips for other buyers?" maxlength="800"></textarea>
+        </div>
+        <div class="review-form-row">
+          <div>
+            <label class="review-form-label">Your Name</label>
+            <input class="review-form-input" id="reviewName" placeholder="James H."/>
+          </div>
+          <div>
+            <label class="review-form-label">Location <span style="color:var(--text-dim)">(optional)</span></label>
+            <input class="review-form-input" id="reviewLocation" placeholder="New York, USA"/>
+          </div>
+        </div>
+        <button class="review-form-submit" id="reviewSubmitBtn" onclick="submitReview()">Submit Review</button>
+        <div class="review-form-note">Your review helps other buyers make confident decisions. All reviews are moderated before publishing.</div>
+      </div>
+    </div>
+
+  </div><!-- end reviews-section -->
+</div><!-- end detailPage -->
+<div class="wish-overlay" id="wishOverlay" onclick="closeWishlist()"></div>
+<div class="wish-drawer" id="wishDrawer">
+  <div class="wish-header"><div class="wish-title">Wishlist <span id="wishLabel"></span></div><button class="close-btn" onclick="closeWishlist()">×</button></div>
+  <div class="wish-items" id="wishItems"></div>
+</div>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header"><div class="cart-title">Your Cart <span id="cartLabel"></span></div><button class="close-btn" onclick="closeCart()">×</button></div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer">
+    <div class="cart-summary">
+      <div class="cart-row"><span>Subtotal</span><span id="subtotal">$0</span></div>
+      <div class="cart-row"><span>Shipping</span><span>Free</span></div>
+      <div class="cart-row total"><span>Total</span><span class="val" id="totalPrice">$0</span></div>
+    </div>
+    <button class="checkout-btn" id="checkoutBtn" onclick="openCheckout()">Proceed to Checkout</button>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="modalTitle">Checkout</div><button class="close-btn" onclick="closeCheckout()">×</button></div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ══════════════════════════════════════
+// CATEGORY → SUB-CATEGORY TAXONOMY
+// ══════════════════════════════════════
+const taxonomy = {
+  'All':     { label:'All Pieces', subs:[] },
+  'Anime':   { label:'Anime', subs:['All Anime','Dragon Ball','Naruto','One Piece','Attack on Titan','Demon Slayer','My Hero Academia','Death Note','Bleach','Fullmetal Alchemist','Hunter x Hunter','Tokyo Ghoul','Jujutsu Kaisen','Sword Art Online'] },
+  'Movies':  { label:'Movies & TV', subs:['All Movies & TV','Marvel','DC Comics','Star Wars','Disney / Pixar','Harry Potter','Lord of the Rings','Horror','Sci-Fi','Classic Cinema','Netflix Series','Action Heroes'] },
+  'Gaming':  { label:'Gaming', subs:['All Gaming','PlayStation','Xbox / PC','Nintendo','Retro / Arcade','League of Legends','Fortnite','Minecraft','GTA','Cyberpunk','Elden Ring'] },
+  'Nature':  { label:'Nature', subs:['All Nature','Wildlife','Landscapes','Botanical / Floral','Ocean & Marine','Birds','Wolves & Predators','Forest Scenes','Mountain Art'] },
+  'Sports':  { label:'Sports', subs:['All Sports','Football / Soccer','Basketball','Combat Sports','Motor Racing','Tennis','Cricket','Rugby','Baseball'] },
+  'Abstract':{ label:'Abstract', subs:['All Abstract','Geometric','Mandala','Japanese Art','Typography','Astral / Space','Optical Art','Minimalist'] },
+  'Life':    { label:'Life & Family', subs:['All Life','Romance','Family','Motivational','Pets','Music','Travel','Custom / Bespoke'] },
+};
+
+// ══════════════════════════════════════
+// WALL ART PRODUCTS DATA
+// (22 seed pieces — your 200+ pieces plug in via same schema)
+// ══════════════════════════════════════
+const products=[
+  {id:1,name:'Kid Goku',sub:'Dragon Ball Series',cat:'Anime',subcat:'Dragon Ball',price:49,emoji:'🐉',badge:'hot',rating:5,material:'Powder Steel',bg:'linear-gradient(135deg,#0d0a05,#1a1005)',desc:'The iconic young Saiyan warrior in his signature fighting stance. Precision laser-cut from 3mm powder-coated steel with a brushed gold finish.',specs:[['Character','Son Goku (Child)'],['Series','Dragon Ball'],['Material','3mm Steel'],['Finish','Brushed Gold'],['Size (M)','40×53 cm'],['Mounting','Wall screws incl.']]},
+  {id:2,name:'Super Saiyan Vegeta',sub:'Dragon Ball Z',cat:'Anime',subcat:'Dragon Ball',price:52,emoji:'⚡',badge:'new',rating:5,material:'Powder Steel',bg:'linear-gradient(135deg,#0d0a05,#1a1005)',desc:'Prince Vegeta in Super Saiyan form, power radiating in every cut line. Laser-etched steel with electro-brushed finish.',specs:[['Character','Vegeta'],['Series','Dragon Ball Z'],['Material','3mm Steel'],['Finish','Electro-Blue'],['Size (M)','38×56 cm'],['Mounting','Keyhole slots']]},
+  {id:3,name:'Naruto Running',sub:'Naruto Shippuden',cat:'Anime',subcat:'Naruto',price:52,emoji:'🍃',badge:'new',rating:5,material:'Powder Steel',bg:'linear-gradient(135deg,#100a05,#1e1008)',desc:'Naruto in his iconic running stance, headband flowing in the wind. Rendered in silhouette form on premium laser-cut metal.',specs:[['Character','Naruto Uzumaki'],['Series','Naruto Shippuden'],['Material','3mm Steel'],['Finish','Matte Black'],['Size (M)','38×55 cm'],['Mounting','Keyhole slots']]},
+  {id:4,name:'Itachi Uchiha',sub:'Naruto — Sharingan',cat:'Anime',subcat:'Naruto',price:61,emoji:'👁️',badge:'new',rating:5,material:'Hardwood',bg:'linear-gradient(135deg,#0a0510,#14081e)',desc:'The brooding elder Uchiha, crow feathers cascading in darkness. Carved from solid oak with a deep charcoal stain.',specs:[['Character','Itachi Uchiha'],['Series','Naruto'],['Material','Solid Oak'],['Finish','Charcoal Stain'],['Size (M)','40×60 cm'],['Mounting','French cleat']]},
+  {id:5,name:'Luffy Gear 5th',sub:'One Piece',cat:'Anime',subcat:'One Piece',price:58,emoji:'☠️',badge:'ltd',rating:5,material:'Acrylic',bg:'linear-gradient(135deg,#0d0505,#1a0808)',desc:'Monkey D. Luffy in legendary Gear 5th — a limited collector piece. Double-layer acrylic with LED-ready cavity.',specs:[['Character','Monkey D. Luffy'],['Series','One Piece'],['Material','Dual Acrylic'],['Finish','Clear + Black'],['Size (M)','42×56 cm'],['Limited','500 units']]},
+  {id:6,name:'Levi Ackerman',sub:'Attack on Titan',cat:'Anime',subcat:'Attack on Titan',price:54,emoji:'⚔️',badge:'',rating:4,material:'Powder Steel',bg:'linear-gradient(135deg,#080d0a,#101a12)',desc:"Humanity's strongest soldier in ODM gear. Every detail of the iconic maneuvering equipment faithfully reproduced in steel.",specs:[['Character','Levi Ackerman'],['Series','Attack on Titan'],['Material','3mm Steel'],['Finish','Military Grey'],['Size (M)','36×58 cm'],['Mounting','D-rings']]},
+  {id:7,name:'Tanjiro Kamado',sub:'Demon Slayer',cat:'Anime',subcat:'Demon Slayer',price:55,emoji:'🌊',badge:'hot',rating:5,material:'Powder Steel',bg:'linear-gradient(135deg,#050a10,#0a1020)',desc:"Tanjiro mid-Water Breathing strike. The flowing sword arc cut from a single piece of 3mm steel is a genuine showstopper.",specs:[['Character','Tanjiro Kamado'],['Series','Demon Slayer'],['Material','3mm Steel'],['Finish','Ocean Blue'],['Size (M)','44×58 cm'],['Mounting','Wall screws']]},
+  {id:8,name:'Deku Full Cowl',sub:'My Hero Academia',cat:'Anime',subcat:'My Hero Academia',price:50,emoji:'💚',badge:'',rating:4,material:'Acrylic',bg:'linear-gradient(135deg,#051005,#0a1e08)',desc:"Izuku Midoriya with One For All surging through him — green lightning trails laser-cut in clear acrylic over black base.",specs:[['Character','Izuku Midoriya'],['Series','My Hero Academia'],['Material','Dual Acrylic'],['Finish','Emerald + Black'],['Size (M)','38×54 cm'],['Mounting','Standoffs']]},
+  {id:9,name:'The Mandalorian',sub:'Star Wars Universe',cat:'Movies',subcat:'Star Wars',price:67,emoji:'🌑',badge:'hot',rating:5,material:'Powder Steel',bg:'linear-gradient(135deg,#080a10,#10141e)',desc:'This is the way. The Mandalorian in beskar steel — precision-cut with a weathered silver finish.',specs:[['Character','Din Djarin'],['Series','The Mandalorian'],['Material','3mm Steel'],['Finish','Weathered Silver'],['Size (M)','38×60 cm'],['Mounting','Wall screws']]},
+  {id:10,name:'Batman Dark Knight',sub:'DC Comics — Nolan',cat:'Movies',subcat:'DC Comics',price:63,emoji:'🦇',badge:'',rating:5,material:'Powder Steel',bg:'linear-gradient(135deg,#080808,#141414)',desc:'The Dark Knight rises. A bold silhouette of the Caped Crusader — matte black powder coat on 4mm steel.',specs:[['Character','Bruce Wayne / Batman'],['Universe','DC Comics'],['Material','4mm Steel'],['Finish','Matte Black'],['Size (M)','44×56 cm'],['Mounting','2 keyhole slots']]},
+  {id:11,name:'Iron Man Pose',sub:'Marvel — Avengers',cat:'Movies',subcat:'Marvel',price:65,emoji:'🔴',badge:'new',rating:5,material:'Powder Steel',bg:'linear-gradient(135deg,#120505,#1e0808)',desc:'Tony Stark in the iconic repulsor blast pose. Red + gold two-tone powder coat on precision-cut 3mm steel.',specs:[['Character','Tony Stark / Iron Man'],['Universe','Marvel'],['Material','3mm Steel'],['Finish','Red + Gold'],['Size (M)','40×58 cm'],['Mounting','Screws incl.']]},
+  {id:12,name:'Baby Yoda',sub:'The Mandalorian — Grogu',cat:'Movies',subcat:'Star Wars',price:44,emoji:'🌿',badge:'sale',oldPrice:58,rating:5,material:'Acrylic',bg:'linear-gradient(135deg,#050d05,#0a1a08)',desc:'Grogu in all his force-sensitive glory. Frosted acrylic with green tint catches light beautifully.',specs:[['Character','Grogu / Baby Yoda'],['Series','The Mandalorian'],['Material','Frosted Acrylic'],['Finish','Tinted Green'],['Size (M)','30×40 cm'],['Mounting','Adhesive pads']]},
+  {id:13,name:'Master Chief',sub:'Halo — UNSC Spartan',cat:'Gaming',subcat:'Xbox / PC',price:56,emoji:'🎮',badge:'new',rating:5,material:'Powder Steel',bg:'linear-gradient(135deg,#05100a,#0a1e12)',desc:"Finish the fight — on your wall. Master Chief's iconic helmet profile in military-grade steel with hunter green coat.",specs:[['Character','Master Chief'],['Series','Halo'],['Material','3mm Steel'],['Finish','Hunter Green'],['Size (M)','36×48 cm'],['Mounting','Screws incl.']]},
+  {id:14,name:'Zelda — Triforce',sub:'Legend of Zelda',cat:'Gaming',subcat:'Nintendo',price:48,emoji:'🔺',badge:'',rating:4,material:'Acrylic',bg:'linear-gradient(135deg,#0d0a05,#1a1508)',desc:'The sacred Triforce — wisdom, power, courage — in glowing gold acrylic. LED-backlight compatible.',specs:[['Symbol','Triforce — Hyrule'],['Series','Legend of Zelda'],['Material','Gold Acrylic'],['Finish','Mirror Gold'],['Size (M)','40×40 cm'],['Mounting','Standoff screws']]},
+  {id:15,name:'Kratos & Atreus',sub:'God of War',cat:'Gaming',subcat:'PlayStation',price:75,emoji:'🪓',badge:'hot',rating:5,material:'Hardwood',bg:'linear-gradient(135deg,#0a0808,#180e0a)',desc:'Father and son in solid ash hardwood. The dual silhouette captures the bond between Kratos and Atreus.',specs:[['Characters','Kratos & Atreus'],['Series','God of War'],['Material','Solid Ash Wood'],['Finish','Natural Oiled'],['Size (M)','52×44 cm'],['Mounting','French cleat']]},
+  {id:16,name:'Lone Wolf',sub:'Forest Silhouette Series',cat:'Nature',subcat:'Wolves & Predators',price:42,emoji:'🐺',badge:'',rating:5,material:'Hardwood',bg:'linear-gradient(135deg,#080a0d,#10141a)',desc:'A lone wolf howling at a crescent moon. Laser-cut from solid birch with a natural wax finish.',specs:[['Series','Forest Silhouette'],['Type','Animal Art'],['Material','Solid Birch'],['Finish','Natural Wax'],['Size (M)','40×48 cm'],['Mounting','Keyhole slots']]},
+  {id:17,name:'Mountain Horizon',sub:'Landscape Series',cat:'Nature',subcat:'Landscapes',price:55,emoji:'🏔️',badge:'new',rating:4,material:'Powder Steel',bg:'linear-gradient(135deg,#080c10,#10161e)',desc:'Layered mountain ranges at dusk — three-dimensional depth via stacked steel panels.',specs:[['Series','Landscape'],['Layers','3 stacked panels'],['Material','2mm Steel'],['Finish','Ombre Blue-Grey'],['Size (M)','60×36 cm'],['Mounting','Hidden brackets']]},
+  {id:18,name:'Basketball Dunk',sub:'Street Sports Series',cat:'Sports',subcat:'Basketball',price:47,emoji:'🏀',badge:'',rating:4,material:'Powder Steel',bg:'linear-gradient(135deg,#0d0a05,#1a1008)',desc:'A player mid-dunk — dynamic, powerful, explosive. Matte black on steel with orange accent stripe.',specs:[['Sport','Basketball'],['Series','Street Sports'],['Material','3mm Steel'],['Finish','Black + Orange'],['Size (M)','36×60 cm'],['Mounting','2 wall screws']]},
+  {id:19,name:'Footballer Volley',sub:'The Beautiful Game',cat:'Sports',subcat:'Football / Soccer',price:45,emoji:'⚽',badge:'new',rating:5,material:'Powder Steel',bg:'linear-gradient(135deg,#080d08,#10180a)',desc:'The perfect volley — frozen in steel at the exact moment of contact.',specs:[['Sport','Football / Soccer'],['Series','The Beautiful Game'],['Material','3mm Steel'],['Finish','Matte Black'],['Size (M)','40×56 cm'],['Mounting','Keyhole slots']]},
+  {id:20,name:'Sacred Geometry',sub:"Metatron's Cube",cat:'Abstract',subcat:'Geometric',price:65,emoji:'🔮',badge:'',rating:5,material:'Acrylic',bg:'linear-gradient(135deg,#08080d,#10101a)',desc:"Metatron's Cube in laser-cut mirrored gold acrylic — sacred geometry meeting contemporary wall art.",specs:[['Pattern',"Metatron's Cube"],['Series','Sacred Geometry'],['Material','Mirror Acrylic'],['Finish','Gold Mirror'],['Size (M)','44×44 cm'],['Mounting','Standoffs']]},
+  {id:21,name:'Wave — Hokusai',sub:'Japanese Art Series',cat:'Abstract',subcat:'Japanese Art',price:58,emoji:'🌊',badge:'hot',rating:5,material:'Hardwood',bg:'linear-gradient(135deg,#08080d,#0a0c1a)',desc:'The Great Wave off Kanagawa in laser-cut walnut layers. Three stacked planes create depth and movement.',specs:[['Inspiration','Katsushika Hokusai'],['Series','Japanese Art'],['Material','Walnut Layers'],['Finish','Natural + Ebony'],['Size (M)','56×38 cm'],['Mounting','Hidden rails']]},
+  {id:22,name:'Family Tree',sub:'Life & Moments Series',cat:'Life',subcat:'Family',price:54,emoji:'🌳',badge:'new',rating:5,material:'Hardwood',bg:'linear-gradient(135deg,#080d08,#101808)',desc:'A blossoming tree silhouette with branches shaped to hold small photographs or notes. Functional art for the home.',specs:[['Type','Interactive Art'],['Series','Life & Moments'],['Material','Solid Oak'],['Finish','Natural Oil'],['Size (M)','52×60 cm'],['Mounting','Heavy-duty rail']]},
+];
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+const PAGE_SIZE = 12;
+let cart=[],wishlist=[],detailId=null;
+let activeCategory='All', activeSubcat='', sortMode='default', searchQuery='';
+let visibleCount = PAGE_SIZE; // how many are currently shown
+
+// ══════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════
+function starsHtml(r){return '★'.repeat(r)+'<span class="star-empty">'+'☆'.repeat(5-r)+'</span>';}
+function gr(id){const g=['0d0a05,1a1005','080a10,10141e','0d0508,1a0810','080d08,10180a','0a0508,180a10','080808,141414'];return g[id%g.length];}
+
+// ══════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════
+function toast(icon,title,sub,type='gold'){
+  const c=document.getElementById('toastContainer');
+  const t=document.createElement('div');t.className=`toast toast-${type}`;
+  t.innerHTML=`<div class="toast-icon">${icon}</div><div class="toast-body"><div class="toast-title">${title}</div><div class="toast-sub">${sub}</div></div><div class="toast-bar"></div>`;
+  c.appendChild(t);setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),350);},3000);
+}
+
+// ══════════════════════════════════════
+// MOBILE MENU
+// ══════════════════════════════════════
+function toggleMobile(){const m=document.getElementById('mobileMenu'),h=document.getElementById('hamburger');const o=m.classList.toggle('open');h.classList.toggle('open',o);document.body.style.overflow=o?'hidden':'';}
+function closeMobile(){document.getElementById('mobileMenu').classList.remove('open');document.getElementById('hamburger').classList.remove('open');document.body.style.overflow='';}
+function mobileSearch(v){searchQuery=v.toLowerCase();activeSubcat='';visibleCount=PAGE_SIZE;renderProducts();closeMobile();goHome();scrollToShop();}
+
+// ══════════════════════════════════════
+// CATEGORY & SUB-CATEGORY SYSTEM
+// ══════════════════════════════════════
+function filterCat(cat, btn) {
+  activeCategory = cat;
+  activeSubcat = '';
+  visibleCount = PAGE_SIZE;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSubcatBar();
+  renderProducts();
+}
+
+function filterSubcat(subcat) {
+  // "All X" sub-buttons clear the sub-filter
+  activeSubcat = subcat.startsWith('All ') ? '' : subcat;
+  visibleCount = PAGE_SIZE;
+  document.querySelectorAll('.subcat-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.sub === subcat);
+  });
+  renderProducts();
+}
+
+function renderSubcatBar() {
+  const bar = document.getElementById('subcatBar');
+  const taxEntry = taxonomy[activeCategory];
+  if (!taxEntry || taxEntry.subs.length === 0) {
+    bar.classList.remove('visible');
+    bar.innerHTML = '';
+    return;
+  }
+  bar.classList.add('visible');
+  bar.innerHTML = taxEntry.subs.map(s => {
+    const isAll = s.startsWith('All ');
+    const active = isAll && !activeSubcat ? 'active' : (s === activeSubcat ? 'active' : '');
+    return `<button class="subcat-btn ${active}" data-sub="${s}" onclick="filterSubcat('${s}')">${s}</button>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+// PRODUCTS — FILTER, SORT, PAGINATE
+// ══════════════════════════════════════
+function getFiltered() {
+  let p = products.filter(x => {
+    const mc = activeCategory==='All' || x.cat===activeCategory;
+    const sc = !activeSubcat || x.subcat===activeSubcat;
+    const ms = !searchQuery ||
+      x.name.toLowerCase().includes(searchQuery) ||
+      x.sub.toLowerCase().includes(searchQuery) ||
+      x.cat.toLowerCase().includes(searchQuery) ||
+      (x.subcat||'').toLowerCase().includes(searchQuery);
+    return mc && sc && ms;
+  });
+  if(sortMode==='price-asc') p.sort((a,b)=>a.price-b.price);
+  else if(sortMode==='price-desc') p.sort((a,b)=>b.price-a.price);
+  else if(sortMode==='name') p.sort((a,b)=>a.name.localeCompare(b.name));
+  return p;
+}
+
+function cardHtml(p, i) {
+  const wished = wishlist.includes(p.id);
+  return `<div class="product-card" style="animation-delay:${i*40}ms">
+    <div class="product-img-wrap">
+      <div class="card-art-bg" style="background:${p.bg||`linear-gradient(135deg,#${gr(p.id)})`}"></div>
+      <div class="card-art-glow"></div>
+      <div class="card-art" style="font-size:80px;z-index:2;display:flex;align-items:center;justify-content:center;width:100%;height:100%;position:absolute;">${p.emoji}</div>
+      ${p.badge?`<span class="product-badge badge-${p.badge}">${p.badge}</span>`:''}
+      <button class="wish-heart ${wished?'active':''}" onclick="event.stopPropagation();toggleWish(${p.id})">${wished?'♥':'♡'}</button>
+      <div class="card-material">${p.material}</div>
+      <!-- Desktop hover overlay -->
+      <div class="card-actions">
+        <button class="add-cart-btn" onclick="event.stopPropagation();addToCart(${p.id})">Add to Cart</button>
+        <button class="view-btn" onclick="event.stopPropagation();openDetail(${p.id})">↗</button>
+      </div>
+      <!-- Mobile floating icon pills (inside image, bottom-left) -->
+      <div class="mob-action-pills">
+        <button class="mob-cart-pill" onclick="event.stopPropagation();addToCart(${p.id})" aria-label="Add to cart">
+          <span class="mob-cart-pill-icon">⊕</span>
+          <span class="mob-cart-pill-label">Cart</span>
+        </button>
+        <button class="mob-view-pill" onclick="event.stopPropagation();openDetail(${p.id})" aria-label="View details">↗</button>
+      </div>
+    </div>
+    <div class="product-info" onclick="openDetail(${p.id})">
+      <div class="product-cat">${p.cat}${p.subcat?' · '+p.subcat:''}</div>
+      <div class="product-name">${p.name}</div>
+      <div class="product-sub">${p.sub}</div>
+      <div class="product-price-row">
+        <div class="product-price">$${p.price}</div>
+        ${p.oldPrice?`<div class="product-price-old">$${p.oldPrice}</div>`:''}
+      </div>
+      <div class="product-rating">${starsHtml(p.rating)}</div>
+    </div>
+  </div>`;
+}
+
+function renderProducts() {
+  const grid = document.getElementById('productsGrid');
+  const all = getFiltered();
+  const total = all.length;
+  const showing = Math.min(visibleCount, total);
+  const page = all.slice(0, showing);
+
+  // Update results bar
+  const catLabel = activeCategory==='All' ? 'All Pieces' : (taxonomy[activeCategory]?.label || activeCategory);
+  const subcatLabel = activeSubcat ? ` › ${activeSubcat}` : '';
+  document.getElementById('productCount').textContent = total ? `(${total})` : '';
+  document.getElementById('resultsInfo').innerHTML =
+    `Showing <strong>${showing}</strong> of <strong>${total}</strong> pieces`;
+  document.getElementById('resultsBreadcrumb').innerHTML =
+    `<span>${catLabel}</span>${activeSubcat?`<span class="results-breadcrumb-sep">›</span><span>${activeSubcat}</span>`:''}`;
+
+  if (!total) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:80px;color:var(--text-muted);font-size:12px;letter-spacing:2px;text-transform:uppercase">No pieces found</div>`;
+    document.getElementById('paginationWrap').style.display='none';
+    return;
+  }
+
+  grid.innerHTML = page.map((p,i) => cardHtml(p,i)).join('');
+
+  // Pagination
+  const pWrap = document.getElementById('paginationWrap');
+  const btn = document.getElementById('loadMoreBtn');
+  const progress = document.getElementById('loadMoreProgress');
+  const fill = document.getElementById('loadMoreFill');
+  if (showing >= total) {
+    pWrap.style.display = 'none';
+  } else {
+    pWrap.style.display = 'flex';
+    const pct = Math.round((showing/total)*100);
+    fill.style.width = pct+'%';
+    progress.textContent = `${showing} of ${total} pieces loaded`;
+    btn.disabled = false;
+    btn.textContent = `Load More Pieces (${total - showing} remaining)`;
+  }
+}
+
+function loadMore() {
+  visibleCount += PAGE_SIZE;
+  renderProducts();
+  // Smooth scroll to the new items
+  setTimeout(()=>{
+    const cards = document.querySelectorAll('#productsGrid .product-card');
+    const newStart = visibleCount - PAGE_SIZE;
+    if(cards[newStart]) cards[newStart].scrollIntoView({behavior:'smooth',block:'nearest'});
+  }, 100);
+}
+
+function filterProducts() {
+  searchQuery = document.getElementById('searchInput').value.toLowerCase();
+  activeSubcat = '';
+  visibleCount = PAGE_SIZE;
+  renderSubcatBar(); // re-render subcat with cleared selection
+  renderProducts();
+}
+function sortProducts(v) { sortMode=v; visibleCount=PAGE_SIZE; renderProducts(); }
+function scrollToShop(e) { if(e)e.preventDefault(); document.getElementById('shop').scrollIntoView({behavior:'smooth'}); }
+function jumpCat(cat) {
+  goHome();
+  setTimeout(()=>{
+    const btn = Array.from(document.querySelectorAll('.cat-btn')).find(b=>b.textContent.trim()===cat);
+    if(btn) filterCat(cat, btn);
+    scrollToShop();
+  }, 50);
+}
+function goHome(){closeCollections();document.getElementById('navShop').classList.add('active');document.getElementById('navCollections').classList.remove('active');}
+
+// ══════════════════════════════════════
+// WISHLIST
+// ══════════════════════════════════════
+function toggleWish(id){
+  const p=products.find(x=>x.id===id);
+  if(wishlist.includes(id)){wishlist=wishlist.filter(w=>w!==id);toast('♡','Removed from Wishlist',p.name,'red');}
+  else{wishlist.push(id);toast('♥','Saved to Wishlist',p.name,'red');}
+  updateWishUI();renderProducts();
+  if(colDetailId)renderColProducts(colDetailId);
+  const wb=document.getElementById('dWishBtn');
+  if(detailId===id&&wb){const w=wishlist.includes(id);wb.classList.toggle('active',w);wb.textContent=w?'♥':'♡';}
+}
+function updateWishUI(){
+  const total=wishlist.length;
+  ['wishCount','wishCount2'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=total;el.classList.toggle('hidden',!total);}});
+  document.getElementById('wishLabel').textContent=total?`(${total})`:'';
+}
+function renderWishlist(){
+  const el=document.getElementById('wishItems');
+  if(!wishlist.length){el.innerHTML=`<div class="wish-empty"><div class="wish-empty-icon">♡</div><p>Your wishlist is empty</p></div>`;return;}
+  el.innerHTML=wishlist.map(id=>{const p=products.find(x=>x.id===id);return `<div class="wish-item">
+    <div class="wish-item-img" style="background:${p.bg||`linear-gradient(135deg,#${gr(p.id)})`}">${p.emoji}</div>
+    <div class="wish-item-info">
+      <div class="wish-item-name">${p.name}</div>
+      <div class="wish-item-sub">${p.sub} · ${p.material}</div>
+      <div class="wish-item-price">$${p.price}</div>
+      <div class="wish-item-actions">
+        <button class="wish-add-btn" onclick="addToCart(${p.id});closeWishlist()">Add to Cart</button>
+        <button class="wish-rm-btn" onclick="toggleWish(${p.id});renderWishlist()">×</button>
+      </div>
+    </div>
+  </div>`;}).join('');
+}
+function openWishlist(){renderWishlist();document.getElementById('wishOverlay').classList.add('open');document.getElementById('wishDrawer').classList.add('open');document.body.style.overflow='hidden';}
+function closeWishlist(){document.getElementById('wishOverlay').classList.remove('open');document.getElementById('wishDrawer').classList.remove('open');document.body.style.overflow=document.getElementById('collectionsPage').classList.contains('open')?'hidden':'';}
+
+// ══════════════════════════════════════
+// CART
+// ══════════════════════════════════════
+function addToCart(id){
+  const p=products.find(x=>x.id===id);const ex=cart.find(c=>c.id===id);if(ex)ex.qty++;else cart.push({...p,qty:1});
+  updateCartUI();toast('⚙️','Added to Cart',`${p.name} — ${p.material}`,'gold');
+}
+function removeFromCart(id){cart=cart.filter(c=>c.id!==id);updateCartUI();renderCart();}
+function changeQty(id,d){const item=cart.find(c=>c.id===id);if(!item)return;item.qty+=d;if(item.qty<=0)cart=cart.filter(c=>c.id!==id);updateCartUI();renderCart();}
+function updateCartUI(){
+  const total=cart.reduce((s,c)=>s+c.qty,0);
+  ['cartCount','cartCount2'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=total;el.classList.toggle('hidden',!total);}});
+  const sub=cart.reduce((s,c)=>s+c.price*c.qty,0);
+  document.getElementById('subtotal').textContent='$'+sub;
+  document.getElementById('totalPrice').textContent='$'+sub;
+  document.getElementById('cartLabel').textContent=total?`(${total})`:'';
+  document.getElementById('checkoutBtn').disabled=!cart.length;
+}
+function renderCart(){
+  const el=document.getElementById('cartItems');
+  if(!cart.length){el.innerHTML=`<div class="cart-empty"><div class="cart-empty-icon">🛒</div><p>Your cart is empty</p></div>`;return;}
+  el.innerHTML=cart.map(c=>`<div class="cart-item">
+    <div class="cart-item-img" style="background:${c.bg||`linear-gradient(135deg,#${gr(c.id)})`}">${c.emoji}</div>
+    <div class="cart-item-info">
+      <div class="cart-item-name">${c.name}</div>
+      <div style="font-size:10px;color:var(--text-dim);letter-spacing:.5px;margin-bottom:4px">${c.sub}</div>
+      <div class="cart-item-price">$${c.price}</div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty(${c.id},-1)">−</button>
+        <span class="qty-num">${c.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${c.id},1)">+</button>
+      </div>
+    </div>
+    <button class="remove-btn" onclick="removeFromCart(${c.id})">×</button>
+  </div>`).join('');
+}
+function openCart(){renderCart();document.getElementById('cartOverlay').classList.add('open');document.getElementById('cartDrawer').classList.add('open');document.body.style.overflow='hidden';}
+function closeCart(){document.getElementById('cartOverlay').classList.remove('open');document.getElementById('cartDrawer').classList.remove('open');document.body.style.overflow=document.getElementById('collectionsPage').classList.contains('open')?'hidden':'';}
+
+// ══════════════════════════════════════
+// PRODUCT DETAIL
+// ══════════════════════════════════════
+function openDetail(id){
+  const p=products.find(x=>x.id===id);detailId=id;
+  document.getElementById('dCat').textContent=p.cat;document.getElementById('dName').textContent=p.name;
+  document.getElementById('dBg').style.background=p.bg||`linear-gradient(135deg,#${gr(p.id)})`;
+  document.getElementById('dSvg').innerHTML=`<div style="font-size:180px;filter:drop-shadow(0 40px 60px rgba(0,0,0,.8));opacity:.85">${p.emoji}</div>`;
+  document.getElementById('dCatLabel').textContent=p.subcat?`${p.cat} › ${p.subcat}`:p.cat;
+  document.getElementById('dTitle').textContent=p.name;
+  document.getElementById('dSubtitle').textContent=p.sub;
+  document.getElementById('dStars').innerHTML=starsHtml(p.rating);
+  document.getElementById('dReviews').textContent=`${Math.floor(Math.random()*200+40)} verified reviews`;
+  document.getElementById('dPrice').textContent='$'+p.price;
+  document.getElementById('dOldPrice').textContent=p.oldPrice?'$'+p.oldPrice:'';
+  document.getElementById('dDesc').textContent=p.desc;
+  document.getElementById('dSpecs').innerHTML=`<div class="detail-spec-title">Product Details</div>${p.specs.map(([k,v])=>`<div class="detail-spec-row"><span class="detail-spec-key">${k}</span><span class="detail-spec-val">${v}</span></div>`).join('')}`;
+  const wb=document.getElementById('dWishBtn');const wished=wishlist.includes(id);wb.classList.toggle('active',wished);wb.textContent=wished?'♥':'♡';
+  const dp=document.getElementById('detailPage');dp.classList.add('open');dp.scrollTop=0;document.body.style.overflow='hidden';
+  // Reviews
+  reviewFilter='all'; reviewSort='recent'; reviewRating=0;
+  document.querySelectorAll('.filter-pill').forEach((b,i)=>b.classList.toggle('active',i===0));
+  document.querySelector('.reviews-sort').value='recent';
+  document.getElementById('writeReviewForm').classList.remove('open');
+  document.getElementById('writeReviewToggle').classList.remove('open');
+  setReviewRating(0);
+  renderReviews(id, true);
+}
+function closeDetail(){document.getElementById('detailPage').classList.remove('open');document.body.style.overflow=document.getElementById('collectionsPage').classList.contains('open')?'hidden':'';detailId=null;}
+function addToCartDetail(){if(detailId)addToCart(detailId);}
+function toggleWishDetail(){if(detailId)toggleWish(detailId);}
+
+// ══════════════════════════════════════
+// CHECKOUT
+// ══════════════════════════════════════
+let checkoutStep=1;
+function openCheckout(){closeCart();checkoutStep=1;renderCheckout();document.getElementById('modalOverlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeCheckout(){document.getElementById('modalOverlay').classList.remove('open');document.body.style.overflow=document.getElementById('collectionsPage').classList.contains('open')?'hidden':'';}
+function renderCheckout(){
+  const content=document.getElementById('modalContent'),title=document.getElementById('modalTitle');
+  const total=cart.reduce((s,c)=>s+c.price*c.qty,0);
+  const sd=s=>`step-dot ${checkoutStep>=s?(checkoutStep>s?'done':'active'):''}`;
+  const sl=s=>`step-line ${checkoutStep>s?'done':''}`;
+  const steps=`<div class="steps-indicator"><div class="${sd(1)}">${checkoutStep>1?'✓':'1'}</div><div class="${sl(1)}"></div><div class="${sd(2)}">${checkoutStep>2?'✓':'2'}</div><div class="${sl(2)}"></div><div class="step-dot ${checkoutStep>=3?'active':''}">3</div></div><div class="steps-labels"><span class="step-label">Delivery</span><span class="step-label">Payment</span><span class="step-label">Review</span></div>`;
+  if(checkoutStep===1){
+    title.textContent='Delivery Details';
+    content.innerHTML=steps+`<div class="modal-body"><div class="form-grid">
+      <div class="form-group"><label class="form-label">First Name</label><input class="form-input" placeholder="James"/></div>
+      <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" placeholder="Harlow"/></div>
+      <div class="form-group full"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="james@example.com"/></div>
+      <div class="form-group full"><label class="form-label">Address</label><input class="form-input" placeholder="123 Main Street"/></div>
+      <div class="form-group"><label class="form-label">City</label><input class="form-input" placeholder="New York"/></div>
+      <div class="form-group"><label class="form-label">Postal Code</label><input class="form-input" placeholder="10001"/></div>
+      <div class="form-group full"><label class="form-label">Country</label><select class="form-input"><option>United States</option><option>United Kingdom</option><option>Germany</option><option>France</option><option>Japan</option><option>Australia</option></select></div>
+    </div></div><div class="modal-footer"><button class="btn-back" onclick="closeCheckout()">Cancel</button><button class="btn-next" onclick="nextStep()">Continue →</button></div>`;
+  }else if(checkoutStep===2){
+    title.textContent='Payment';
+    content.innerHTML=steps+`<div class="modal-body"><div class="form-grid">
+      <div class="form-group full"><label class="form-label">Cardholder Name</label><input class="form-input" placeholder="James Harlow"/></div>
+      <div class="form-group full"><label class="form-label">Card Number</label><input class="form-input" placeholder="•••• •••• •••• ••••" maxlength="19"/></div>
+      <div class="form-group"><label class="form-label">Expiry</label><input class="form-input" placeholder="MM / YY"/></div>
+      <div class="form-group"><label class="form-label">CVV</label><input class="form-input" placeholder="•••" maxlength="4"/></div>
+    </div><div style="margin-top:20px;display:flex;gap:12px;align-items:center">
+      <div style="background:var(--surface2);border:1px solid var(--border);padding:8px 14px;font-size:10px;color:var(--text-muted)">VISA</div>
+      <div style="background:var(--surface2);border:1px solid var(--border);padding:8px 14px;font-size:10px;color:var(--text-muted)">MASTERCARD</div>
+      <div style="background:var(--surface2);border:1px solid var(--border);padding:8px 14px;font-size:10px;color:var(--text-muted)">AMEX</div>
+      <span style="font-size:11px;color:var(--text-dim)">🔒 Secured</span>
+    </div></div><div class="modal-footer"><button class="btn-back" onclick="prevStep()">← Back</button><button class="btn-next" onclick="nextStep()">Review Order →</button></div>`;
+  }else if(checkoutStep===3){
+    title.textContent='Review Order';
+    content.innerHTML=steps+`<div class="modal-body"><div style="margin-bottom:24px">
+      ${cart.map(c=>`<div class="order-item-row"><span>${c.emoji} ${c.name} × ${c.qty}</span><span class="order-item-price">$${c.price*c.qty}</span></div>`).join('')}
+      <div class="order-total-row"><span>Total</span><span class="val">$${total}</span></div></div>
+      <div style="padding:14px;background:var(--surface2);border:1px solid var(--border);font-size:12px;color:var(--text-muted);line-height:1.9">
+        📦 Laser-cut & dispatched within 3–5 business days<br/>🎁 Gift-boxed at no extra charge<br/>↩️ 30-day hassle-free returns
+      </div></div><div class="modal-footer"><button class="btn-back" onclick="prevStep()">← Back</button><button class="btn-next" onclick="placeOrder()">Place Order ✓</button></div>`;
+  }else if(checkoutStep===4){
+    const num='OB-'+Math.random().toString(36).toUpperCase().slice(2,10);
+    title.textContent='';
+    content.innerHTML=`<div class="success-state"><div class="success-icon">⚙️</div><div class="success-title">Order Placed.</div>
+      <div class="success-sub">Your wall art is being laser-cut and gift-boxed. Dispatched within 3–5 business days.</div>
+      <div class="success-order"><div class="success-order-num">Order Reference</div><div class="success-order-val">${num}</div></div>
+      <button class="btn-next" style="margin-top:8px" onclick="finishOrder()">Continue Shopping</button>
+    </div>`;
+  }
+}
+function nextStep(){checkoutStep++;renderCheckout();}
+function prevStep(){checkoutStep--;renderCheckout();}
+function placeOrder(){checkoutStep=4;renderCheckout();cart=[];updateCartUI();toast('⚙️','Order Confirmed!','Your wall art is being crafted','gold');}
+function finishOrder(){closeCheckout();}
+
+// ══════════════════════════════════════
+// COLLECTIONS
+// ══════════════════════════════════════
+const collections=[
+  {id:'anime-universe',name:'Anime Universe',tagline:'For those who grew up on subtitles',desc:'The greatest anime characters immortalised in laser-cut steel and hardwood. Each piece is drawn directly from the source material.',season:'Limited 2026 Series',filter:'anime',bg:'linear-gradient(135deg,#0d0905 0%,#1e1005 50%,#0d0508 100%)',art:'⚔️',tags:['Shonen','Shojo','Seinen','Collector'],productIds:[1,2,3,4,5],size:'large'},
+  {id:'cinema-icons',name:'Cinema Icons',tagline:'The screen becomes the wall',desc:'Hollywood and beyond — the most iconic characters from cinema and television rendered in premium cut metal.',season:'Film Series 2026',filter:'pop',bg:'linear-gradient(135deg,#080a0d 0%,#0f1520 50%,#080a0d 100%)',art:'🌑',tags:['Sci-Fi','Action','Fantasy','Collector'],productIds:[9,10,11,12],size:'tall'},
+  {id:'gaming-legends',name:'Gaming Legends',tagline:'Respawn. Hang. Repeat.',desc:'The characters who defined gaming culture — from Halo to Hyrule. Tributes to the games that shaped a generation.',season:'Player One Collection',filter:'pop',bg:'linear-gradient(135deg,#050d08 0%,#0a1a10 50%,#050d05 100%)',art:'🎮',tags:['Action','RPG','First Person','Co-op'],productIds:[13,14,15],size:'wide'},
+  {id:'wild-world',name:'Wild World',tagline:'Nature, in steel and grain',desc:'From lone wolves to mountain horizons — the natural world captured in the most unnatural materials.',season:'Nature Series',filter:'nature',bg:'linear-gradient(135deg,#080a08 0%,#101408 50%,#080a07 100%)',art:'🐺',tags:['Forest','Mountains','Wildlife','Minimal'],productIds:[16,17],size:'wide'},
+  {id:'sports-energy',name:'Sports Energy',tagline:'Dynamic. Powerful. Permanent.',desc:'The split-second moments that define sport — frozen in laser-cut metal on your wall.',season:'Arena Collection',filter:'pop',bg:'linear-gradient(135deg,#0d0a05 0%,#1a1008 50%,#0d0a05 100%)',art:'⚽',tags:['Football','Basketball','Combat','Racing'],productIds:[18,19],size:'small'},
+  {id:'beyond-form',name:'Beyond Form',tagline:'Art that asks questions',desc:'Geometry, philosophy, and pure aesthetics in laser-cut form — wall art for those who see differently.',season:'Abstract Series',filter:'nature',bg:'linear-gradient(135deg,#08080d 0%,#101018 50%,#08080d 100%)',art:'🔮',tags:['Geometry','Mandala','Japanese','Spiritual'],productIds:[20,21],size:'small'},
+];
+let colDetailId=null,colSortMode='default',colFilter='all';
+
+function openCollections(){
+  document.getElementById('collectionsPage').classList.add('open');
+  document.getElementById('collectionsPage').scrollTop=0;
+  document.body.style.overflow='hidden';
+  document.getElementById('navShop').classList.remove('active');
+  document.getElementById('navCollections').classList.add('active');
+  closeColDetail();renderColGrid('all');initParticles();
+}
+function closeCollections(){
+  document.getElementById('collectionsPage').classList.remove('open');
+  document.body.style.overflow='';colDetailId=null;
+  document.getElementById('navShop').classList.add('active');
+  document.getElementById('navCollections').classList.remove('active');
+}
+function initParticles(){
+  const c=document.getElementById('colParticles');if(c.children.length)return;
+  for(let i=0;i<36;i++){const p=document.createElement('div');p.className='col-hero-particle';p.style.left=Math.random()*100+'%';p.style.top=Math.random()*100+'%';p.style.setProperty('--dur',(6+Math.random()*8)+'s');p.style.setProperty('--delay',(-Math.random()*8)+'s');p.style.width=p.style.height=(1+Math.random()*2)+'px';c.appendChild(p);}
+}
+const sizeMap={large:'large',tall:'tall',wide:'wide',small:'small'};
+function setColFilter(f,btn){colFilter=f;document.querySelectorAll('.col-filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderColGrid(f);}
+function renderColGrid(filter){
+  const grid=document.getElementById('colGrid');
+  const vis=filter==='all'?collections:collections.filter(c=>c.filter===filter);
+  grid.innerHTML=vis.map((c,i)=>`
+    <div class="col-card ${sizeMap[c.size]||'small'}" onclick="openColDetail('${c.id}')" style="animation:fadeUp .5s ease ${i*80}ms both">
+      <div class="col-card-inner">
+        <div class="col-card-bg" style="background:${c.bg}"></div>
+        <div class="col-card-art">${c.art}</div>
+        <div class="col-card-overlay"></div>
+        <div class="col-card-content">
+          <div class="col-card-tag">${c.season}</div>
+          <div class="col-card-name">${c.name}</div>
+          <div class="col-card-meta">
+            <div class="col-card-count">${c.productIds.length} pieces</div>
+            <div class="col-card-type">${c.filter==='anime'?'Anime':c.filter==='nature'?'Nature':'Pop Culture'}</div>
+          </div>
+          <div class="col-card-desc">${c.tagline}</div>
+          <div class="col-card-cta">Explore<div class="col-card-cta-arrow"></div></div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function openColDetail(id){
+  const col=collections.find(c=>c.id===id);colDetailId=id;colSortMode='default';
+  document.getElementById('colDetailBg').style.background=col.bg;
+  document.getElementById('colDetailSeason').textContent=col.season;
+  document.getElementById('colDetailTitle').textContent=col.name;
+  document.getElementById('colDetailDesc').textContent=col.desc;
+  document.getElementById('colDetailTags').innerHTML=col.tags.map(t=>`<div class="col-detail-tag">${t}</div>`).join('');
+  document.getElementById('colDetailArt').textContent=col.art;
+  document.getElementById('colDetailProductsTitle').textContent=col.name;
+  renderColProducts(id);renderMoreCollections(id);
+  document.getElementById('colOverview').style.display='none';
+  document.getElementById('colDetailView').classList.add('open');
+  document.getElementById('collectionsPage').scrollTop=0;
+}
+function closeColDetail(){
+  colDetailId=null;
+  document.getElementById('colDetailView').classList.remove('open');
+  document.getElementById('colOverview').style.display='';
+  document.getElementById('collectionsPage').scrollTop=0;
+}
+function renderColProducts(id){
+  const col=collections.find(c=>c.id===id);
+  let prods=col.productIds.map(pid=>products.find(p=>p.id===pid)).filter(Boolean);
+  if(colSortMode==='price-asc')prods.sort((a,b)=>a.price-b.price);
+  else if(colSortMode==='price-desc')prods.sort((a,b)=>b.price-a.price);
+  document.getElementById('colDetailProductsCount').textContent=`${prods.length} piece${prods.length!==1?'s':''} in this collection`;
+  document.getElementById('colProductsGrid').innerHTML=prods.map((p,i)=>cardHtml(p,i)).join('');
+}
+function sortColProducts(v){colSortMode=v;if(colDetailId)renderColProducts(colDetailId);}
+function renderMoreCollections(currentId){
+  const others=collections.filter(c=>c.id!==currentId);
+  document.getElementById('moreCollectionsGrid').innerHTML=others.map(c=>`
+    <div class="more-card" onclick="openColDetail('${c.id}')">
+      <div class="more-card-icon" style="background:${c.bg}">${c.art}</div>
+      <div><div class="more-card-name">${c.name}</div><div class="more-card-count">${c.productIds.length} pieces · ${c.season}</div></div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════
+// REVIEWS SYSTEM
+// ══════════════════════════════════════
+const starLabels = ['','Terrible','Poor','Average','Good','Outstanding'];
+
+// Seed reviews store — keyed by product id
+const reviewsStore = {
+  1: [
+    {id:'r1',author:'Marcus T.',location:'London, UK',avatar:'M',rating:5,title:'Absolutely stunning on my gaming room wall',text:'I ordered the Kid Goku piece in medium powder steel and the quality blew me away. The brushed gold finish catches the light perfectly and the silhouette detail is incredibly precise — every hair spike is razor sharp. Took about 10 minutes to mount with the included screws. Already ordered the Vegeta to sit beside it.',material:'Powder Steel',date:'2026-02-18',helpful:24,verified:true,expanded:false},
+    {id:'r2',author:'Priya S.',location:'Toronto, CA',avatar:'P',rating:5,title:'Perfect gift for my nephew',text:'Bought this as a birthday gift for my Dragon Ball-obsessed nephew. He was genuinely speechless. The packaging is beautiful — came in a black gift box with tissue paper. The piece itself is heavy, premium quality. Nothing like the cheap prints you see elsewhere.',material:'Powder Steel',date:'2026-01-30',helpful:18,verified:true,expanded:false},
+    {id:'r3',author:'Diego M.',location:'Madrid, ES',avatar:'D',rating:4,title:'Great piece, slight wait on delivery',text:'The piece itself is exactly as described — superb craftsmanship and the gold finish is warm and luxurious. Knocked one star only because shipping took 9 days rather than the quoted 5. But once it arrived I forgot all about the wait. Would definitely order again.',material:'Hardwood',date:'2026-01-12',helpful:9,verified:true,expanded:false},
+    {id:'r4',author:'Aiko N.',location:'Tokyo, JP',avatar:'A',rating:5,title:'Museum-quality wall art',text:'I was hesitant to spend this much on a wall piece but it\'s worth every penny. The laser precision on the fingers and facial features is remarkable. I went with the acrylic version for the living room and the way it catches light is constantly changing throughout the day. My guests always ask about it first.',material:'Acrylic',date:'2025-12-28',helpful:31,verified:true,expanded:false},
+    {id:'r5',author:'Ryan K.',location:'Sydney, AU',avatar:'R',rating:3,title:'Good but smaller than expected',text:'Quality is genuinely excellent and the finish is perfect. My only issue is that the medium size felt smaller than expected in my large lounge room. Probably should have gone XL. I\'d suggest they add a scale reference photo showing the piece next to a person. Still happy with it overall.',material:'Powder Steel',date:'2025-12-10',helpful:7,verified:false,expanded:false},
+  ],
+  2: [
+    {id:'r6',author:'Leon C.',location:'Paris, FR',avatar:'L',rating:5,title:'Better than I imagined',text:'Super Saiyan Vegeta in the electro-blue finish is genuinely breathtaking. The blue sheen shifts subtly as you walk past it. Mounted it above my TV and it completely transforms the room.',material:'Powder Steel',date:'2026-02-05',helpful:14,verified:true,expanded:false},
+    {id:'r7',author:'Sophie B.',location:'Berlin, DE',avatar:'S',rating:4,title:'Excellent quality, prompt service',text:'Very happy with this purchase. The Vegeta silhouette has incredible detail in the armour and the power stance captures the character perfectly. Fast delivery and well packed.',material:'Powder Steel',date:'2026-01-20',helpful:6,verified:true,expanded:false},
+  ],
+  3: [
+    {id:'r8',author:'Kenji O.',location:'Osaka, JP',avatar:'K',rating:5,title:'The Gear 5th piece is legendary',text:'Limited edition and absolutely worth it. The dual acrylic layering creates a genuine 3D depth effect — it literally looks like Luffy is bursting out of the wall. Positioned near my window and the natural light makes it come alive.',material:'Acrylic',date:'2026-02-22',helpful:38,verified:true,expanded:false},
+  ],
+};
+
+// Runtime state for reviews
+let currentProductId = null;
+let reviewFilter = 'all';
+let reviewSort = 'recent';
+let reviewRating = 0;
+let reviewsVisible = 4;
+
+function getProductReviews(id) {
+  return reviewsStore[id] || [];
+}
+
+function getFilteredReviews(id) {
+  let reviews = [...getProductReviews(id)];
+  if (reviewFilter !== 'all') reviews = reviews.filter(r => r.rating === reviewFilter);
+  if (reviewSort === 'helpful') reviews.sort((a,b) => b.helpful - a.helpful);
+  else if (reviewSort === 'highest') reviews.sort((a,b) => b.rating - a.rating);
+  else if (reviewSort === 'lowest') reviews.sort((a,b) => a.rating - b.rating);
+  else reviews.sort((a,b) => new Date(b.date) - new Date(a.date));
+  return reviews;
+}
+
+function renderStars(rating, empty='review-star-empty') {
+  return '★'.repeat(rating) + `<span class="${empty}">${'★'.repeat(5-rating)}</span>`;
+}
+
+function renderReviews(id, resetVisible = false) {
+  if (resetVisible) reviewsVisible = 4;
+  currentProductId = id;
+  const allReviews = getProductReviews(id);
+  const filtered = getFilteredReviews(id);
+
+  // — Score block —
+  const avg = allReviews.length
+    ? (allReviews.reduce((s,r) => s+r.rating, 0) / allReviews.length).toFixed(1)
+    : '0.0';
+  document.getElementById('scoreNum').textContent = avg;
+  document.getElementById('scoreStars').innerHTML = renderStars(Math.round(parseFloat(avg)));
+  document.getElementById('scoreCount').textContent = `${allReviews.length} review${allReviews.length!==1?'s':''}`;
+  document.getElementById('reviewsHeaderCount').textContent = allReviews.length ? `${allReviews.length} verified review${allReviews.length!==1?'s':''}` : '';
+
+  // — Distribution bars —
+  const counts = [5,4,3,2,1].map(s => allReviews.filter(r=>r.rating===s).length);
+  const max = Math.max(...counts, 1);
+  document.getElementById('reviewsBars').innerHTML = [5,4,3,2,1].map((star,i) => `
+    <div class="reviews-bar-row">
+      <div class="bar-label"><span>${star}</span> ★</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${(counts[i]/max*100)}%"></div>
+      </div>
+      <div class="bar-count">${counts[i]}</div>
+    </div>`).join('');
+
+  // — Review cards —
+  const list = document.getElementById('reviewsList');
+  if (!filtered.length) {
+    list.innerHTML = `<div class="reviews-empty">
+      <div class="reviews-empty-icon">✦</div>
+      <div class="reviews-empty-text">${reviewFilter!=='all'?'No '+reviewFilter+'-star reviews yet':'Be the first to review this piece'}</div>
+    </div>`;
+    document.getElementById('reviewsLoadMore').style.display = 'none';
+    return;
+  }
+
+  const visible = filtered.slice(0, reviewsVisible);
+  list.innerHTML = visible.map((r, idx) => `
+    <div class="review-card" style="animation-delay:${idx*60}ms">
+      <div class="review-top">
+        <div class="review-author-block">
+          <div class="review-avatar">${r.avatar}</div>
+          <div class="review-author-info">
+            <div class="review-author-name">${r.author}</div>
+            <div class="review-author-meta">
+              <span class="review-date">${formatDate(r.date)}</span>
+              ${r.location?`<span class="review-date">· ${r.location}</span>`:''}
+              ${r.verified?'<span class="review-verified">✓ Verified</span>':''}
+              ${r.material?`<span class="review-material-tag">${r.material}</span>`:''}
+            </div>
+          </div>
+        </div>
+        <div class="review-stars-row">${renderStars(r.rating,'review-star-empty')}</div>
+      </div>
+      <div class="review-body-block">
+        <div class="review-title">${r.title}</div>
+        <div class="review-text ${r.text.length>220&&!r.expanded?'clamped':''}" id="rt-${r.id}">${r.text}</div>
+        ${r.text.length>220&&!r.expanded?`<button class="review-read-more" onclick="expandReview('${r.id}')">Read more →</button>`:''}
+      </div>
+      <div class="review-footer">
+        <div class="review-helpful">
+          Helpful?
+          <button class="helpful-btn ${r.votedHelpful?'voted':''}" onclick="voteHelpful('${r.id}')">
+            👍 ${r.helpful}
+          </button>
+        </div>
+        <button class="review-report" onclick="this.textContent='Reported'">Report</button>
+      </div>
+    </div>`).join('');
+
+  // Animate bars (delayed)
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach(el => {
+      el.style.transition = 'width .9s cubic-bezier(.4,0,.2,1)';
+    });
+  }, 80);
+
+  const loadMore = document.getElementById('reviewsLoadMore');
+  loadMore.style.display = filtered.length > reviewsVisible ? 'block' : 'none';
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
+}
+
+function expandReview(id) {
+  // Find and expand in all stores
+  for (const pid in reviewsStore) {
+    const r = reviewsStore[pid].find(r => r.id === id);
+    if (r) { r.expanded = true; break; }
+  }
+  renderReviews(currentProductId, false);
+}
+
+function voteHelpful(id) {
+  for (const pid in reviewsStore) {
+    const r = reviewsStore[pid].find(r => r.id === id);
+    if (r && !r.votedHelpful) { r.helpful++; r.votedHelpful = true; break; }
+  }
+  renderReviews(currentProductId, false);
+}
+
+function setReviewFilter(val, btn) {
+  reviewFilter = val;
+  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderReviews(currentProductId, true);
+}
+
+function setReviewSort(val) {
+  reviewSort = val;
+  renderReviews(currentProductId, true);
+}
+
+function loadMoreReviews() {
+  reviewsVisible += 4;
+  renderReviews(currentProductId, false);
+}
+
+// ── Star Picker ──
+function setReviewRating(val) {
+  reviewRating = val;
+  document.querySelectorAll('.star-pick').forEach((s,i) => {
+    s.classList.toggle('lit', i < val);
+  });
+  document.getElementById('starPickerLabel').textContent =
+    val ? starLabels[val] + (val===5?' — thank you! ✦':'') : 'Tap a star to rate';
+}
+
+// Hover preview on desktop
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.star-pick').forEach((s,i,arr) => {
+    s.addEventListener('mouseenter', () => {
+      arr.forEach((x,j) => x.classList.toggle('lit', j<=i));
+      document.getElementById('starPickerLabel').textContent = starLabels[i+1];
+    });
+    s.addEventListener('mouseleave', () => {
+      arr.forEach((x,j) => x.classList.toggle('lit', j<reviewRating));
+      document.getElementById('starPickerLabel').textContent =
+        reviewRating ? starLabels[reviewRating] : 'Tap a star to rate';
+    });
+  });
+});
+
+// ── Toggle Form ──
+function toggleReviewForm() {
+  const toggle = document.getElementById('writeReviewToggle');
+  const form = document.getElementById('writeReviewForm');
+  const isOpen = form.classList.toggle('open');
+  toggle.classList.toggle('open', isOpen);
+  if (isOpen) form.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+// ── Submit Review ──
+function submitReview() {
+  const rating = reviewRating;
+  const title = document.getElementById('reviewTitle').value.trim();
+  const body = document.getElementById('reviewBody').value.trim();
+  const name = document.getElementById('reviewName').value.trim();
+  const location = document.getElementById('reviewLocation').value.trim();
+
+  if (!rating) { toast('★','Please select a rating','Tap a star to rate','red'); return; }
+  if (!title)  { toast('✦','Title required','Give your review a brief headline','red'); return; }
+  if (body.length < 20) { toast('✦','Review too short','Please write at least 20 characters','red'); return; }
+  if (!name)   { toast('✦','Name required','Let others know who you are','red'); return; }
+
+  const btn = document.getElementById('reviewSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  // Simulate async submit
+  setTimeout(() => {
+    const newReview = {
+      id: 'r' + Date.now(),
+      author: name,
+      location: location || '',
+      avatar: name.charAt(0).toUpperCase(),
+      rating,
+      title,
+      text: body,
+      material: 'Powder Steel',
+      date: new Date().toISOString().split('T')[0],
+      helpful: 0,
+      verified: false,
+      expanded: true,
+    };
+    if (!reviewsStore[currentProductId]) reviewsStore[currentProductId] = [];
+    reviewsStore[currentProductId].unshift(newReview);
+
+    // Reset form
+    reviewRating = 0;
+    setReviewRating(0);
+    ['reviewTitle','reviewBody','reviewName','reviewLocation'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    btn.disabled = false;
+    btn.textContent = 'Submit Review';
+
+    // Close form, show success, re-render
+    toggleReviewForm();
+    toast('✦','Review Submitted!','Thank you — it will appear after moderation','gold');
+    setReviewFilter('all', document.querySelector('.filter-pill'));
+    renderReviews(currentProductId, true);
+  }, 900);
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+renderProducts();
+updateCartUI();
+updateWishUI();
+</script>
+</body>
+</html>
