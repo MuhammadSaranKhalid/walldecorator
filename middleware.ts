@@ -72,10 +72,12 @@ export async function middleware(request: NextRequest) {
   const hasStoredCurrency = request.cookies.has('obsidian-currency-set')
 
   if (!hasStoredCurrency) {
-    // request.geo is populated by Vercel's edge network automatically.
-    // Falls back to the raw header for local dev / non-Vercel environments.
+    // Vercel populates request.geo on NextRequest at the edge (documented API).
+    // The TypeScript types may lag the runtime — cast to access geo safely,
+    // with a fallback to the raw x-vercel-ip-country header for local dev.
+    const geoRequest = request as NextRequest & { geo?: { country?: string } }
     const country =
-      request.geo?.country ??
+      geoRequest.geo?.country ??
       request.headers.get('x-vercel-ip-country') ??
       undefined
 
