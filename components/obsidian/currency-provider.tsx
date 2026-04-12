@@ -22,34 +22,32 @@ function writeCookie(name: string, value: string) {
  * Mount once in the root layout.
  *
  * Logic:
- * 1. If the user has ever had a currency stored (obsidian-currency-set cookie),
- *    the Zustand store was already rehydrated from localStorage — do nothing.
- * 2. On a fresh first visit, the hint cookie was set by middleware from the
- *    user's Vercel geo header. We read it and initialise the store.
- * 3. After initialisation we write obsidian-currency-set so the middleware
- *    stops overwriting the hint on future requests.
+ * 1. obsidian-currency-set cookie = "we have already initialised the currency".
+ *    If it exists, do nothing — Zustand rehydrates from localStorage on its own.
+ * 2. On a fresh first visit (no cookie), read the geo-detected hint that
+ *    middleware wrote from the Vercel x-vercel-ip-country header.
+ * 3. After applying the hint, write obsidian-currency-set so middleware skips
+ *    geo-detection and this provider skips the hint on all future visits.
+ *
+ * NOTE: We intentionally do NOT check localStorage here. Zustand's persist
+ * middleware writes the default PKR value to localStorage on first mount before
+ * this effect runs, which would make a localStorage check always return "stored"
+ * and prevent the geo hint from ever being applied.
  */
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const { setCurrency } = useCurrencyStore()
 
   useEffect(() => {
-    // If Zustand already persisted a value to localStorage, honour it.
-    const stored = localStorage.getItem('obsidian-currency')
-    if (stored) {
-      // Mark as set so middleware skips geo-detection on subsequent visits
-      if (!readCookie('obsidian-currency-set')) {
-        writeCookie('obsidian-currency-set', '1')
-      }
-      return
-    }
+    // Already initialised — Zustand handles rehydration from localStorage
+    if (readCookie('obsidian-currency-set')) return
 
-    // First visit — read the geo-detected hint written by middleware
+    // First visit — apply the geo-detected hint written by middleware
     const hint = readCookie('obsidian-currency-hint')
     if (hint && VALID_CURRENCIES.includes(hint as CurrencyCode)) {
       setCurrency(hint as CurrencyCode)
     }
 
-    // Mark that currency has been initialised; middleware won't set hint again
+    // Mark as initialised so neither this effect nor middleware runs again
     writeCookie('obsidian-currency-set', '1')
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
