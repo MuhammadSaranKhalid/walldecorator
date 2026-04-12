@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { ObsidianHeroSection } from '@/components/obsidian/hero-section'
 import { MaterialStrip } from '@/components/obsidian/material-strip'
 import { ObsidianProductsPage } from '@/components/obsidian/products-page'
-import { getProducts } from '@/queries/products'
+import { getProducts, getProductCategories } from '@/queries/products'
 import { getHomepageData } from '@/queries/home'
 
 export const metadata: Metadata = {
@@ -22,22 +22,15 @@ export const metadata: Metadata = {
 export const revalidate = 1800
 
 export default async function HomePage() {
-  // Fetch homepage config
-  const homepageData = await getHomepageData()
+  const [homepageData, categories] = await Promise.all([
+    getHomepageData(),
+    getProductCategories(),
+  ])
 
   return (
     <main className="relative z-1">
       {/* ── 1. HERO ─────────────────────────────────────────────── */}
-      <ObsidianHeroSection
-        title="Where"
-        subtitle="Passion"
-        titleLine3="Meets Wall"
-        eyebrow="Laser-Cut Wall Art Decorator Pieces"
-        description="Premium metal & wood silhouette art spanning anime, cinema, nature, and life. Each piece is precision laser-cut and ready to transform your space."
-        primaryCTA={{ text: 'Browse All Pieces', href: '#shop' }}
-        secondaryCTA={{ text: 'View Collections', href: '/collections' }}
-        categories={['Anime', 'Movies', 'Gaming', 'Nature', 'Sports', 'Abstract']}
-      />
+      <ObsidianHeroSection categories={categories} />
 
       {/* ── 2. MATERIAL STRIP ───────────────────────────────────── */}
       <MaterialStrip />
@@ -45,7 +38,7 @@ export default async function HomePage() {
       {/* ── 3. SHOP SECTION (Categories + Products Grid) ────────── */}
       <div id="shop">
         <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading products...</div>}>
-          <ShopSection />
+          <ShopSection categories={categories} />
         </Suspense>
       </div>
     </main>
@@ -54,10 +47,18 @@ export default async function HomePage() {
 
 // ─── Server Component for Shop Section ─────────────
 
-async function ShopSection() {
-  // Fetch all products for the shop section
-  // Pass empty string for category to get all products (null/empty = no category filter)
+async function ShopSection({ categories }: { categories: Awaited<ReturnType<typeof getProductCategories>> }) {
   const products = await getProducts({ category: '', sort: 'newest', page: 1, limit: 100 })
 
-  return <ObsidianProductsPage initialProducts={products.items} />
+  return (
+    <ObsidianProductsPage
+      initialProducts={products.items}
+      categories={categories}
+      totalCount={products.totalCount}
+      currentPage={1}
+      totalPages={1}
+      currentCategory=""
+      currentSort="newest"
+    />
+  )
 }

@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "خریداری",
+    "collections": "مجموعات",
+    "custom": "کسٹم",
+    "track": "ٹریک",
+    "searchPlaceholder": "تلاش کریں...",
+    "cart": "کارٹ",
+    "wishlist": "خواہش فہرست",
+    "toggleMenu": "مینو کھولیں"
+  },
+  "hero": {
+    "eyebrow": "لیزر کٹ وال آرٹ ڈیکوریٹر پیسز",
+    "title": "جہاں",
+    "subtitle": "جذبہ",
+    "titleLine3": "دیوار سے ملتا ہے",
+    "description": "پریمیم دھاتی اور لکڑی کا فن جو انیمے، سنیما، فطرت اور زندگی پر محیط ہے۔ ہر ٹکڑا لیزر سے درستگی سے کاٹا گیا ہے۔",
+    "primaryCTA": "تمام پیسز دیکھیں",
+    "secondaryCTA": "مجموعات دیکھیں",
+    "categories": {
+      "anime": "انیمے",
+      "movies": "فلمیں",
+      "gaming": "گیمنگ",
+      "nature": "فطرت",
+      "sports": "کھیل",
+      "abstract": "تجریدی",
+      "islamic": "اسلامی",
+      "geometric": "جیومیٹرک"
+    },
+    "stats": {
+      "uniqueDesigns": "+500",
+      "uniqueDesignsLabel": "منفرد ڈیزائن",
+      "materialsLabel": "مواد",
+      "materials": "دھات · لکڑی"
+    },
+    "artLabel": "کڈ گوکو — ڈریگن بال سیریز"
+  },
+  "materials": {
+    "precisionLaserCut": "درست لیزر کٹ",
+    "powderCoatedSteel": "پاؤڈر کوٹڈ اسٹیل",
+    "solidHardwood": "ٹھوس لکڑی",
+    "acrylicResin": "ایکریلک اور رال",
+    "freeGiftPackaging": "مفت گفٹ پیکیجنگ",
+    "worldwideShipping": "دنیا بھر میں ترسیل"
+  },
+  "cart": {
+    "title": "کارٹ",
+    "empty": "آپ کا کارٹ خالی ہے",
+    "subtotal": "ذیلی کل",
+    "shipping": "ترسیل",
+    "shippingFree": "مفت",
+    "total": "کل",
+    "checkout": "چیک آؤٹ",
+    "close": "کارٹ بند کریں"
+  },
+  "footer": {
+    "tagline": "درستگی سے لیزر کٹ ڈیزائن جو آپ کی دیواروں کو گیلری میں بدل دیتے ہیں۔ پریمیم مواد، کسٹم سائزنگ، اور دنیا بھر میں ترسیل۔",
+    "sections": {
+      "shop": "خریداری",
+      "support": "معاونت",
+      "company": "کمپنی"
+    },
+    "links": {
+      "allProducts": "تمام مصنوعات",
+      "bestsellers": "بیسٹ سیلرز",
+      "newArrivals": "نئی آمد",
+      "collections": "مجموعات",
+      "customOrder": "کسٹم آرڈر",
+      "trackOrder": "آرڈر ٹریک کریں",
+      "shippingInfo": "ترسیل کی معلومات",
+      "returns": "واپسی",
+      "aboutUs": "ہمارے بارے میں",
+      "contact": "رابطہ کریں",
+      "privacyPolicy": "رازداری کی پالیسی",
+      "termsOfService": "خدمت کی شرائط"
+    },
+    "newsletter": {
+      "title": "متاثر رہیں",
+      "description": "نئے ڈیزائن، خصوصی پیشکش، اور اندرونی سجاوٹ کی تحریک تک خصوصی رسائی حاصل کریں۔",
+      "placeholder": "اپنا ای میل درج کریں",
+      "subscribe": "سبسکرائب کریں"
+    },
+    "privacy": "رازداری",
+    "terms": "شرائط",
+    "cookies": "کوکیز",
+    "copyright": "© {{year}} OBSIDIAN. تمام حقوق محفوظ ہیں۔",
+    "madeIn": "پاکستان میں فخر کے ساتھ بنایا گیا"
+  },
+  "language": {
+    "select": "زبان",
+    "search": "زبان تلاش کریں..."
+  }
+}

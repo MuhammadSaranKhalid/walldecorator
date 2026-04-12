@@ -2,10 +2,13 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Heart, ShoppingCart, Eye } from 'lucide-react'
+import { Heart, Eye } from 'lucide-react'
 import { useCartStore } from '@/store/cart.store'
 import { useWishlistStore } from '@/store/wishlist.store'
 import { useToastStore } from '@/store/toast.store'
+import { getStorageUrl } from '@/lib/supabase/storage'
+import { useCurrencyStore } from '@/store/currency.store'
+import { formatPrice } from '@/lib/currency'
 
 interface ProductCardProps {
   product: any // Flexible type to accept different product structures
@@ -17,6 +20,7 @@ export function ObsidianProductCard({ product, badge, animationDelay = 0 }: Prod
   const { addItem: addToCart } = useCartStore()
   const { toggleItem: toggleWishlist, isInWishlist } = useWishlistStore()
   const { showSuccess } = useToastStore()
+  const { currency } = useCurrencyStore()
 
   const isWishlisted = isInWishlist(product.id)
   const hasDiscount = product.compare_at_price && product.compare_at_price > product.price
@@ -26,15 +30,16 @@ export function ObsidianProductCard({ product, badge, animationDelay = 0 }: Prod
     // Check for nested primary_image object (old format)
     if (product.primary_image) {
       return {
-        url: product.primary_image.storage_path,
+        url: getStorageUrl(product.primary_image.storage_path),
         alt_text: product.primary_image.alt_text,
         blurhash: product.primary_image.blurhash,
       }
     }
     // Check for denormalized fields (new format from database)
     if (product.primary_image_storage_path || product.primary_image_medium_path) {
+      const path = product.primary_image_medium_path ?? product.primary_image_storage_path
       return {
-        url: product.primary_image_medium_path ?? product.primary_image_storage_path,
+        url: getStorageUrl(path),
         alt_text: product.primary_image_alt_text,
         blurhash: product.primary_image_blurhash,
       }
@@ -88,9 +93,9 @@ export function ObsidianProductCard({ product, badge, animationDelay = 0 }: Prod
       case 'sale':
         return 'bg-[var(--obsidian-red)] text-white'
       case 'hot':
-        return 'bg-[#1a1a1a] border border-[var(--obsidian-border)] text-[var(--obsidian-text-muted)]'
+        return 'bg-[var(--obsidian-surface2)] border border-[var(--obsidian-border)] text-[var(--obsidian-text-muted)]'
       case 'limited':
-        return 'bg-[#1e1218] border border-[#3d1e30] text-[#c94c8a]'
+        return 'bg-[var(--obsidian-surface2)] border border-[var(--obsidian-border)] text-[#c94c8a]'
       default:
         return ''
     }
@@ -103,7 +108,7 @@ export function ObsidianProductCard({ product, badge, animationDelay = 0 }: Prod
       style={{ animationDelay: `${animationDelay}ms` }}
     >
       {/* Image Container */}
-      <div className="aspect-[3/4] overflow-hidden relative flex items-center justify-center">
+      <div className="aspect-square overflow-hidden relative flex items-center justify-center">
         {/* Background */}
         <div className="absolute inset-0 bg-[var(--obsidian-surface2)]" />
 
@@ -157,15 +162,15 @@ export function ObsidianProductCard({ product, badge, animationDelay = 0 }: Prod
           </div>
         )}
 
-        {/* Card Actions - Show on hover */}
-        <div className="absolute bottom-0 left-0 right-0 px-2.5 py-2.5 bg-[rgba(8,8,8,0.92)] opacity-0 translate-y-2 transition-all duration-250 flex gap-2 z-[4] group-hover:opacity-100 group-hover:translate-y-0">
+        {/* Card Actions — desktop only, hover-reveal overlay on image */}
+        <div className="hidden md:flex absolute bottom-0 left-0 right-0 px-2.5 py-2.5 bg-[rgba(8,8,8,0.92)] gap-2 z-[4] opacity-0 translate-y-2 transition-all duration-[250ms] group-hover:opacity-100 group-hover:translate-y-0">
           <button
             onClick={handleAddToCart}
-            className="flex-1 bg-[var(--obsidian-gold)] text-[var(--obsidian-bg)] border-none px-2.5 py-2.5 cursor-pointer font-[family-name:var(--font-dm-sans)] text-[10px] tracking-[0.15625em] uppercase font-medium transition-colors duration-200 hover:bg-[var(--obsidian-gold-light)]"
+            className="flex-1 bg-[var(--obsidian-gold)] text-[var(--obsidian-bg)] border-none px-2.5 py-2.5 cursor-pointer font-[family-name:var(--font-dm-sans)] text-[10px] tracking-[0.15625em] uppercase font-medium whitespace-nowrap transition-colors duration-200 hover:bg-[var(--obsidian-gold-light)]"
           >
             Add to Cart
           </button>
-          <button className="bg-[var(--obsidian-surface2)] border border-[var(--obsidian-border)] text-[var(--obsidian-text)] px-3.5 py-2.5 cursor-pointer text-[13px] transition-all duration-200 hover:border-[var(--obsidian-gold)] hover:text-[var(--obsidian-gold)]">
+          <button className="flex bg-[var(--obsidian-surface2)] border border-[var(--obsidian-border)] text-[var(--obsidian-text)] px-3.5 py-2.5 cursor-pointer text-[13px] items-center transition-all duration-200 hover:border-[var(--obsidian-gold)] hover:text-[var(--obsidian-gold)]">
             <Eye className="w-4 h-4" />
           </button>
         </div>
@@ -179,35 +184,43 @@ export function ObsidianProductCard({ product, badge, animationDelay = 0 }: Prod
         </div>
 
         {/* Name */}
-        <div className="font-[family-name:var(--font-cormorant)] text-lg font-normal mb-1.5 leading-tight">
+        <div className="font-[family-name:var(--font-cormorant)] text-lg font-normal mb-1.5 leading-tight line-clamp-2">
           {product.name}
         </div>
 
         {/* Description/Material */}
-        <div className="text-[11px] text-[var(--obsidian-text-dim)] mb-2.5 tracking-wide">
+        {/* <div className="text-[11px] text-[var(--obsidian-text-dim)] mb-2.5 tracking-wide">
           Laser-cut precision art
-        </div>
+        </div> */}
 
         {/* Price Row */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 mb-3">
           <div className="text-sm text-[var(--obsidian-gold)]">
-            Rs. {product.price.toLocaleString()}
+            {formatPrice(product.price, currency)}
           </div>
           {hasDiscount && product.compare_at_price && (
             <div className="text-xs text-[var(--obsidian-text-dim)] line-through">
-              Rs. {product.compare_at_price.toLocaleString()}
+              {formatPrice(product.compare_at_price, currency)}
             </div>
           )}
         </div>
 
         {/* Rating - placeholder for now */}
-        <div className="flex gap-0.5 mt-2 text-[var(--obsidian-gold)] text-[10px]">
+        {/* <div className="flex gap-0.5 text-[var(--obsidian-gold)] text-[10px] mb-3">
           {'★★★★★'.split('').map((star, i) => (
             <span key={i} className={i < 4 ? '' : 'text-[var(--obsidian-text-dim)]'}>
               {star}
             </span>
           ))}
-        </div>
+        </div> */}
+
+        {/* Add to Cart — mobile only, sits in info section below image */}
+        <button
+          onClick={handleAddToCart}
+          className="md:hidden w-full bg-[var(--obsidian-gold)] text-[var(--obsidian-bg)] border-none py-2.5 cursor-pointer font-[family-name:var(--font-dm-sans)] text-[10px] tracking-[0.15625em] uppercase font-medium transition-colors duration-200 active:bg-[var(--obsidian-gold-light)]"
+        >
+          Add to Cart
+        </button>
       </div>
     </Link>
   )

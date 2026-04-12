@@ -13,12 +13,12 @@ export function ContactSection() {
     <div className="space-y-4">
       <div className="pb-2 border-b">
         <h2 className="text-xl font-semibold">Contact Information</h2>
-        <p className="text-sm text-gray-600 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           We'll use this to send you order updates
         </p>
       </div>
 
-      <div className="space-y-4 bg-white rounded-lg border p-6">
+      <div className="space-y-4 bg-card rounded-lg border p-6">
         <Controller
           name="email"
           control={control}
@@ -28,7 +28,7 @@ export function ContactSection() {
                 Email Address
               </FieldLabel>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   {...field}
                   id={field.name}
@@ -57,7 +57,7 @@ export function ContactSection() {
                   Full Name
                 </FieldLabel>
                 <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     {...field}
                     id={field.name}
@@ -85,7 +85,7 @@ export function ContactSection() {
                   Phone Number
                 </FieldLabel>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     {...field}
                     id={field.name}

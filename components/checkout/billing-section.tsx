@@ -42,7 +42,7 @@ export function BillingSection() {
         name="useSameAddress"
         control={control}
         render={({ field }) => (
-          <Field orientation="horizontal" className="flex items-start space-x-3 space-y-0 rounded-lg bg-white border p-4">
+          <Field orientation="horizontal" className="flex items-start space-x-3 space-y-0 rounded-lg bg-card border p-4">
             <Checkbox
               id={field.name}
               checked={field.value}
@@ -61,12 +61,12 @@ export function BillingSection() {
         <div className="space-y-4">
           <div className="pb-2 border-b">
             <h2 className="text-xl font-semibold">Billing Address</h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Enter your billing information
             </p>
           </div>
 
-          <div className="space-y-4 bg-white rounded-lg border p-6">
+          <div className="space-y-4 bg-card rounded-lg border p-6">
             <Controller
               name="billing.line1"
               control={control}
@@ -76,7 +76,7 @@ export function BillingSection() {
                     Address Line 1
                   </FieldLabel>
                   <div className="relative">
-                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       {...field}
                       value={field.value || ''}
@@ -100,7 +100,7 @@ export function BillingSection() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name} className="text-sm font-medium">
-                    Address Line 2 <span className="text-gray-400 font-normal">(Optional)</span>
+                    Address Line 2 <span className="text-muted-foreground font-normal">(Optional)</span>
                   </FieldLabel>
                   <Input
                     {...field}

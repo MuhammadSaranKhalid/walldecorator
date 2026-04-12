@@ -1,13 +1,9 @@
 import { cache } from 'react'
 import { db } from '@/lib/db/client'
 import { redis } from '@/lib/upstash/client'
-import { desc, isNotNull } from 'drizzle-orm'
+import { desc } from 'drizzle-orm'
 import { homepage_config } from '@/lib/db/schema'
-import type {
-  HomepageData,
-  Category,
-  HomepageProduct,
-} from '@/types/homepage'
+import type { HomepageData, HomepageProduct } from '@/types/homepage'
 
 /**
  * Homepage configuration — hero text, promo banner, settings.
@@ -51,47 +47,6 @@ export const getHomepageData = cache(async (): Promise<HomepageData> => {
 })
 
 /**
- * Get top-level categories for homepage showcase.
- * Cached in Redis for 1 hour.
- */
-export const getCategories = cache(async (): Promise<Category[]> => {
-  const cacheKey = 'homepage:categories'
-  const cached = await redis.get<Category[]>(cacheKey)
-  if (cached) {
-    return typeof cached === 'string' ? (JSON.parse(cached) as Category[]) : cached
-  }
-
-  const data = await db.query.categories.findMany({
-    where: (c, { isNull, eq, and }) => and(isNull(c.parent_id), eq(c.is_visible, true)),
-    columns: {
-      id: true,
-      name: true,
-      slug: true,
-      image_id: true,
-      product_count: true,
-    },
-    with: {
-      images: {
-        columns: {
-          id: true,
-          storage_path: true,
-          alt_text: true,
-          thumbnail_path: true,
-          medium_path: true,
-          large_path: true,
-          blurhash: true,
-        },
-      },
-    },
-    orderBy: (c, { asc }) => [asc(c.display_order)],
-    limit: 8,
-  })
-
-  await redis.setex(cacheKey, 3600, JSON.stringify(data))
-  return data as unknown as Category[]
-})
-
-/**
  * Get featured products for homepage.
  * Cached in Redis for 30 minutes.
  */
@@ -103,7 +58,7 @@ export const getFeaturedProducts = cache(async (): Promise<HomepageProduct[]> =>
   }
 
   const data = await db.query.products.findMany({
-    where: (p, { and, eq }) =>
+    where: (p, { and, eq, isNotNull }) =>
       and(eq(p.status, 'active'), eq(p.is_featured, true), isNotNull(p.min_price)),
     columns: {
       id: true,
@@ -137,7 +92,7 @@ export const getBestsellers = cache(async (): Promise<HomepageProduct[]> => {
   }
 
   const data = await db.query.products.findMany({
-    where: (p, { eq, and }) => and(eq(p.status, 'active'), isNotNull(p.min_price)),
+    where: (p, { eq, and, isNotNull }) => and(eq(p.status, 'active'), isNotNull(p.min_price)),
     columns: {
       id: true,
       name: true,
@@ -170,7 +125,7 @@ export const getNewArrivals = cache(async (): Promise<HomepageProduct[]> => {
   }
 
   const data = await db.query.products.findMany({
-    where: (p, { eq, and }) => and(eq(p.status, 'active'), isNotNull(p.min_price)),
+    where: (p, { eq, and, isNotNull }) => and(eq(p.status, 'active'), isNotNull(p.min_price)),
     columns: {
       id: true,
       name: true,

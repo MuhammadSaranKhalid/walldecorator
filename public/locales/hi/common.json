@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "खरीदारी",
+    "collections": "संग्रह",
+    "custom": "कस्टम",
+    "track": "ट्रैक",
+    "searchPlaceholder": "खोजें...",
+    "cart": "कार्ट",
+    "wishlist": "विशलिस्ट",
+    "toggleMenu": "मेनू टॉगल करें"
+  },
+  "hero": {
+    "eyebrow": "लेज़र-कट वॉल आर्ट डेकोरेटर पीस",
+    "title": "जहाँ",
+    "subtitle": "जुनून",
+    "titleLine3": "दीवार से मिलता है",
+    "description": "एनीमे, सिनेमा, प्रकृति और जीवन पर फैली प्रीमियम धातु और लकड़ी की सिल्हूट कला। हर टुकड़ा लेज़र से सटीक रूप से कटा हुआ है।",
+    "primaryCTA": "सभी पीस ब्राउज़ करें",
+    "secondaryCTA": "संग्रह देखें",
+    "categories": {
+      "anime": "एनीमे",
+      "movies": "फिल्में",
+      "gaming": "गेमिंग",
+      "nature": "प्रकृति",
+      "sports": "खेल",
+      "abstract": "अमूर्त",
+      "islamic": "इस्लामिक",
+      "geometric": "ज्यामितीय"
+    },
+    "stats": {
+      "uniqueDesigns": "500+",
+      "uniqueDesignsLabel": "अद्वितीय डिज़ाइन",
+      "materialsLabel": "सामग्री",
+      "materials": "धातु · लकड़ी"
+    },
+    "artLabel": "किड गोकू — ड्रैगन बॉल सीरीज़"
+  },
+  "materials": {
+    "precisionLaserCut": "सटीक लेज़र-कट",
+    "powderCoatedSteel": "पाउडर-कोटेड स्टील",
+    "solidHardwood": "ठोस दृढ़ लकड़ी",
+    "acrylicResin": "ऐक्रेलिक और रेज़िन",
+    "freeGiftPackaging": "मुफ्त गिफ्ट पैकेजिंग",
+    "worldwideShipping": "विश्वव्यापी शिपिंग"
+  },
+  "cart": {
+    "title": "कार्ट",
+    "empty": "आपका कार्ट खाली है",
+    "subtotal": "उप-योग",
+    "shipping": "शिपिंग",
+    "shippingFree": "मुफ्त",
+    "total": "कुल",
+    "checkout": "चेकआउट",
+    "close": "कार्ट बंद करें"
+  },
+  "footer": {
+    "tagline": "सटीक लेज़र-कट डिज़ाइन जो आपकी दीवारों को गैलरी में बदल देते हैं। प्रीमियम सामग्री, कस्टम आकार, और विश्वव्यापी शिपिंग।",
+    "sections": {
+      "shop": "खरीदारी",
+      "support": "सहायता",
+      "company": "कंपनी"
+    },
+    "links": {
+      "allProducts": "सभी उत्पाद",
+      "bestsellers": "बेस्टसेलर",
+      "newArrivals": "नई आगमन",
+      "collections": "संग्रह",
+      "customOrder": "कस्टम ऑर्डर",
+      "trackOrder": "ऑर्डर ट्रैक करें",
+      "shippingInfo": "शिपिंग जानकारी",
+      "returns": "वापसी",
+      "aboutUs": "हमारे बारे में",
+      "contact": "संपर्क करें",
+      "privacyPolicy": "गोपनीयता नीति",
+      "termsOfService": "सेवा की शर्तें"
+    },
+    "newsletter": {
+      "title": "प्रेरित रहें",
+      "description": "नए डिज़ाइन, विशेष ऑफर, और इंटीरियर डिज़ाइन प्रेरणा तक विशेष पहुँच पाएं।",
+      "placeholder": "अपना ईमेल दर्ज करें",
+      "subscribe": "सदस्यता लें"
+    },
+    "privacy": "गोपनीयता",
+    "terms": "शर्तें",
+    "cookies": "कुकीज़",
+    "copyright": "© {{year}} OBSIDIAN. सर्वाधिकार सुरक्षित।",
+    "madeIn": "पाकिस्तान में गर्व के साथ निर्मित"
+  },
+  "language": {
+    "select": "भाषा",
+    "search": "भाषा खोजें..."
+  }
+}

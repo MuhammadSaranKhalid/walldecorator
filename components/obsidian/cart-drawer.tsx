@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useTranslation } from 'react-i18next'
 import { useCartStore } from '@/store/cart.store'
-import { useUIStore } from '@/store/ui.store'
+import { useCurrencyStore } from '@/store/currency.store'
+import { formatPrice } from '@/lib/currency'
 import { X, ShoppingCart, Minus, Plus, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 
@@ -22,9 +25,11 @@ export function ObsidianCartDrawer() {
 }
 
 function CartDrawerContent() {
+  const { t } = useTranslation('common')
   const { isOpen, closeCart, items, getTotalItems, getTotalPrice, updateQuantity, removeItem } =
     useCartStore()
-  const { openCheckoutModal } = useUIStore()
+  const { currency } = useCurrencyStore()
+  const router = useRouter()
 
   const total = getTotalPrice()
   const itemCount = getTotalItems()
@@ -32,14 +37,14 @@ function CartDrawerContent() {
 
   const handleCheckout = () => {
     closeCart()
-    openCheckoutModal()
+    router.push('/checkout')
   }
 
   return (
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black/70 z-[200] transition-opacity duration-300 backdrop-blur-sm ${
+        className={`fixed inset-0 bg-black/50 dark:bg-black/70 z-[200] transition-opacity duration-300 backdrop-blur-sm ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         onClick={closeCart}
@@ -52,15 +57,16 @@ function CartDrawerContent() {
         }`}
       >
         {/* Header */}
-        <div className="px-8 py-7 border-b border-[var(--obsidian-border)] flex items-center justify-between">
+        <div className="px-5 sm:px-8 py-5 sm:py-7 border-b border-[var(--obsidian-border)] flex items-center justify-between">
           <div>
             <span className="font-[family-name:var(--font-cormorant)] text-[26px] font-light">
-              Cart
+              {t('cart.title')}
             </span>
             <span className="text-[var(--obsidian-text-muted)] text-base ml-2">{itemCount}</span>
           </div>
           <button
             onClick={closeCart}
+            aria-label={t('cart.close')}
             className="bg-transparent border border-[var(--obsidian-border)] text-[var(--obsidian-text-muted)] w-9 h-9 cursor-pointer text-lg flex items-center justify-center transition-all duration-200 hover:border-[var(--obsidian-text)] hover:text-[var(--obsidian-text)]"
           >
             <X className="w-5 h-5" />
@@ -71,12 +77,12 @@ function CartDrawerContent() {
           // Empty state
           <div className="flex flex-col items-center justify-center flex-1 text-[var(--obsidian-text-muted)] gap-3">
             <ShoppingCart className="w-12 h-12 opacity-30" />
-            <p className="text-xs tracking-wide uppercase">Your cart is empty</p>
+            <p className="text-xs tracking-wide uppercase">{t('cart.empty')}</p>
           </div>
         ) : (
           <>
             {/* Items */}
-            <div className="flex-1 overflow-y-auto px-8 py-6 obsidian-scrollbar">
+            <div className="flex-1 overflow-y-auto px-5 sm:px-8 py-5 sm:py-6 obsidian-scrollbar">
               <div className="space-y-0">
                 {items.map((item) => (
                   <div
@@ -106,14 +112,14 @@ function CartDrawerContent() {
                         {item.variantDescription}
                       </div>
                       <div className="text-[var(--obsidian-gold)] text-[13px] mb-2.5">
-                        Rs. {item.price.toLocaleString()}
+                        {formatPrice(item.price, currency)}
                       </div>
 
                       {/* Quantity controls */}
                       <div className="flex items-center gap-3">
                         <button
                           onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
-                          className="bg-[var(--obsidian-surface2)] border border-[var(--obsidian-border)] text-[var(--obsidian-text)] w-[26px] h-[26px] cursor-pointer text-base flex items-center justify-center transition-all duration-200 hover:border-[var(--obsidian-gold)] hover:text-[var(--obsidian-gold)]"
+                          className="bg-[var(--obsidian-surface2)] border border-[var(--obsidian-border)] text-[var(--obsidian-text)] w-8 h-8 cursor-pointer text-base flex items-center justify-center transition-all duration-200 hover:border-[var(--obsidian-gold)] hover:text-[var(--obsidian-gold)]"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
@@ -122,7 +128,7 @@ function CartDrawerContent() {
                         </span>
                         <button
                           onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
-                          className="bg-[var(--obsidian-surface2)] border border-[var(--obsidian-border)] text-[var(--obsidian-text)] w-[26px] h-[26px] cursor-pointer text-base flex items-center justify-center transition-all duration-200 hover:border-[var(--obsidian-gold)] hover:text-[var(--obsidian-gold)]"
+                          className="bg-[var(--obsidian-surface2)] border border-[var(--obsidian-border)] text-[var(--obsidian-text)] w-8 h-8 cursor-pointer text-base flex items-center justify-center transition-all duration-200 hover:border-[var(--obsidian-gold)] hover:text-[var(--obsidian-gold)]"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
@@ -142,23 +148,23 @@ function CartDrawerContent() {
             </div>
 
             {/* Footer */}
-            <div className="px-8 py-6 border-t border-[var(--obsidian-border)]">
+            <div className="px-5 sm:px-8 py-5 sm:py-6 border-t border-[var(--obsidian-border)]">
               {/* Summary */}
               <div className="mb-5">
                 <div className="flex justify-between text-xs text-[var(--obsidian-text-muted)] py-1.5 tracking-wide">
-                  <span>Subtotal</span>
-                  <span>Rs. {total.toLocaleString()}</span>
+                  <span>{t('cart.subtotal')}</span>
+                  <span>{formatPrice(total, currency)}</span>
                 </div>
                 <div className="flex justify-between text-xs text-[var(--obsidian-text-muted)] py-1.5 tracking-wide">
-                  <span>Shipping</span>
+                  <span>{t('cart.shipping')}</span>
                   <span className={shippingCost === 0 ? 'text-[var(--obsidian-gold)]' : ''}>
-                    {shippingCost === 0 ? 'Free' : `Rs. ${shippingCost}`}
+                    {shippingCost === 0 ? t('cart.shippingFree') : formatPrice(shippingCost, currency)}
                   </span>
                 </div>
                 <div className="flex justify-between font-[family-name:var(--font-cormorant)] text-xl pt-3.5 border-t border-[var(--obsidian-border)] mt-2">
-                  <span>Total</span>
+                  <span>{t('cart.total')}</span>
                   <span className="text-[var(--obsidian-gold)]">
-                    Rs. {(total + shippingCost).toLocaleString()}
+                    {formatPrice(total + shippingCost, currency)}
                   </span>
                 </div>
               </div>
@@ -168,7 +174,7 @@ function CartDrawerContent() {
                 onClick={handleCheckout}
                 className="w-full bg-[var(--obsidian-gold)] text-[var(--obsidian-bg)] border-none px-6 py-4.5 cursor-pointer font-[family-name:var(--font-dm-sans)] text-[11px] tracking-[0.1875em] uppercase font-medium transition-all duration-250 hover:bg-[var(--obsidian-gold-light)]"
               >
-                Checkout
+                {t('cart.checkout')}
               </button>
             </div>
           </>

@@ -21,12 +21,12 @@ export function ShippingSection() {
     <div className="space-y-4">
       <div className="pb-2 border-b">
         <h2 className="text-xl font-semibold">Delivery</h2>
-        <p className="text-sm text-gray-600 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Where should we deliver your order?
         </p>
       </div>
 
-      <div className="space-y-4 bg-white rounded-lg border p-6">
+      <div className="space-y-4 bg-card rounded-lg border p-6">
         <Controller
           name="shipping.line1"
           control={control}
@@ -36,7 +36,7 @@ export function ShippingSection() {
                 Address Line 1
               </FieldLabel>
               <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   {...field}
                   id={field.name}
@@ -60,7 +60,7 @@ export function ShippingSection() {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor={field.name} className="text-sm font-medium">
-                Address Line 2 <span className="text-gray-400 font-normal">(Optional)</span>
+                Address Line 2 <span className="text-muted-foreground font-normal">(Optional)</span>
               </FieldLabel>
               <Input
                 {...field}

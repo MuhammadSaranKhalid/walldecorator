@@ -3,6 +3,9 @@ import { Cormorant_Garamond, DM_Sans } from "next/font/google"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 import "./globals.css"
 import { JsonLd } from "@/components/seo/json-ld"
+import { I18nProvider } from "@/lib/i18n/provider"
+import { ThemeProvider } from "@/components/theme-provider"
+import { CurrencyProvider } from "@/components/obsidian/currency-provider"
 
 const cormorantGaramond = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -111,13 +114,24 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="obsidian-scrollbar">
+    <html lang="en" className="obsidian-scrollbar" suppressHydrationWarning>
       <body className={`${cormorantGaramond.variable} ${dmSans.variable} font-[family-name:var(--font-dm-sans)] antialiased bg-[var(--obsidian-bg)] text-[var(--obsidian-text)] min-h-screen overflow-x-hidden obsidian-noise`}>
-        <NuqsAdapter>
-          <JsonLd data={websiteSchema} />
-          <JsonLd data={organizationSchema} />
-          {children}
-        </NuqsAdapter>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <I18nProvider>
+            <CurrencyProvider>
+              <NuqsAdapter>
+                <JsonLd data={websiteSchema} />
+                <JsonLd data={organizationSchema} />
+                {children}
+              </NuqsAdapter>
+            </CurrencyProvider>
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -7,8 +7,17 @@
 export function getStorageUrl(path: string, bucket: string = 'product-images'): string {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 
-  if (!supabaseUrl || !path) {
+  if (!path) {
     return '/placeholder.jpg' // Fallback placeholder image
+  }
+
+  // Already an absolute URL — return as-is
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path
+  }
+
+  if (!supabaseUrl) {
+    return '/placeholder.jpg'
   }
 
   // Use the official Supabase URL pattern for public buckets

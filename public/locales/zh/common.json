@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "购物",
+    "collections": "系列",
+    "custom": "定制",
+    "track": "追踪",
+    "searchPlaceholder": "搜索...",
+    "cart": "购物车",
+    "wishlist": "心愿单",
+    "toggleMenu": "切换菜单"
+  },
+  "hero": {
+    "eyebrow": "激光切割墙艺装饰作品",
+    "title": "激情",
+    "subtitle": "与墙壁",
+    "titleLine3": "相遇之处",
+    "description": "跨越动漫、电影、自然和生活的优质金属与木材剪影艺术。每件作品均经过精密激光切割，随时可以改变您的空间。",
+    "primaryCTA": "浏览所有作品",
+    "secondaryCTA": "查看系列",
+    "categories": {
+      "anime": "动漫",
+      "movies": "电影",
+      "gaming": "游戏",
+      "nature": "自然",
+      "sports": "运动",
+      "abstract": "抽象",
+      "islamic": "伊斯兰",
+      "geometric": "几何"
+    },
+    "stats": {
+      "uniqueDesigns": "500+",
+      "uniqueDesignsLabel": "独特设计",
+      "materialsLabel": "材料",
+      "materials": "金属 · 木材"
+    },
+    "artLabel": "小悟空 — 龙珠系列"
+  },
+  "materials": {
+    "precisionLaserCut": "精密激光切割",
+    "powderCoatedSteel": "粉末涂层钢",
+    "solidHardwood": "实心硬木",
+    "acrylicResin": "亚克力和树脂",
+    "freeGiftPackaging": "免费礼品包装",
+    "worldwideShipping": "全球配送"
+  },
+  "cart": {
+    "title": "购物车",
+    "empty": "您的购物车是空的",
+    "subtotal": "小计",
+    "shipping": "运费",
+    "shippingFree": "免费",
+    "total": "总计",
+    "checkout": "结账",
+    "close": "关闭购物车"
+  },
+  "footer": {
+    "tagline": "精密激光切割设计，将您的墙壁变成画廊。优质材料、定制尺寸和全球配送。",
+    "sections": {
+      "shop": "购物",
+      "support": "支持",
+      "company": "公司"
+    },
+    "links": {
+      "allProducts": "所有产品",
+      "bestsellers": "畅销品",
+      "newArrivals": "新品",
+      "collections": "系列",
+      "customOrder": "定制订单",
+      "trackOrder": "追踪订单",
+      "shippingInfo": "配送信息",
+      "returns": "退货",
+      "aboutUs": "关于我们",
+      "contact": "联系我们",
+      "privacyPolicy": "隐私政策",
+      "termsOfService": "服务条款"
+    },
+    "newsletter": {
+      "title": "保持灵感",
+      "description": "获取新设计、特别优惠和室内设计灵感的独家访问权。",
+      "placeholder": "输入您的邮箱",
+      "subscribe": "订阅"
+    },
+    "privacy": "隐私",
+    "terms": "条款",
+    "cookies": "Cookies",
+    "copyright": "© {{year}} OBSIDIAN. 保留所有权利。",
+    "madeIn": "在巴基斯坦精心制造"
+  },
+  "language": {
+    "select": "语言",
+    "search": "搜索语言..."
+  }
+}

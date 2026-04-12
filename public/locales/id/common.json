@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "Toko",
+    "collections": "Koleksi",
+    "custom": "Kustom",
+    "track": "Lacak",
+    "searchPlaceholder": "Cari...",
+    "cart": "Keranjang",
+    "wishlist": "Daftar Keinginan",
+    "toggleMenu": "Buka/tutup menu"
+  },
+  "hero": {
+    "eyebrow": "Hiasan Dinding Potong Laser",
+    "title": "Di Mana",
+    "subtitle": "Semangat",
+    "titleLine3": "Bertemu Dinding",
+    "description": "Seni siluet logam dan kayu premium yang mencakup anime, sinema, alam, dan kehidupan. Setiap karya dipotong laser dengan presisi dan siap mengubah ruang Anda.",
+    "primaryCTA": "Jelajahi Semua Karya",
+    "secondaryCTA": "Lihat Koleksi",
+    "categories": {
+      "anime": "Anime",
+      "movies": "Film",
+      "gaming": "Game",
+      "nature": "Alam",
+      "sports": "Olahraga",
+      "abstract": "Abstrak",
+      "islamic": "Islami",
+      "geometric": "Geometris"
+    },
+    "stats": {
+      "uniqueDesigns": "500+",
+      "uniqueDesignsLabel": "Desain Unik",
+      "materialsLabel": "Material",
+      "materials": "Logam · Kayu"
+    },
+    "artLabel": "Kid Goku — Seri Dragon Ball"
+  },
+  "materials": {
+    "precisionLaserCut": "Potong Laser Presisi",
+    "powderCoatedSteel": "Baja Berlapis Serbuk",
+    "solidHardwood": "Kayu Keras Solid",
+    "acrylicResin": "Akrilik & Resin",
+    "freeGiftPackaging": "Kemasan Hadiah Gratis",
+    "worldwideShipping": "Pengiriman Seluruh Dunia"
+  },
+  "cart": {
+    "title": "Keranjang",
+    "empty": "Keranjang Anda kosong",
+    "subtotal": "Subtotal",
+    "shipping": "Ongkir",
+    "shippingFree": "Gratis",
+    "total": "Total",
+    "checkout": "Checkout",
+    "close": "Tutup keranjang"
+  },
+  "footer": {
+    "tagline": "Desain potong laser presisi yang mengubah dinding Anda menjadi galeri. Material premium, ukuran kustom, dan pengiriman seluruh dunia.",
+    "sections": {
+      "shop": "Toko",
+      "support": "Dukungan",
+      "company": "Perusahaan"
+    },
+    "links": {
+      "allProducts": "Semua Produk",
+      "bestsellers": "Terlaris",
+      "newArrivals": "Terbaru",
+      "collections": "Koleksi",
+      "customOrder": "Pesanan Kustom",
+      "trackOrder": "Lacak Pesanan",
+      "shippingInfo": "Info Pengiriman",
+      "returns": "Pengembalian",
+      "aboutUs": "Tentang Kami",
+      "contact": "Kontak",
+      "privacyPolicy": "Kebijakan Privasi",
+      "termsOfService": "Syarat Layanan"
+    },
+    "newsletter": {
+      "title": "Tetap Terinspirasi",
+      "description": "Dapatkan akses eksklusif ke desain baru, penawaran spesial, dan inspirasi desain interior.",
+      "placeholder": "Masukkan email Anda",
+      "subscribe": "Berlangganan"
+    },
+    "privacy": "Privasi",
+    "terms": "Syarat",
+    "cookies": "Cookie",
+    "copyright": "© {{year}} OBSIDIAN. Hak cipta dilindungi.",
+    "madeIn": "Dibuat dengan bangga di Pakistan"
+  },
+  "language": {
+    "select": "Bahasa",
+    "search": "Cari bahasa..."
+  }
+}

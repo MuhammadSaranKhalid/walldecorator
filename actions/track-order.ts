@@ -1,8 +1,6 @@
 'use server'
 
 import { db } from '@/lib/db/client'
-import { eq, and, sql } from 'drizzle-orm'
-import { orders, order_items } from '@/lib/db/schema'
 
 export type OrderItem = {
   id: string
@@ -102,22 +100,13 @@ export async function trackOrder(
       }
     }
 
-    const address = order.shipping_address as {
-      line1: string
-      line2?: string | null
-      city: string
-      province: string
-      postal_code: string
-      country: string
-    }
-
     return {
       found: true,
       order_number: order.order_number,
       status: order.status ?? 'pending',
       payment_status: order.payment_status ?? 'pending',
       customer_name: order.customer_name,
-      shipping_address: address,
+      shipping_address: order.shipping_address,
       items: order.order_items.map((item) => ({
         ...item,
         unit_price: Number(item.unit_price),

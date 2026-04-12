@@ -1,0 +1,99 @@
+{
+  "nav": {
+    "shop": "Shop",
+    "collections": "Collections",
+    "custom": "Custom",
+    "track": "Track",
+    "searchPlaceholder": "Search...",
+    "cart": "Cart",
+    "wishlist": "Wishlist",
+    "toggleMenu": "Toggle menu"
+  },
+  "hero": {
+    "eyebrow": "Laser-Cut Wall Art Decorator Pieces",
+    "title": "Where",
+    "subtitle": "Passion",
+    "titleLine3": "Meets Wall",
+    "description": "Premium metal & wood silhouette art spanning anime, cinema, nature, and life. Each piece is precision laser-cut and ready to transform your space.",
+    "primaryCTA": "Browse All Pieces",
+    "secondaryCTA": "View Collections",
+    "categories": {
+      "anime": "Anime",
+      "movies": "Movies",
+      "gaming": "Gaming",
+      "nature": "Nature",
+      "sports": "Sports",
+      "abstract": "Abstract",
+      "islamic": "Islamic",
+      "geometric": "Geometric"
+    },
+    "stats": {
+      "uniqueDesigns": "500+",
+      "uniqueDesignsLabel": "Unique Designs",
+      "materialsLabel": "Materials",
+      "materials": "Metal · Wood"
+    },
+    "artLabel": "Kid Goku — Dragon Ball Series"
+  },
+  "materials": {
+    "precisionLaserCut": "Precision Laser-Cut",
+    "powderCoatedSteel": "Powder-Coated Steel",
+    "solidHardwood": "Solid Hardwood",
+    "acrylicResin": "Acrylic & Resin",
+    "freeGiftPackaging": "Free Gift Packaging",
+    "worldwideShipping": "Worldwide Shipping"
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "shippingFree": "Free",
+    "total": "Total",
+    "checkout": "Checkout",
+    "close": "Close cart"
+  },
+  "footer": {
+    "tagline": "Precision-crafted laser-cut designs that transform your walls into a gallery. Premium materials, custom sizing, and worldwide shipping.",
+    "sections": {
+      "shop": "Shop",
+      "support": "Support",
+      "company": "Company"
+    },
+    "links": {
+      "allProducts": "All Products",
+      "bestsellers": "Bestsellers",
+      "newArrivals": "New Arrivals",
+      "collections": "Collections",
+      "customOrder": "Custom Order",
+      "trackOrder": "Track Order",
+      "shippingInfo": "Shipping Info",
+      "returns": "Returns",
+      "aboutUs": "About Us",
+      "contact": "Contact",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service"
+    },
+    "newsletter": {
+      "title": "Stay Inspired",
+      "description": "Get exclusive access to new designs, special offers, and interior design inspiration.",
+      "placeholder": "Enter your email",
+      "subscribe": "Subscribe"
+    },
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "cookies": "Cookies",
+    "copyright": "© {{year}} OBSIDIAN. All rights reserved.",
+    "madeIn": "Crafted with pride in Pakistan"
+  },
+  "language": {
+    "select": "Language",
+    "search": "Search language..."
+  },
+  "currency": {
+    "select": "Currency",
+    "PKR": "Pakistani Rupee",
+    "USD": "US Dollar",
+    "EUR": "Euro"
+  }
+}

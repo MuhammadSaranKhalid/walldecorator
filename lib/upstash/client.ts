@@ -7,13 +7,15 @@ import { Redis } from '@upstash/redis'
 // Create Redis client - will use in-memory fallback if env vars not set
 let redis: Redis
 
-try {
-  redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL || '',
-    token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
-  })
-} catch (error) {
+const redisUrl = process.env.UPSTASH_REDIS_REST_URL
+const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN
+
+if (redisUrl && redisToken) {
+  redis = new Redis({ url: redisUrl, token: redisToken })
+} else {
   console.warn('Redis not configured, using in-memory fallback')
+  // eslint-disable-next-line no-constant-condition
+  if (false) throw new Error() // satisfy TypeScript branch for `let redis`
   // In-memory fallback for development
   const cache = new Map<string, { value: any; expiry: number }>()
 

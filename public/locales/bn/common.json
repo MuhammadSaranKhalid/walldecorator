@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "শপ",
+    "collections": "কালেকশন",
+    "custom": "কাস্টম",
+    "track": "ট্র্যাক",
+    "searchPlaceholder": "খুঁজুন...",
+    "cart": "কার্ট",
+    "wishlist": "উইশলিস্ট",
+    "toggleMenu": "মেনু টগল করুন"
+  },
+  "hero": {
+    "eyebrow": "লেজার-কাট ওয়াল আর্ট ডেকোরেটর পিস",
+    "title": "যেখানে",
+    "subtitle": "আবেগ",
+    "titleLine3": "দেয়ালের সাথে মেলে",
+    "description": "অ্যানিমে, সিনেমা, প্রকৃতি এবং জীবন জুড়ে প্রিমিয়াম ধাতু ও কাঠের সিলুয়েট আর্ট। প্রতিটি পিস নির্ভুলভাবে লেজার-কাট করা।",
+    "primaryCTA": "সব পিস দেখুন",
+    "secondaryCTA": "কালেকশন দেখুন",
+    "categories": {
+      "anime": "অ্যানিমে",
+      "movies": "মুভি",
+      "gaming": "গেমিং",
+      "nature": "প্রকৃতি",
+      "sports": "খেলাধুলা",
+      "abstract": "বিমূর্ত",
+      "islamic": "ইসলামিক",
+      "geometric": "জ্যামিতিক"
+    },
+    "stats": {
+      "uniqueDesigns": "৫০০+",
+      "uniqueDesignsLabel": "অনন্য ডিজাইন",
+      "materialsLabel": "উপকরণ",
+      "materials": "ধাতু · কাঠ"
+    },
+    "artLabel": "কিড গোকু — ড্রাগন বল সিরিজ"
+  },
+  "materials": {
+    "precisionLaserCut": "নির্ভুল লেজার-কাট",
+    "powderCoatedSteel": "পাউডার-কোটেড স্টিল",
+    "solidHardwood": "কঠিন শক্ত কাঠ",
+    "acrylicResin": "অ্যাক্রিলিক ও রেজিন",
+    "freeGiftPackaging": "বিনামূল্যে গিফট প্যাকেজিং",
+    "worldwideShipping": "বিশ্বব্যাপী শিপিং"
+  },
+  "cart": {
+    "title": "কার্ট",
+    "empty": "আপনার কার্ট খালি",
+    "subtotal": "সাবটোটাল",
+    "shipping": "শিপিং",
+    "shippingFree": "বিনামূল্যে",
+    "total": "মোট",
+    "checkout": "চেকআউট",
+    "close": "কার্ট বন্ধ করুন"
+  },
+  "footer": {
+    "tagline": "নির্ভুল লেজার-কাট ডিজাইন যা আপনার দেয়ালকে গ্যালারিতে রূপান্তরিত করে। প্রিমিয়াম উপকরণ, কাস্টম সাইজিং এবং বিশ্বব্যাপী শিপিং।",
+    "sections": {
+      "shop": "শপ",
+      "support": "সহায়তা",
+      "company": "কোম্পানি"
+    },
+    "links": {
+      "allProducts": "সব পণ্য",
+      "bestsellers": "বেস্টসেলার",
+      "newArrivals": "নতুন আগমন",
+      "collections": "কালেকশন",
+      "customOrder": "কাস্টম অর্ডার",
+      "trackOrder": "অর্ডার ট্র্যাক করুন",
+      "shippingInfo": "শিপিং তথ্য",
+      "returns": "রিটার্ন",
+      "aboutUs": "আমাদের সম্পর্কে",
+      "contact": "যোগাযোগ",
+      "privacyPolicy": "গোপনীয়তা নীতি",
+      "termsOfService": "সেবার শর্তাবলী"
+    },
+    "newsletter": {
+      "title": "অনুপ্রাণিত থাকুন",
+      "description": "নতুন ডিজাইন, বিশেষ অফার এবং ইন্টেরিয়র ডিজাইন অনুপ্রেরণায় একচেটিয়া অ্যাক্সেস পান।",
+      "placeholder": "আপনার ইমেইল লিখুন",
+      "subscribe": "সাবস্ক্রাইব করুন"
+    },
+    "privacy": "গোপনীয়তা",
+    "terms": "শর্তাবলী",
+    "cookies": "কুকিজ",
+    "copyright": "© {{year}} OBSIDIAN. সর্বস্বত্ব সংরক্ষিত।",
+    "madeIn": "পাকিস্তানে গর্বের সাথে তৈরি"
+  },
+  "language": {
+    "select": "ভাষা",
+    "search": "ভাষা খুঁজুন..."
+  }
+}

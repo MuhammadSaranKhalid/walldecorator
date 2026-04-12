@@ -10,24 +10,16 @@ import {
   getProductReviews,
 } from '@/queries/product-detail'
 import { getStorageUrl } from '@/lib/supabase/storage'
-import { ProductGallery } from '@/components/store/product/product-gallery'
-import { ProductInfo } from '@/components/store/product/product-info'
-import { ProductDescription } from '@/components/store/product/product-description'
+import { ObsidianProductDetailPage } from '@/components/obsidian/product-detail-page'
 import { RelatedProducts } from '@/components/store/product/related-products'
 import { ReviewSummary } from '@/components/store/product/reviews/review-summary'
 import { ReviewList } from '@/components/store/product/reviews/review-list'
-import { ProductBreadcrumb } from '@/components/store/product/product-breadcrumb'
 
 // ─── ISR Configuration ───────────────────────────────────────────────────────
 
-// Safety net: revalidate every 10 minutes even without webhook trigger
 export const revalidate = 600
-
-// dynamicParams = true: new products not in generateStaticParams
-// get server-rendered on first visit, then cached as ISR pages
 export const dynamicParams = true
 
-// Pre-build top 100 products at build time
 export async function generateStaticParams() {
   const slugs = await getTopProductSlugs(100)
   return slugs.map((slug) => ({ slug }))
@@ -43,23 +35,21 @@ export async function generateMetadata({
   const { slug } = await params
   const product = await getProductBySlug(slug)
 
-  if (!product) {
-    return { title: 'Product Not Found' }
-  }
+  if (!product) return { title: 'Product Not Found' }
 
   const firstImage = product.product_images[0]
 
   return {
     title: product.name,
     description: product.seo_description || product.description?.slice(0, 160),
-    alternates: {
-      canonical: `/products/${slug}`,
-    },
+    alternates: { canonical: `/products/${slug}` },
     openGraph: {
       title: product.name,
       description: product.seo_description || product.description?.slice(0, 160),
       type: 'website',
-      images: firstImage ? [{ url: getStorageUrl(firstImage.image.storage_path), alt: product.name }] : [],
+      images: firstImage
+        ? [{ url: getStorageUrl(firstImage.image.storage_path), alt: product.name }]
+        : [],
     },
   }
 }
@@ -72,23 +62,17 @@ type ProductPageProps = {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params
-
-  // Fetch core product data — critical path
   const product = await getProductBySlug(slug)
 
-  // Show 404 for invalid slugs or inactive products
-  if (!product || product.status !== 'active') {
-    notFound()
-  }
+  if (!product || product.status !== 'active') notFound()
 
-  // Schedule view tracking after response is done (React 19 / Next.js 15 best practice)
   after(() => {
     incrementProductViewCount(product.id).catch(console.error)
   })
 
   return (
     <>
-      {/* Structured Data for SEO */}
+      {/* Structured Data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -97,12 +81,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
             '@type': 'Product',
             name: product.name,
             description: product.description,
-            sku: product.id,
-            brand: {
-              '@type': 'Brand',
-              name: 'Wall Decorator',
-            },
-            image: product.product_images.map((img) => getStorageUrl(img.image.storage_path)),
+            brand: { '@type': 'Brand', name: 'Wall Decorator' },
+            image: product.product_images.map((img) =>
+              getStorageUrl(img.image.storage_path)
+            ),
             offers: Object.values(product.selection_map).map((v) => ({
               '@type': 'Offer',
               price: v.price,
@@ -116,50 +98,35 @@ export default async function ProductPage({ params }: ProductPageProps) {
         }}
       />
 
-      <div className="container mx-auto px-4 py-8">
-        {/* Breadcrumb */}
-        <ProductBreadcrumb category={product.category} productName={product.name} />
+      {/* Main product detail — full obsidian design */}
+      <ObsidianProductDetailPage product={product} />
 
-        {/* Main product section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-6">
-          {/* Left: Image Gallery */}
-          <ProductGallery images={product.product_images} productName={product.name} />
+      {/* Reviews — streamed below, non-blocking */}
+      <div className="container mx-auto px-6 sm:px-12 mt-16 mb-8">
+        <Suspense
+          fallback={
+            <div className="animate-pulse space-y-4">
+              <div className="h-8 w-32 bg-[var(--obsidian-surface2)] rounded" />
+              <div className="h-40 bg-[var(--obsidian-surface2)] rounded" />
+            </div>
+          }
+        >
+          <ReviewSection productId={product.id} />
+        </Suspense>
+      </div>
 
-          {/* Right: Product Info */}
-          <ProductInfo product={product} />
-        </div>
-
-        {/* Product Description & Specs */}
-        <div className="mt-16">
-          <ProductDescription description={product.description} />
-        </div>
-
-        {/* Reviews — streamed separately, non-blocking */}
-        <div className="mt-16">
+      {/* Related Products — streamed below, only when category exists */}
+      {product.category && (
+        <div className="container mx-auto px-6 sm:px-12 mt-8 mb-16">
           <Suspense
             fallback={
-              <div className="animate-pulse">
-                <div className="h-8 w-32 bg-muted rounded mb-4" />
-                <div className="h-40 bg-muted rounded" />
-              </div>
-            }
-          >
-            <ReviewSection productId={product.id} />
-          </Suspense>
-        </div>
-
-        {/* Related Products — streamed separately, non-blocking */}
-        <div className="mt-16">
-          <Suspense
-            fallback={
-              <div className="animate-pulse">
-                <div className="h-8 w-48 bg-muted rounded mb-6" />
+              <div className="animate-pulse space-y-4">
+                <div className="h-8 w-48 bg-[var(--obsidian-surface2)] rounded" />
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <div key={i} className="space-y-3">
-                      <div className="aspect-square bg-muted rounded-xl" />
-                      <div className="h-4 bg-muted rounded w-3/4" />
-                      <div className="h-4 bg-muted rounded w-1/2" />
+                      <div className="aspect-square bg-[var(--obsidian-surface2)] rounded" />
+                      <div className="h-4 bg-[var(--obsidian-surface2)] rounded w-3/4" />
                     </div>
                   ))}
                 </div>
@@ -172,17 +139,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
             />
           </Suspense>
         </div>
-      </div>
+      )}
     </>
   )
 }
 
-// ─── Server Components for Streaming (React 19 with use() hook) ─────────────
+// ─── Streamed Server Components ───────────────────────────────────────────────
 
 function ReviewSection({ productId }: { productId: string }) {
-  // React 19: use() hook unwraps promises - cleaner than async/await
   const { reviews, summary } = use(getProductReviews(productId))
-
   return (
     <>
       <ReviewSummary summary={summary} />
@@ -198,7 +163,6 @@ function RelatedProductsSection({
   categoryId: string
   currentProductId: string
 }) {
-  // React 19: use() hook unwraps promises
   const related = use(getRelatedProducts(categoryId, currentProductId))
   return <RelatedProducts products={related} />
 }

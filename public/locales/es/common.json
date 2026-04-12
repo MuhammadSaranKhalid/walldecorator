@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "Tienda",
+    "collections": "Colecciones",
+    "custom": "Personalizado",
+    "track": "Rastrear",
+    "searchPlaceholder": "Buscar...",
+    "cart": "Carrito",
+    "wishlist": "Lista de deseos",
+    "toggleMenu": "Alternar menú"
+  },
+  "hero": {
+    "eyebrow": "Piezas decorativas de pared cortadas con láser",
+    "title": "Donde",
+    "subtitle": "la pasión",
+    "titleLine3": "se encuentra con la pared",
+    "description": "Arte de silueta en metal y madera de calidad premium que abarca anime, cine, naturaleza y vida. Cada pieza está cortada con precisión con láser.",
+    "primaryCTA": "Ver todas las piezas",
+    "secondaryCTA": "Ver colecciones",
+    "categories": {
+      "anime": "Anime",
+      "movies": "Películas",
+      "gaming": "Videojuegos",
+      "nature": "Naturaleza",
+      "sports": "Deportes",
+      "abstract": "Abstracto",
+      "islamic": "Islámico",
+      "geometric": "Geométrico"
+    },
+    "stats": {
+      "uniqueDesigns": "500+",
+      "uniqueDesignsLabel": "Diseños únicos",
+      "materialsLabel": "Materiales",
+      "materials": "Metal · Madera"
+    },
+    "artLabel": "Kid Goku — Serie Dragon Ball"
+  },
+  "materials": {
+    "precisionLaserCut": "Corte láser de precisión",
+    "powderCoatedSteel": "Acero con recubrimiento en polvo",
+    "solidHardwood": "Madera dura sólida",
+    "acrylicResin": "Acrílico y resina",
+    "freeGiftPackaging": "Embalaje de regalo gratuito",
+    "worldwideShipping": "Envío mundial"
+  },
+  "cart": {
+    "title": "Carrito",
+    "empty": "Tu carrito está vacío",
+    "subtotal": "Subtotal",
+    "shipping": "Envío",
+    "shippingFree": "Gratis",
+    "total": "Total",
+    "checkout": "Pagar",
+    "close": "Cerrar carrito"
+  },
+  "footer": {
+    "tagline": "Diseños cortados con láser con precisión que transforman tus paredes en una galería. Materiales premium, tamaños personalizados y envío mundial.",
+    "sections": {
+      "shop": "Tienda",
+      "support": "Soporte",
+      "company": "Empresa"
+    },
+    "links": {
+      "allProducts": "Todos los productos",
+      "bestsellers": "Más vendidos",
+      "newArrivals": "Novedades",
+      "collections": "Colecciones",
+      "customOrder": "Pedido personalizado",
+      "trackOrder": "Rastrear pedido",
+      "shippingInfo": "Info de envío",
+      "returns": "Devoluciones",
+      "aboutUs": "Sobre nosotros",
+      "contact": "Contacto",
+      "privacyPolicy": "Política de privacidad",
+      "termsOfService": "Términos de servicio"
+    },
+    "newsletter": {
+      "title": "Mantente inspirado",
+      "description": "Obtén acceso exclusivo a nuevos diseños, ofertas especiales e inspiración de diseño interior.",
+      "placeholder": "Ingresa tu email",
+      "subscribe": "Suscribirse"
+    },
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "cookies": "Cookies",
+    "copyright": "© {{year}} OBSIDIAN. Todos los derechos reservados.",
+    "madeIn": "Fabricado con orgullo en Pakistán"
+  },
+  "language": {
+    "select": "Idioma",
+    "search": "Buscar idioma..."
+  }
+}

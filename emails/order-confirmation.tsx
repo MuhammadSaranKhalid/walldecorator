@@ -36,6 +36,8 @@ interface ShippingAddress {
     country: string;
 }
 
+import { formatPrice as formatCurrencyPrice, type CurrencyCode } from "../lib/currency";
+
 interface OrderConfirmationEmailProps {
     orderNumber: string;
     customerName: string;
@@ -47,9 +49,8 @@ interface OrderConfirmationEmailProps {
     total: number;
     shippingAddress: ShippingAddress;
     trackingUrl?: string;
+    currency?: CurrencyCode;
 }
-
-const formatPrice = (amount: number) => `Rs ${amount.toLocaleString("en-PK", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
@@ -81,7 +82,9 @@ export const OrderConfirmationEmail = ({
         country: "Pakistan",
     },
     trackingUrl,
+    currency = 'PKR',
 }: OrderConfirmationEmailProps) => {
+    const formatPrice = (amount: number) => formatCurrencyPrice(amount, currency);
     const previewText = `Order ${orderNumber} confirmed — Thank you for your purchase!`;
 
     return (

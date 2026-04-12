@@ -188,15 +188,15 @@ export function DeliveryMap({ addressQueryOptions, addressLabel }: Props) {
     }, [(addressQueryOptions ?? []).join('|')])
 
     return (
-        <div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+        <div className="rounded-xl overflow-hidden border border-border shadow-sm">
             {/* Header */}
-            <div className="bg-white px-5 py-4 flex items-center gap-3 border-b border-gray-100">
+            <div className="bg-card px-5 py-4 flex items-center gap-3 border-b border-border">
                 <div className="rounded-full bg-green-100 p-2">
                     <MapPin className="h-4 w-4 text-green-600" />
                 </div>
                 <div>
-                    <h3 className="font-semibold text-gray-900 text-sm">Delivery Location</h3>
-                    <p className="text-xs text-gray-500">Map of your shipping area</p>
+                    <h3 className="font-semibold text-foreground text-sm">Delivery Location</h3>
+                    <p className="text-xs text-muted-foreground">Map of your shipping area</p>
                 </div>
             </div>
 
@@ -214,18 +214,18 @@ export function DeliveryMap({ addressQueryOptions, addressLabel }: Props) {
             <div className="relative">
                 {/* Spinner overlay */}
                 {mapState === 'loading' ? (
-                    <div className="absolute inset-0 z-10 bg-gray-50 flex flex-col items-center justify-center gap-3">
+                    <div className="absolute inset-0 z-10 bg-muted flex flex-col items-center justify-center gap-3">
                         <Loader2 className="h-8 w-8 text-green-500 animate-spin" />
-                        <p className="text-sm text-gray-500">Locating address…</p>
+                        <p className="text-sm text-muted-foreground">Locating address…</p>
                     </div>
                 ) : null}
 
                 {/* Unavailable state */}
                 {mapState === 'unavailable' ? (
-                    <div className="h-36 bg-gray-50 flex flex-col items-center justify-center gap-2 px-6 text-center">
-                        <Navigation className="h-6 w-6 text-gray-300" />
-                        <p className="text-sm text-gray-700 font-medium">Map preview unavailable</p>
-                        <p className="text-xs text-gray-500 max-w-[250px]">
+                    <div className="h-36 bg-muted flex flex-col items-center justify-center gap-2 px-6 text-center">
+                        <Navigation className="h-6 w-6 text-muted-foreground/40" />
+                        <p className="text-sm text-foreground font-medium">Map preview unavailable</p>
+                        <p className="text-xs text-muted-foreground max-w-[250px]">
                             We couldn't automatically locate this exact address on the map, but your order was still placed successfully.
                         </p>
                     </div>

@@ -154,7 +154,9 @@ export async function POST(request: Request) {
     await db
       .update(imagesTable)
       .set({
-        ...variantPaths,
+        thumbnail_path: variantPaths['thumbnail_path'] ?? null,
+        medium_path: variantPaths['medium_path'] ?? null,
+        large_path: variantPaths['large_path'] ?? null,
         blurhash,
         processing_status: "completed",
         processing_error: null,

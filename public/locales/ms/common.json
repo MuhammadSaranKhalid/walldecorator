@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "Kedai",
+    "collections": "Koleksi",
+    "custom": "Tersuai",
+    "track": "Jejak",
+    "searchPlaceholder": "Cari...",
+    "cart": "Troli",
+    "wishlist": "Senarai Hajat",
+    "toggleMenu": "Togol menu"
+  },
+  "hero": {
+    "eyebrow": "Hiasan Dinding Potong Laser",
+    "title": "Di Mana",
+    "subtitle": "Semangat",
+    "titleLine3": "Bertemu Dinding",
+    "description": "Seni siluet logam dan kayu premium yang merangkumi anime, sinema, alam semula jadi dan kehidupan. Setiap karya dipotong laser dengan tepat.",
+    "primaryCTA": "Layari Semua Karya",
+    "secondaryCTA": "Lihat Koleksi",
+    "categories": {
+      "anime": "Anime",
+      "movies": "Filem",
+      "gaming": "Permainan",
+      "nature": "Alam",
+      "sports": "Sukan",
+      "abstract": "Abstrak",
+      "islamic": "Islamik",
+      "geometric": "Geometrik"
+    },
+    "stats": {
+      "uniqueDesigns": "500+",
+      "uniqueDesignsLabel": "Reka Bentuk Unik",
+      "materialsLabel": "Bahan",
+      "materials": "Logam · Kayu"
+    },
+    "artLabel": "Kid Goku — Siri Dragon Ball"
+  },
+  "materials": {
+    "precisionLaserCut": "Potong Laser Tepat",
+    "powderCoatedSteel": "Keluli Bersalut Serbuk",
+    "solidHardwood": "Kayu Keras Pepejal",
+    "acrylicResin": "Akrilik & Resin",
+    "freeGiftPackaging": "Pembungkusan Hadiah Percuma",
+    "worldwideShipping": "Penghantaran Seluruh Dunia"
+  },
+  "cart": {
+    "title": "Troli",
+    "empty": "Troli anda kosong",
+    "subtotal": "Subjumlah",
+    "shipping": "Penghantaran",
+    "shippingFree": "Percuma",
+    "total": "Jumlah",
+    "checkout": "Daftar Keluar",
+    "close": "Tutup troli"
+  },
+  "footer": {
+    "tagline": "Reka bentuk potong laser tepat yang mengubah dinding anda menjadi galeri. Bahan premium, saiz tersuai dan penghantaran seluruh dunia.",
+    "sections": {
+      "shop": "Kedai",
+      "support": "Sokongan",
+      "company": "Syarikat"
+    },
+    "links": {
+      "allProducts": "Semua Produk",
+      "bestsellers": "Terlaris",
+      "newArrivals": "Ketibaan Baru",
+      "collections": "Koleksi",
+      "customOrder": "Pesanan Tersuai",
+      "trackOrder": "Jejak Pesanan",
+      "shippingInfo": "Maklumat Penghantaran",
+      "returns": "Pemulangan",
+      "aboutUs": "Tentang Kami",
+      "contact": "Hubungi",
+      "privacyPolicy": "Dasar Privasi",
+      "termsOfService": "Terma Perkhidmatan"
+    },
+    "newsletter": {
+      "title": "Kekal Terilham",
+      "description": "Dapatkan akses eksklusif kepada reka bentuk baharu, tawaran istimewa dan inspirasi reka bentuk dalaman.",
+      "placeholder": "Masukkan e-mel anda",
+      "subscribe": "Langgan"
+    },
+    "privacy": "Privasi",
+    "terms": "Terma",
+    "cookies": "Kuki",
+    "copyright": "© {{year}} OBSIDIAN. Hak cipta terpelihara.",
+    "madeIn": "Dibuat dengan bangga di Pakistan"
+  },
+  "language": {
+    "select": "Bahasa",
+    "search": "Cari bahasa..."
+  }
+}

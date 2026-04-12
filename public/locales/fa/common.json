@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "فروشگاه",
+    "collections": "مجموعه‌ها",
+    "custom": "سفارشی",
+    "track": "پیگیری",
+    "searchPlaceholder": "جستجو...",
+    "cart": "سبد خرید",
+    "wishlist": "علاقه‌مندی‌ها",
+    "toggleMenu": "بازکردن منو"
+  },
+  "hero": {
+    "eyebrow": "قطعات دیوارآرای برش لیزری",
+    "title": "جایی که",
+    "subtitle": "اشتیاق",
+    "titleLine3": "با دیوار روبرو می‌شود",
+    "description": "هنر سیلوئت فلزی و چوبی لوکس شامل انیمه، سینما، طبیعت و زندگی. هر قطعه با دقت برش لیزری شده است.",
+    "primaryCTA": "مشاهده همه آثار",
+    "secondaryCTA": "مشاهده مجموعه‌ها",
+    "categories": {
+      "anime": "انیمه",
+      "movies": "فیلم",
+      "gaming": "بازی",
+      "nature": "طبیعت",
+      "sports": "ورزش",
+      "abstract": "انتزاعی",
+      "islamic": "اسلامی",
+      "geometric": "هندسی"
+    },
+    "stats": {
+      "uniqueDesigns": "+۵۰۰",
+      "uniqueDesignsLabel": "طرح منحصربه‌فرد",
+      "materialsLabel": "مواد",
+      "materials": "فلز · چوب"
+    },
+    "artLabel": "کید گوکو — سری دراگون بال"
+  },
+  "materials": {
+    "precisionLaserCut": "برش لیزری دقیق",
+    "powderCoatedSteel": "فولاد پودری",
+    "solidHardwood": "چوب سخت جامد",
+    "acrylicResin": "آکریلیک و رزین",
+    "freeGiftPackaging": "بسته‌بندی هدیه رایگان",
+    "worldwideShipping": "ارسال جهانی"
+  },
+  "cart": {
+    "title": "سبد خرید",
+    "empty": "سبد خرید شما خالی است",
+    "subtotal": "جمع جزء",
+    "shipping": "حمل‌ونقل",
+    "shippingFree": "رایگان",
+    "total": "مجموع",
+    "checkout": "تکمیل خرید",
+    "close": "بستن سبد خرید"
+  },
+  "footer": {
+    "tagline": "طرح‌های برش لیزری دقیق که دیوارهای شما را به یک گالری تبدیل می‌کنند. مواد لوکس، سایزبندی سفارشی و ارسال جهانی.",
+    "sections": {
+      "shop": "فروشگاه",
+      "support": "پشتیبانی",
+      "company": "شرکت"
+    },
+    "links": {
+      "allProducts": "همه محصولات",
+      "bestsellers": "پرفروش‌ترین‌ها",
+      "newArrivals": "جدیدترین‌ها",
+      "collections": "مجموعه‌ها",
+      "customOrder": "سفارش سفارشی",
+      "trackOrder": "پیگیری سفارش",
+      "shippingInfo": "اطلاعات ارسال",
+      "returns": "مرجوعات",
+      "aboutUs": "درباره ما",
+      "contact": "تماس با ما",
+      "privacyPolicy": "سیاست حریم خصوصی",
+      "termsOfService": "شرایط استفاده"
+    },
+    "newsletter": {
+      "title": "الهام‌بخش بمانید",
+      "description": "دسترسی انحصاری به طرح‌های جدید، پیشنهادات ویژه و الهام طراحی داخلی داشته باشید.",
+      "placeholder": "ایمیل خود را وارد کنید",
+      "subscribe": "عضویت"
+    },
+    "privacy": "حریم خصوصی",
+    "terms": "شرایط",
+    "cookies": "کوکی‌ها",
+    "copyright": "© {{year}} OBSIDIAN. تمامی حقوق محفوظ است.",
+    "madeIn": "با افتخار ساخته شده در پاکستان"
+  },
+  "language": {
+    "select": "زبان",
+    "search": "جستجوی زبان..."
+  }
+}

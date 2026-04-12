@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "Cửa hàng",
+    "collections": "Bộ sưu tập",
+    "custom": "Tùy chỉnh",
+    "track": "Theo dõi",
+    "searchPlaceholder": "Tìm kiếm...",
+    "cart": "Giỏ hàng",
+    "wishlist": "Danh sách yêu thích",
+    "toggleMenu": "Chuyển đổi menu"
+  },
+  "hero": {
+    "eyebrow": "Tác phẩm trang trí tường cắt laser",
+    "title": "Nơi",
+    "subtitle": "đam mê",
+    "titleLine3": "gặp bức tường",
+    "description": "Nghệ thuật bóng hình kim loại và gỗ cao cấp bao gồm anime, điện ảnh, thiên nhiên và cuộc sống. Mỗi tác phẩm được cắt laser chính xác.",
+    "primaryCTA": "Xem tất cả tác phẩm",
+    "secondaryCTA": "Xem bộ sưu tập",
+    "categories": {
+      "anime": "Anime",
+      "movies": "Phim",
+      "gaming": "Game",
+      "nature": "Thiên nhiên",
+      "sports": "Thể thao",
+      "abstract": "Trừu tượng",
+      "islamic": "Hồi giáo",
+      "geometric": "Hình học"
+    },
+    "stats": {
+      "uniqueDesigns": "500+",
+      "uniqueDesignsLabel": "Thiết kế độc đáo",
+      "materialsLabel": "Vật liệu",
+      "materials": "Kim loại · Gỗ"
+    },
+    "artLabel": "Kid Goku — Series Dragon Ball"
+  },
+  "materials": {
+    "precisionLaserCut": "Cắt laser chính xác",
+    "powderCoatedSteel": "Thép phủ bột",
+    "solidHardwood": "Gỗ cứng nguyên khối",
+    "acrylicResin": "Acrylic & Nhựa",
+    "freeGiftPackaging": "Bao bì quà tặng miễn phí",
+    "worldwideShipping": "Vận chuyển toàn cầu"
+  },
+  "cart": {
+    "title": "Giỏ hàng",
+    "empty": "Giỏ hàng của bạn trống",
+    "subtotal": "Tạm tính",
+    "shipping": "Vận chuyển",
+    "shippingFree": "Miễn phí",
+    "total": "Tổng cộng",
+    "checkout": "Thanh toán",
+    "close": "Đóng giỏ hàng"
+  },
+  "footer": {
+    "tagline": "Thiết kế cắt laser chính xác biến tường của bạn thành phòng trưng bày. Vật liệu cao cấp, kích thước tùy chỉnh và vận chuyển toàn cầu.",
+    "sections": {
+      "shop": "Cửa hàng",
+      "support": "Hỗ trợ",
+      "company": "Công ty"
+    },
+    "links": {
+      "allProducts": "Tất cả sản phẩm",
+      "bestsellers": "Bán chạy nhất",
+      "newArrivals": "Hàng mới về",
+      "collections": "Bộ sưu tập",
+      "customOrder": "Đặt hàng tùy chỉnh",
+      "trackOrder": "Theo dõi đơn hàng",
+      "shippingInfo": "Thông tin vận chuyển",
+      "returns": "Đổi trả",
+      "aboutUs": "Về chúng tôi",
+      "contact": "Liên hệ",
+      "privacyPolicy": "Chính sách bảo mật",
+      "termsOfService": "Điều khoản dịch vụ"
+    },
+    "newsletter": {
+      "title": "Luôn được truyền cảm hứng",
+      "description": "Nhận quyền truy cập độc quyền vào các thiết kế mới, ưu đãi đặc biệt và cảm hứng thiết kế nội thất.",
+      "placeholder": "Nhập email của bạn",
+      "subscribe": "Đăng ký"
+    },
+    "privacy": "Quyền riêng tư",
+    "terms": "Điều khoản",
+    "cookies": "Cookie",
+    "copyright": "© {{year}} OBSIDIAN. Đã đăng ký bản quyền.",
+    "madeIn": "Được làm với niềm tự hào tại Pakistan"
+  },
+  "language": {
+    "select": "Ngôn ngữ",
+    "search": "Tìm kiếm ngôn ngữ..."
+  }
+}

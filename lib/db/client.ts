@@ -3,15 +3,12 @@ import { Pool } from 'pg'
 import * as schema from './schema'
 import * as relations from './relations'
 
-// Only cache the Pool — it holds the actual DB connections.
-// Re-creating the drizzle() wrapper per module load is cheap and preserves schema types.
 const globalForPg = globalThis as unknown as { pool: Pool | undefined }
 
 function createPool() {
   return new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false },
-    // Cap concurrent connections. Supabase free tier / PgBouncer multiplexes these.
     max: 10,
   })
 }
@@ -19,7 +16,8 @@ function createPool() {
 const pool = globalForPg.pool ?? createPool()
 if (!globalForPg.pool) globalForPg.pool = pool
 
-export const db = drizzle({
-  client: pool,
-  schema: { ...schema, ...relations },
-})
+// Drizzle RQB (db.query.*) requires both table definitions AND relation
+// definitions in the schema object. Per Drizzle docs the schema option
+// accepts any object containing tables and/or relations — non-table keys
+// are simply ignored by the query builder internals.
+export const db = drizzle({ client: pool, schema: { ...schema, ...relations } })

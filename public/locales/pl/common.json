@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "Sklep",
+    "collections": "Kolekcje",
+    "custom": "Na zamówienie",
+    "track": "Śledź",
+    "searchPlaceholder": "Szukaj...",
+    "cart": "Koszyk",
+    "wishlist": "Lista życzeń",
+    "toggleMenu": "Przełącz menu"
+  },
+  "hero": {
+    "eyebrow": "Dekoracje ścienne wycinane laserem",
+    "title": "Gdzie",
+    "subtitle": "pasja",
+    "titleLine3": "spotyka ścianę",
+    "description": "Premium metalowa i drewniana sztuka sylwetkowa obejmująca anime, kino, naturę i życie. Każdy element jest precyzyjnie wycięty laserem.",
+    "primaryCTA": "Przeglądaj wszystkie dzieła",
+    "secondaryCTA": "Zobacz kolekcje",
+    "categories": {
+      "anime": "Anime",
+      "movies": "Filmy",
+      "gaming": "Gaming",
+      "nature": "Natura",
+      "sports": "Sport",
+      "abstract": "Abstrakcja",
+      "islamic": "Islamski",
+      "geometric": "Geometryczny"
+    },
+    "stats": {
+      "uniqueDesigns": "500+",
+      "uniqueDesignsLabel": "Unikalnych wzorów",
+      "materialsLabel": "Materiały",
+      "materials": "Metal · Drewno"
+    },
+    "artLabel": "Kid Goku — Seria Dragon Ball"
+  },
+  "materials": {
+    "precisionLaserCut": "Precyzyjne cięcie laserowe",
+    "powderCoatedSteel": "Stal malowana proszkowo",
+    "solidHardwood": "Lity twardy drewno",
+    "acrylicResin": "Akryl i żywica",
+    "freeGiftPackaging": "Darmowe opakowanie prezentowe",
+    "worldwideShipping": "Wysyłka na cały świat"
+  },
+  "cart": {
+    "title": "Koszyk",
+    "empty": "Twój koszyk jest pusty",
+    "subtotal": "Suma częściowa",
+    "shipping": "Wysyłka",
+    "shippingFree": "Bezpłatna",
+    "total": "Łącznie",
+    "checkout": "Do kasy",
+    "close": "Zamknij koszyk"
+  },
+  "footer": {
+    "tagline": "Precyzyjnie wycinane laserowo wzory, które zamieniają Twoje ściany w galerię. Premium materiały, niestandardowe rozmiary i wysyłka na cały świat.",
+    "sections": {
+      "shop": "Sklep",
+      "support": "Wsparcie",
+      "company": "Firma"
+    },
+    "links": {
+      "allProducts": "Wszystkie produkty",
+      "bestsellers": "Bestsellery",
+      "newArrivals": "Nowości",
+      "collections": "Kolekcje",
+      "customOrder": "Zamówienie na zamówienie",
+      "trackOrder": "Śledź zamówienie",
+      "shippingInfo": "Informacje o wysyłce",
+      "returns": "Zwroty",
+      "aboutUs": "O nas",
+      "contact": "Kontakt",
+      "privacyPolicy": "Polityka prywatności",
+      "termsOfService": "Warunki usługi"
+    },
+    "newsletter": {
+      "title": "Pozostań zainspirowany",
+      "description": "Uzyskaj ekskluzywny dostęp do nowych wzorów, ofert specjalnych i inspiracji dekoratorskich.",
+      "placeholder": "Podaj swój email",
+      "subscribe": "Subskrybuj"
+    },
+    "privacy": "Prywatność",
+    "terms": "Warunki",
+    "cookies": "Pliki cookie",
+    "copyright": "© {{year}} OBSIDIAN. Wszelkie prawa zastrzeżone.",
+    "madeIn": "Wykonane z dumą w Pakistanie"
+  },
+  "language": {
+    "select": "Język",
+    "search": "Szukaj języka..."
+  }
+}

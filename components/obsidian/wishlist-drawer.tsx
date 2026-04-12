@@ -3,6 +3,8 @@
 import { useWishlistStore } from '@/store/wishlist.store'
 import { useCartStore } from '@/store/cart.store'
 import { useToastStore } from '@/store/toast.store'
+import { useCurrencyStore } from '@/store/currency.store'
+import { formatPrice } from '@/lib/currency'
 import { X, Heart, ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 
@@ -10,6 +12,7 @@ export function WishlistDrawer() {
   const { items, isOpen, closeWishlist, removeItem } = useWishlistStore()
   const { addItem: addToCart } = useCartStore()
   const { showSuccess } = useToastStore()
+  const { currency } = useCurrencyStore()
 
   const handleMoveToCart = (item: typeof items[0]) => {
     addToCart({
@@ -29,7 +32,7 @@ export function WishlistDrawer() {
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black/70 z-[200] transition-opacity duration-300 backdrop-blur-sm ${
+        className={`fixed inset-0 bg-black/50 dark:bg-black/70 z-[200] transition-opacity duration-300 backdrop-blur-sm ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         onClick={closeWishlist}
@@ -42,7 +45,7 @@ export function WishlistDrawer() {
         }`}
       >
         {/* Header */}
-        <div className="px-8 py-7 border-b border-[var(--obsidian-border)] flex items-center justify-between">
+        <div className="px-5 sm:px-8 py-5 sm:py-7 border-b border-[var(--obsidian-border)] flex items-center justify-between">
           <div>
             <span className="font-[family-name:var(--font-cormorant)] text-[26px] font-light">
               Wishlist
@@ -60,7 +63,7 @@ export function WishlistDrawer() {
         </div>
 
         {/* Items */}
-        <div className="flex-1 overflow-y-auto px-8 py-6 obsidian-scrollbar">
+        <div className="flex-1 overflow-y-auto px-5 sm:px-8 py-5 sm:py-6 obsidian-scrollbar">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-[var(--obsidian-text-muted)] gap-3">
               <Heart className="w-12 h-12 opacity-30" />
@@ -96,10 +99,10 @@ export function WishlistDrawer() {
                       {item.variantDescription}
                     </div>
                     <div className="text-[var(--obsidian-gold)] text-[13px] mb-2.5 flex items-center gap-2">
-                      <span>Rs. {item.price.toLocaleString()}</span>
+                      <span>{formatPrice(item.price, currency)}</span>
                       {item.oldPrice && (
                         <span className="text-[var(--obsidian-text-dim)] line-through text-xs">
-                          Rs. {item.oldPrice.toLocaleString()}
+                          {formatPrice(item.oldPrice, currency)}
                         </span>
                       )}
                     </div>

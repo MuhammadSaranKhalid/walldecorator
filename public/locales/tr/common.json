@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "Mağaza",
+    "collections": "Koleksiyonlar",
+    "custom": "Özel",
+    "track": "Takip",
+    "searchPlaceholder": "Ara...",
+    "cart": "Sepet",
+    "wishlist": "İstek Listesi",
+    "toggleMenu": "Menüyü aç/kapat"
+  },
+  "hero": {
+    "eyebrow": "Lazer Kesim Duvar Sanatı Dekoratif Parçaları",
+    "title": "Tutkunun",
+    "subtitle": "Duvarla",
+    "titleLine3": "Buluştuğu Yer",
+    "description": "Anime, sinema, doğa ve yaşamı kapsayan premium metal ve ahşap siluet sanatı. Her parça hassas lazer kesimle üretilmiş ve alanınızı dönüştürmeye hazır.",
+    "primaryCTA": "Tüm Eserlere Gözat",
+    "secondaryCTA": "Koleksiyonları Gör",
+    "categories": {
+      "anime": "Anime",
+      "movies": "Filmler",
+      "gaming": "Oyun",
+      "nature": "Doğa",
+      "sports": "Spor",
+      "abstract": "Soyut",
+      "islamic": "İslami",
+      "geometric": "Geometrik"
+    },
+    "stats": {
+      "uniqueDesigns": "500+",
+      "uniqueDesignsLabel": "Benzersiz Tasarım",
+      "materialsLabel": "Malzemeler",
+      "materials": "Metal · Ahşap"
+    },
+    "artLabel": "Küçük Goku — Dragon Ball Serisi"
+  },
+  "materials": {
+    "precisionLaserCut": "Hassas Lazer Kesim",
+    "powderCoatedSteel": "Toz Boyalı Çelik",
+    "solidHardwood": "Sağlam Sert Ahşap",
+    "acrylicResin": "Akrilik ve Reçine",
+    "freeGiftPackaging": "Ücretsiz Hediye Ambalajı",
+    "worldwideShipping": "Dünya Geneli Kargo"
+  },
+  "cart": {
+    "title": "Sepet",
+    "empty": "Sepetiniz boş",
+    "subtotal": "Ara Toplam",
+    "shipping": "Kargo",
+    "shippingFree": "Ücretsiz",
+    "total": "Toplam",
+    "checkout": "Ödeme Yap",
+    "close": "Sepeti Kapat"
+  },
+  "footer": {
+    "tagline": "Duvarlarınızı bir galeriye dönüştüren hassas lazer kesim tasarımlar. Premium malzemeler, özel boyutlar ve dünya geneli kargo.",
+    "sections": {
+      "shop": "Mağaza",
+      "support": "Destek",
+      "company": "Şirket"
+    },
+    "links": {
+      "allProducts": "Tüm Ürünler",
+      "bestsellers": "Çok Satanlar",
+      "newArrivals": "Yeni Gelenler",
+      "collections": "Koleksiyonlar",
+      "customOrder": "Özel Sipariş",
+      "trackOrder": "Sipariş Takibi",
+      "shippingInfo": "Kargo Bilgisi",
+      "returns": "İadeler",
+      "aboutUs": "Hakkımızda",
+      "contact": "İletişim",
+      "privacyPolicy": "Gizlilik Politikası",
+      "termsOfService": "Hizmet Şartları"
+    },
+    "newsletter": {
+      "title": "İlham Almaya Devam Edin",
+      "description": "Yeni tasarımlara, özel tekliflere ve iç mekan tasarımı ilhamına özel erişim kazanın.",
+      "placeholder": "E-postanızı girin",
+      "subscribe": "Abone Ol"
+    },
+    "privacy": "Gizlilik",
+    "terms": "Şartlar",
+    "cookies": "Çerezler",
+    "copyright": "© {{year}} OBSIDIAN. Tüm hakları saklıdır.",
+    "madeIn": "Pakistan'da gururla üretilmiştir"
+  },
+  "language": {
+    "select": "Dil",
+    "search": "Dil ara..."
+  }
+}

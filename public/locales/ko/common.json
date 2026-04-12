@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "쇼핑",
+    "collections": "컬렉션",
+    "custom": "맞춤",
+    "track": "추적",
+    "searchPlaceholder": "검색...",
+    "cart": "장바구니",
+    "wishlist": "위시리스트",
+    "toggleMenu": "메뉴 전환"
+  },
+  "hero": {
+    "eyebrow": "레이저 컷 벽 예술 장식 작품",
+    "title": "열정이",
+    "subtitle": "벽을",
+    "titleLine3": "만나는 곳",
+    "description": "애니메이션, 영화, 자연, 삶을 아우르는 프리미엄 금속 및 목재 실루엣 아트. 각 작품은 정밀 레이저 커팅으로 공간을 변화시킬 준비가 되어 있습니다.",
+    "primaryCTA": "모든 작품 보기",
+    "secondaryCTA": "컬렉션 보기",
+    "categories": {
+      "anime": "애니메이션",
+      "movies": "영화",
+      "gaming": "게임",
+      "nature": "자연",
+      "sports": "스포츠",
+      "abstract": "추상",
+      "islamic": "이슬람",
+      "geometric": "기하학"
+    },
+    "stats": {
+      "uniqueDesigns": "500+",
+      "uniqueDesignsLabel": "독특한 디자인",
+      "materialsLabel": "소재",
+      "materials": "금속 · 나무"
+    },
+    "artLabel": "어린 손오공 — 드래곤볼 시리즈"
+  },
+  "materials": {
+    "precisionLaserCut": "정밀 레이저 컷",
+    "powderCoatedSteel": "파우더 코팅 스틸",
+    "solidHardwood": "단단한 원목",
+    "acrylicResin": "아크릴 & 레진",
+    "freeGiftPackaging": "무료 선물 포장",
+    "worldwideShipping": "전 세계 배송"
+  },
+  "cart": {
+    "title": "장바구니",
+    "empty": "장바구니가 비어 있습니다",
+    "subtotal": "소계",
+    "shipping": "배송비",
+    "shippingFree": "무료",
+    "total": "합계",
+    "checkout": "결제하기",
+    "close": "장바구니 닫기"
+  },
+  "footer": {
+    "tagline": "벽을 갤러리로 바꾸는 정밀 레이저 컷 디자인. 프리미엄 소재, 맞춤 크기, 전 세계 배송.",
+    "sections": {
+      "shop": "쇼핑",
+      "support": "지원",
+      "company": "회사"
+    },
+    "links": {
+      "allProducts": "전체 상품",
+      "bestsellers": "베스트셀러",
+      "newArrivals": "신상품",
+      "collections": "컬렉션",
+      "customOrder": "맞춤 주문",
+      "trackOrder": "주문 추적",
+      "shippingInfo": "배송 정보",
+      "returns": "반품",
+      "aboutUs": "회사 소개",
+      "contact": "문의하기",
+      "privacyPolicy": "개인정보 처리방침",
+      "termsOfService": "이용약관"
+    },
+    "newsletter": {
+      "title": "영감을 유지하세요",
+      "description": "새로운 디자인, 특별 혜택, 인테리어 디자인 영감에 독점 접근하세요.",
+      "placeholder": "이메일을 입력하세요",
+      "subscribe": "구독하기"
+    },
+    "privacy": "개인정보",
+    "terms": "약관",
+    "cookies": "쿠키",
+    "copyright": "© {{year}} OBSIDIAN. 모든 권리 보유.",
+    "madeIn": "파키스탄에서 자부심을 가지고 제작"
+  },
+  "language": {
+    "select": "언어",
+    "search": "언어 검색..."
+  }
+}

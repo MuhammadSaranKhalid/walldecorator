@@ -9,7 +9,6 @@ import type {
   Review,
   AvailableOptions,
   SelectionMap,
-  ProductCategory,
 } from '@/types/products'
 
 const REVIEWS_PAGE_SIZE = 10
@@ -47,9 +46,9 @@ export const getProductBySlug = cache(async (slug: string): Promise<ProductDetai
         },
         with: {
           // Named relations for material/size/thickness attribute values
-          material_attr: { columns: { value: true } },
-          size_attr: { columns: { value: true } },
-          thickness_attr: { columns: { value: true } },
+          material_attr: { columns: { value: true, display_name: true } },
+          size_attr: { columns: { value: true, display_name: true } },
+          thickness_attr: { columns: { value: true, display_name: true } },
           inventory: {
             columns: { quantity_available: true, allow_backorder: true },
           },
@@ -71,10 +70,22 @@ export const getProductBySlug = cache(async (slug: string): Promise<ProductDetai
       stock: v.inventory?.quantity_available ?? 0,
       attributes: {
         material: v.material_attr?.value ?? '',
+        material_display: v.material_attr?.display_name ?? '',
         size: v.size_attr?.value ?? '',
+        size_display: v.size_attr?.display_name ?? '',
         thickness: v.thickness_attr?.value ?? '',
+        thickness_display: v.thickness_attr?.display_name ?? '',
       },
     }
+  })
+
+  // Build attribute display name lookup: raw value → display name
+  const attribute_display_names: Record<string, string> = {}
+  variants.forEach((v) => {
+    const { material, material_display, size, size_display, thickness, thickness_display } = v.attributes
+    if (material) attribute_display_names[material] = material_display || material
+    if (size) attribute_display_names[size] = size_display || size
+    if (thickness) attribute_display_names[thickness] = thickness_display || thickness
   })
 
   // 1. Build hierarchical available options
@@ -83,7 +94,7 @@ export const getProductBySlug = cache(async (slug: string): Promise<ProductDetai
     const { material, size, thickness } = v.attributes
     if (!available_options[material]) {
       available_options[material] = {
-        display_name: material.charAt(0).toUpperCase() + material.slice(1),
+        display_name: attribute_display_names[material] ?? (material.charAt(0).toUpperCase() + material.slice(1)),
         sizes: {},
       }
     }
@@ -123,7 +134,7 @@ export const getProductBySlug = cache(async (slug: string): Promise<ProductDetai
     description: data.description,
     seo_description: data.seo_description,
     status: data.status ?? 'active',
-    category: data.categories as ProductCategory,
+    category: data.categories ?? null,
     product_images: data.product_images.map((img) => ({
       display_order: img.display_order ?? 0,
       is_primary: img.is_primary ?? false,
@@ -133,6 +144,7 @@ export const getProductBySlug = cache(async (slug: string): Promise<ProductDetai
     available_options,
     selection_map,
     price_range,
+    attribute_display_names,
   }
 
   await redis.setex(cacheKey, 600, JSON.stringify(product))

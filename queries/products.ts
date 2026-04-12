@@ -2,11 +2,12 @@ import { cache } from 'react'
 import { db } from '@/lib/db/client'
 import { redis } from '@/lib/upstash/client'
 import { searchParamsCache } from '@/lib/search-params/products'
-import { eq, and, count, isNotNull } from 'drizzle-orm'
+import { eq, and, count, isNotNull, inArray, type SQL } from 'drizzle-orm'
 import { products, categories } from '@/lib/db/schema'
 import type {
   ProductsResult,
   Category,
+  CategoryWithSubs,
   ProductListing,
 } from '@/types/products'
 
@@ -44,15 +45,25 @@ export const getProducts = cache(async (params: ProductParams): Promise<Products
   const offset = (params.page - 1) * params.limit
 
   // Build WHERE clause for category filtering
-  let categoryCondition: any = undefined
+  // When a parent category is selected, include its subcategories too
+  let categoryCondition: SQL | undefined = undefined
   if (categorySlug) {
-    // Get category ID first
     const category = await db.query.categories.findFirst({
       where: (c, { eq }) => eq(c.slug, categorySlug),
       columns: { id: true },
+      with: {
+        other_categories: {
+          columns: { id: true },
+          where: (c, { eq }) => eq(c.is_visible, true),
+        },
+      },
     })
     if (category) {
-      categoryCondition = eq(products.category_id, category.id)
+      const categoryIds = [category.id, ...category.other_categories.map((c) => c.id)]
+      categoryCondition =
+        categoryIds.length === 1
+          ? eq(products.category_id, categoryIds[0])
+          : inArray(products.category_id, categoryIds)
     }
   }
 
@@ -150,31 +161,58 @@ export const getProducts = cache(async (params: ProductParams): Promise<Products
 })
 
 /**
- * Get all categories for filter sidebar.
- * Cached in Redis for 1 hour.
+ * Get all top-level categories with their subcategories.
+ * Only returns categories that have at least one visible product (product_count > 0)
+ * OR have subcategories with products. Cached in Redis for 1 hour.
  */
-export const getProductCategories = cache(async (): Promise<Category[]> => {
-  const cacheKey = 'products:categories'
+export const getProductCategories = cache(async (): Promise<CategoryWithSubs[]> => {
+  const cacheKey = 'products:categories:v2'
   const cached = await redis.get(cacheKey)
   if (cached) {
-    return (typeof cached === 'string' ? JSON.parse(cached) : cached) as Category[]
+    return (typeof cached === 'string' ? JSON.parse(cached) : cached) as CategoryWithSubs[]
   }
 
   const data = await db.query.categories.findMany({
     where: (c, { isNull, eq, and }) => and(isNull(c.parent_id), eq(c.is_visible, true)),
+    columns: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      product_count: true,
+    },
     with: {
       other_categories: {
         where: (c, { eq }) => eq(c.is_visible, true),
-        with: {
-          other_categories: {
-            where: (c, { eq }) => eq(c.is_visible, true),
-          },
-        },
+        columns: { id: true, name: true, slug: true, product_count: true },
       },
     },
-    orderBy: (c, { asc }) => [asc(c.name)],
+    orderBy: (c, { asc }) => [asc(c.display_order), asc(c.name)],
   })
 
-  await redis.setex(cacheKey, 3600, JSON.stringify(data))
-  return data as unknown as Category[]
+  // Include a category if it has products itself OR any subcategory has products
+  const result: CategoryWithSubs[] = data
+    .filter((cat) => {
+      const hasOwnProducts = (cat.product_count ?? 0) > 0
+      const hasSubProducts = cat.other_categories.some((sub) => (sub.product_count ?? 0) > 0)
+      return hasOwnProducts || hasSubProducts
+    })
+    .map((cat) => ({
+      id: cat.id,
+      name: cat.name,
+      slug: cat.slug,
+      description: cat.description,
+      product_count: cat.product_count ?? 0,
+      subcategories: cat.other_categories
+        .filter((sub) => (sub.product_count ?? 0) > 0)
+        .map((sub) => ({
+          id: sub.id,
+          name: sub.name,
+          slug: sub.slug,
+          product_count: sub.product_count ?? 0,
+        })),
+    }))
+
+  await redis.setex(cacheKey, 3600, JSON.stringify(result))
+  return result
 })

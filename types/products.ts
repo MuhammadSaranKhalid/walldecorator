@@ -4,10 +4,7 @@
 // ============================================================
 
 import { Image } from './images'
-import type {
-  categories,
-  products,
-} from '@/lib/db/schema'
+import type { categories } from '@/lib/db/schema'
 
 // Junction table data + centralized image data
 export interface ProductImage {
@@ -34,11 +31,29 @@ export type Category = typeof categories.$inferSelect & {
   })[]
 }
 
-// Product listing row — product-centric, no variant join needed.
-// min_price / min_compare_at_price are denormalized on products (trigger-maintained).
-export type ProductListing = Omit<typeof products.$inferSelect, 'min_price' | 'min_compare_at_price'> & {
+// Product listing row — only the columns selected in getProducts query.
+// price / compare_at_price are normalized from min_price / min_compare_at_price.
+export interface ProductListing {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  status: string | null
+  category_id: string | null
+  is_featured: boolean | null
+  total_sold: number | null
+  view_count: number | null
+  seo_title: string | null
+  seo_description: string | null
+  primary_image_storage_path: string | null
+  primary_image_medium_path: string | null
+  primary_image_blurhash: string | null
+  primary_image_alt_text: string | null
+  created_at: Date
+  updated_at: Date
   price: number
   compare_at_price: number | null
+  categories: { id: string; name: string; slug: string } | null
 }
 
 export interface ProductsResult {
@@ -109,7 +124,7 @@ export interface ProductDetail {
   description: string | null
   seo_description: string | null
   status: string
-  category: ProductCategory
+  category: ProductCategory | null
   product_images: ProductDetailImage[]
   available_options: AvailableOptions
   selection_map: SelectionMap
@@ -118,6 +133,22 @@ export interface ProductDetail {
     max: number
     has_discount: boolean
   }
+  /** Maps raw attribute values to display names. e.g. "steel" → "Steel", "2x2" → "2ft × 2ft", "1.2" → "1.2mm" */
+  attribute_display_names: Record<string, string>
+}
+
+export type CategoryWithSubs = {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  product_count: number
+  subcategories: {
+    id: string
+    name: string
+    slug: string
+    product_count: number
+  }[]
 }
 
 export interface ReviewSummary {

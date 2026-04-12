@@ -3,22 +3,20 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useCartStore } from '@/store/cart.store'
 import { useWishlistStore } from '@/store/wishlist.store'
 import { useUIStore } from '@/store/ui.store'
-import { Search, ShoppingCart, Heart, Menu } from 'lucide-react'
-
-const navigation = [
-  { name: 'Shop', href: '/products' },
-  { name: 'Collections', href: '/collections' },
-  { name: 'Custom', href: '/custom-order' },
-  { name: 'Track', href: '/track-order' },
-]
+import { Search, ShoppingCart, Heart } from 'lucide-react'
+import { LanguageSwitcher } from './language-switcher'
+import { CurrencySwitcher } from './currency-switcher'
+import { ThemeToggle } from './theme-toggle'
 
 export function ObsidianNavigation() {
   const [isClient, setIsClient] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const pathname = usePathname()
+  const { t } = useTranslation('common')
 
   const { openCart, getTotalItems } = useCartStore()
   const wishlistItems = useWishlistStore((state) => state.items)
@@ -27,6 +25,13 @@ export function ObsidianNavigation() {
 
   const cartItemCount = getTotalItems()
   const wishlistCount = wishlistItems.length
+
+  const navigation = [
+    { nameKey: 'nav.shop', href: '/products' },
+    { nameKey: 'nav.collections', href: '/collections' },
+    { nameKey: 'nav.custom', href: '/custom-order' },
+    { nameKey: 'nav.track', href: '/track-order' },
+  ]
 
   useEffect(() => {
     setIsClient(true)
@@ -38,7 +43,7 @@ export function ObsidianNavigation() {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-12 py-5 obsidian-glass border-b border-[var(--obsidian-border)]">
+    <nav className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-4 sm:px-6 lg:px-12 py-5 obsidian-glass border-b border-[var(--obsidian-border)]">
       {/* Logo */}
       <Link href="/" className="flex flex-col cursor-pointer group">
         <div className="font-[family-name:var(--font-cormorant)] text-xl font-semibold tracking-[0.375em] text-[var(--obsidian-gold)] uppercase leading-none transition-colors group-hover:text-[var(--obsidian-gold-light)]">
@@ -53,7 +58,7 @@ export function ObsidianNavigation() {
       <div className="hidden md:flex gap-9">
         {navigation.map((item) => (
           <Link
-            key={item.name}
+            key={item.nameKey}
             href={item.href}
             className={`text-[11px] tracking-[0.15625em] uppercase transition-colors duration-250 ${
               isActive(item.href)
@@ -61,30 +66,43 @@ export function ObsidianNavigation() {
                 : 'text-[var(--obsidian-text-muted)] hover:text-[var(--obsidian-text)]'
             }`}
           >
-            {item.name}
+            {t(item.nameKey)}
           </Link>
         ))}
       </div>
 
-      {/* Right side - Search, Wishlist, Cart, Mobile Menu */}
-      <div className="flex items-center gap-3">
+      {/* Right side - Search, Language, Wishlist, Cart, Mobile Menu */}
+      <div className="flex items-center gap-1.5 sm:gap-2.5">
         {/* Search Input - Desktop only */}
         <div className="hidden md:flex items-center gap-2.5 bg-[var(--obsidian-surface)] border border-[var(--obsidian-border)] rounded-sm px-3.5 py-2">
           <Search className="w-3.5 h-3.5 text-[var(--obsidian-text-dim)]" />
           <input
             type="text"
-            placeholder="Search..."
+            placeholder={t('nav.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-transparent border-none outline-none text-[var(--obsidian-text)] font-[family-name:var(--font-dm-sans)] text-xs tracking-wide w-44 placeholder:text-[var(--obsidian-text-dim)]"
+            className="bg-transparent border-none outline-none text-[var(--obsidian-text)] font-[family-name:var(--font-dm-sans)] text-xs tracking-wide w-36 placeholder:text-[var(--obsidian-text-dim)]"
           />
+        </div>
+
+        {/* Theme Toggle */}
+        <ThemeToggle />
+
+        {/* Currency Switcher — hidden on small phones */}
+        <div className="hidden sm:block">
+          <CurrencySwitcher />
+        </div>
+
+        {/* Language Switcher — hidden on small phones to prevent nav overflow */}
+        <div className="hidden sm:block">
+          <LanguageSwitcher />
         </div>
 
         {/* Wishlist Button */}
         <button
           onClick={openWishlist}
-          className="relative bg-transparent border border-[var(--obsidian-border)] text-[var(--obsidian-text)] px-3.5 py-2 cursor-pointer font-[family-name:var(--font-dm-sans)] text-xs tracking-wide transition-all duration-250 whitespace-nowrap hover:border-[var(--obsidian-gold)] hover:text-[var(--obsidian-gold)]"
-          aria-label="Wishlist"
+          className="relative bg-transparent border border-[var(--obsidian-border)] text-[var(--obsidian-text)] px-2.5 sm:px-3.5 py-2 cursor-pointer font-[family-name:var(--font-dm-sans)] text-xs tracking-wide transition-all duration-250 whitespace-nowrap hover:border-[var(--obsidian-gold)] hover:text-[var(--obsidian-gold)]"
+          aria-label={t('nav.wishlist')}
         >
           <Heart className="w-4 h-4" />
           {isClient && wishlistCount > 0 && (
@@ -97,8 +115,8 @@ export function ObsidianNavigation() {
         {/* Cart Button */}
         <button
           onClick={openCart}
-          className="relative bg-transparent border border-[var(--obsidian-border)] text-[var(--obsidian-text)] px-3.5 py-2 cursor-pointer font-[family-name:var(--font-dm-sans)] text-xs tracking-wide transition-all duration-250 whitespace-nowrap hover:border-[var(--obsidian-gold)] hover:text-[var(--obsidian-gold)]"
-          aria-label="Shopping Cart"
+          className="relative bg-transparent border border-[var(--obsidian-border)] text-[var(--obsidian-text)] px-2.5 sm:px-3.5 py-2 cursor-pointer font-[family-name:var(--font-dm-sans)] text-xs tracking-wide transition-all duration-250 whitespace-nowrap hover:border-[var(--obsidian-gold)] hover:text-[var(--obsidian-gold)]"
+          aria-label={t('nav.cart')}
         >
           <ShoppingCart className="w-4 h-4" />
           {isClient && cartItemCount > 0 && (
@@ -112,7 +130,7 @@ export function ObsidianNavigation() {
         <button
           onClick={toggleMobileMenu}
           className="md:hidden flex flex-col gap-1.5 bg-transparent border-none cursor-pointer p-1.5"
-          aria-label="Toggle menu"
+          aria-label={t('nav.toggleMenu')}
         >
           <span className="block w-5.5 h-px bg-[var(--obsidian-text)] transition-all duration-300" />
           <span className="block w-5.5 h-px bg-[var(--obsidian-text)] transition-all duration-300" />

@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "Winkel",
+    "collections": "Collecties",
+    "custom": "Op maat",
+    "track": "Volgen",
+    "searchPlaceholder": "Zoeken...",
+    "cart": "Winkelwagen",
+    "wishlist": "Verlanglijst",
+    "toggleMenu": "Menu wisselen"
+  },
+  "hero": {
+    "eyebrow": "Lasergestanste wanddecoratiestukken",
+    "title": "Waar",
+    "subtitle": "passie",
+    "titleLine3": "de muur ontmoet",
+    "description": "Premium metaal en hout silhouetkunst die anime, cinema, natuur en leven omvat. Elk stuk is nauwkeurig lasergestanst en klaar om uw ruimte te transformeren.",
+    "primaryCTA": "Bekijk alle stukken",
+    "secondaryCTA": "Bekijk collecties",
+    "categories": {
+      "anime": "Anime",
+      "movies": "Films",
+      "gaming": "Gaming",
+      "nature": "Natuur",
+      "sports": "Sport",
+      "abstract": "Abstract",
+      "islamic": "Islamitisch",
+      "geometric": "Geometrisch"
+    },
+    "stats": {
+      "uniqueDesigns": "500+",
+      "uniqueDesignsLabel": "Unieke designs",
+      "materialsLabel": "Materialen",
+      "materials": "Metaal · Hout"
+    },
+    "artLabel": "Kid Goku — Dragon Ball Serie"
+  },
+  "materials": {
+    "precisionLaserCut": "Precisie lasersnijden",
+    "powderCoatedSteel": "Poedergecoat staal",
+    "solidHardwood": "Massief hardhout",
+    "acrylicResin": "Acryl & Hars",
+    "freeGiftPackaging": "Gratis cadeauverpakking",
+    "worldwideShipping": "Wereldwijde verzending"
+  },
+  "cart": {
+    "title": "Winkelwagen",
+    "empty": "Uw winkelwagen is leeg",
+    "subtotal": "Subtotaal",
+    "shipping": "Verzending",
+    "shippingFree": "Gratis",
+    "total": "Totaal",
+    "checkout": "Afrekenen",
+    "close": "Winkelwagen sluiten"
+  },
+  "footer": {
+    "tagline": "Nauwkeurig lasergestanste ontwerpen die uw muren in een galerie veranderen. Premium materialen, op maat gemaakte afmetingen en wereldwijde verzending.",
+    "sections": {
+      "shop": "Winkel",
+      "support": "Ondersteuning",
+      "company": "Bedrijf"
+    },
+    "links": {
+      "allProducts": "Alle producten",
+      "bestsellers": "Bestsellers",
+      "newArrivals": "Nieuw",
+      "collections": "Collecties",
+      "customOrder": "Op maat bestellen",
+      "trackOrder": "Bestelling volgen",
+      "shippingInfo": "Verzendinfo",
+      "returns": "Retourzendingen",
+      "aboutUs": "Over ons",
+      "contact": "Contact",
+      "privacyPolicy": "Privacybeleid",
+      "termsOfService": "Servicevoorwaarden"
+    },
+    "newsletter": {
+      "title": "Blijf geïnspireerd",
+      "description": "Krijg exclusieve toegang tot nieuwe ontwerpen, speciale aanbiedingen en interieurontwerpinspiratie.",
+      "placeholder": "Voer uw e-mail in",
+      "subscribe": "Abonneren"
+    },
+    "privacy": "Privacy",
+    "terms": "Voorwaarden",
+    "cookies": "Cookies",
+    "copyright": "© {{year}} OBSIDIAN. Alle rechten voorbehouden.",
+    "madeIn": "Met trots gemaakt in Pakistan"
+  },
+  "language": {
+    "select": "Taal",
+    "search": "Taal zoeken..."
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "ショップ",
+    "collections": "コレクション",
+    "custom": "カスタム",
+    "track": "追跡",
+    "searchPlaceholder": "検索...",
+    "cart": "カート",
+    "wishlist": "ウィッシュリスト",
+    "toggleMenu": "メニュー切替"
+  },
+  "hero": {
+    "eyebrow": "レーザーカット ウォールアート デコレーターピース",
+    "title": "情熱が",
+    "subtitle": "壁と",
+    "titleLine3": "出会う場所",
+    "description": "アニメ、映画、自然、生活をテーマにしたプレミアムメタル＆ウッドのシルエットアート。各作品は精密にレーザーカットされ、空間を変える準備が整っています。",
+    "primaryCTA": "すべての作品を見る",
+    "secondaryCTA": "コレクションを見る",
+    "categories": {
+      "anime": "アニメ",
+      "movies": "映画",
+      "gaming": "ゲーム",
+      "nature": "自然",
+      "sports": "スポーツ",
+      "abstract": "抽象",
+      "islamic": "イスラム",
+      "geometric": "幾何学"
+    },
+    "stats": {
+      "uniqueDesigns": "500+",
+      "uniqueDesignsLabel": "ユニークデザイン",
+      "materialsLabel": "素材",
+      "materials": "メタル · ウッド"
+    },
+    "artLabel": "孫悟空（少年期） — ドラゴンボールシリーズ"
+  },
+  "materials": {
+    "precisionLaserCut": "精密レーザーカット",
+    "powderCoatedSteel": "粉体塗装スチール",
+    "solidHardwood": "無垢材ハードウッド",
+    "acrylicResin": "アクリル＆レジン",
+    "freeGiftPackaging": "無料ギフトパッケージ",
+    "worldwideShipping": "世界中に発送"
+  },
+  "cart": {
+    "title": "カート",
+    "empty": "カートは空です",
+    "subtotal": "小計",
+    "shipping": "送料",
+    "shippingFree": "無料",
+    "total": "合計",
+    "checkout": "チェックアウト",
+    "close": "カートを閉じる"
+  },
+  "footer": {
+    "tagline": "壁をギャラリーに変える精密レーザーカットデザイン。プレミアム素材、カスタムサイズ、世界中への発送。",
+    "sections": {
+      "shop": "ショップ",
+      "support": "サポート",
+      "company": "会社"
+    },
+    "links": {
+      "allProducts": "すべての商品",
+      "bestsellers": "ベストセラー",
+      "newArrivals": "新着",
+      "collections": "コレクション",
+      "customOrder": "カスタムオーダー",
+      "trackOrder": "注文追跡",
+      "shippingInfo": "配送情報",
+      "returns": "返品",
+      "aboutUs": "会社概要",
+      "contact": "お問い合わせ",
+      "privacyPolicy": "プライバシーポリシー",
+      "termsOfService": "利用規約"
+    },
+    "newsletter": {
+      "title": "インスピレーションを保つ",
+      "description": "新しいデザイン、特別オファー、インテリアデザインのインスピレーションへの独占アクセスを取得。",
+      "placeholder": "メールアドレスを入力",
+      "subscribe": "購読する"
+    },
+    "privacy": "プライバシー",
+    "terms": "利用規約",
+    "cookies": "クッキー",
+    "copyright": "© {{year}} OBSIDIAN. All rights reserved.",
+    "madeIn": "パキスタンで誇りを持って製造"
+  },
+  "language": {
+    "select": "言語",
+    "search": "言語を検索..."
+  }
+}

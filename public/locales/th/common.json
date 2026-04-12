@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "ร้านค้า",
+    "collections": "คอลเลกชัน",
+    "custom": "สั่งทำพิเศษ",
+    "track": "ติดตาม",
+    "searchPlaceholder": "ค้นหา...",
+    "cart": "ตะกร้า",
+    "wishlist": "รายการโปรด",
+    "toggleMenu": "สลับเมนู"
+  },
+  "hero": {
+    "eyebrow": "ชิ้นงานตกแต่งผนังตัดด้วยเลเซอร์",
+    "title": "ที่ซึ่ง",
+    "subtitle": "ความหลงใหล",
+    "titleLine3": "พบกับผนัง",
+    "description": "ศิลปะซิลูเอตโลหะและไม้คุณภาพพรีเมียม ครอบคลุมอนิเมะ ภาพยนตร์ ธรรมชาติ และชีวิต ทุกชิ้นตัดด้วยเลเซอร์อย่างแม่นยำ",
+    "primaryCTA": "ดูชิ้นงานทั้งหมด",
+    "secondaryCTA": "ดูคอลเลกชัน",
+    "categories": {
+      "anime": "อนิเมะ",
+      "movies": "ภาพยนตร์",
+      "gaming": "เกมส์",
+      "nature": "ธรรมชาติ",
+      "sports": "กีฬา",
+      "abstract": "นามธรรม",
+      "islamic": "อิสลาม",
+      "geometric": "เรขาคณิต"
+    },
+    "stats": {
+      "uniqueDesigns": "500+",
+      "uniqueDesignsLabel": "ดีไซน์เฉพาะ",
+      "materialsLabel": "วัสดุ",
+      "materials": "โลหะ · ไม้"
+    },
+    "artLabel": "คิด โกคู — ซีรีส์ดราก้อนบอล"
+  },
+  "materials": {
+    "precisionLaserCut": "ตัดเลเซอร์แม่นยำ",
+    "powderCoatedSteel": "เหล็กเคลือบผง",
+    "solidHardwood": "ไม้แข็งแท้",
+    "acrylicResin": "อะครีลิกและเรซิน",
+    "freeGiftPackaging": "บรรจุภัณฑ์ของขวัญฟรี",
+    "worldwideShipping": "จัดส่งทั่วโลก"
+  },
+  "cart": {
+    "title": "ตะกร้า",
+    "empty": "ตะกร้าของคุณว่างเปล่า",
+    "subtotal": "ยอดรวมย่อย",
+    "shipping": "ค่าจัดส่ง",
+    "shippingFree": "ฟรี",
+    "total": "ยอดรวม",
+    "checkout": "ชำระเงิน",
+    "close": "ปิดตะกร้า"
+  },
+  "footer": {
+    "tagline": "ดีไซน์ตัดเลเซอร์แม่นยำที่เปลี่ยนผนังของคุณให้เป็นแกลเลอรี วัสดุพรีเมียม ขนาดสั่งทำพิเศษ และจัดส่งทั่วโลก",
+    "sections": {
+      "shop": "ร้านค้า",
+      "support": "การสนับสนุน",
+      "company": "บริษัท"
+    },
+    "links": {
+      "allProducts": "สินค้าทั้งหมด",
+      "bestsellers": "ขายดี",
+      "newArrivals": "สินค้าใหม่",
+      "collections": "คอลเลกชัน",
+      "customOrder": "สั่งทำพิเศษ",
+      "trackOrder": "ติดตามออเดอร์",
+      "shippingInfo": "ข้อมูลการจัดส่ง",
+      "returns": "การคืนสินค้า",
+      "aboutUs": "เกี่ยวกับเรา",
+      "contact": "ติดต่อ",
+      "privacyPolicy": "นโยบายความเป็นส่วนตัว",
+      "termsOfService": "เงื่อนไขการให้บริการ"
+    },
+    "newsletter": {
+      "title": "อยู่กับแรงบันดาลใจ",
+      "description": "รับสิทธิ์เข้าถึงดีไซน์ใหม่ ข้อเสนอพิเศษ และแรงบันดาลใจการตกแต่งภายในแบบพิเศษ",
+      "placeholder": "ใส่อีเมลของคุณ",
+      "subscribe": "สมัครสมาชิก"
+    },
+    "privacy": "ความเป็นส่วนตัว",
+    "terms": "เงื่อนไข",
+    "cookies": "คุกกี้",
+    "copyright": "© {{year}} OBSIDIAN สงวนลิขสิทธิ์",
+    "madeIn": "ผลิตอย่างภาคภูมิใจในปากีสถาน"
+  },
+  "language": {
+    "select": "ภาษา",
+    "search": "ค้นหาภาษา..."
+  }
+}

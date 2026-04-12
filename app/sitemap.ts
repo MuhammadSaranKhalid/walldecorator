@@ -1,6 +1,5 @@
 import { MetadataRoute } from 'next'
 import { db } from '@/lib/db/client'
-import { eq } from 'drizzle-orm'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'

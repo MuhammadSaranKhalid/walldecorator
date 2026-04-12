@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "Butik",
+    "collections": "Kollektioner",
+    "custom": "Anpassad",
+    "track": "Spåra",
+    "searchPlaceholder": "Sök...",
+    "cart": "Varukorg",
+    "wishlist": "Önskelista",
+    "toggleMenu": "Växla meny"
+  },
+  "hero": {
+    "eyebrow": "Laserslurna väggdekortioner",
+    "title": "Där",
+    "subtitle": "passionen",
+    "titleLine3": "möter väggen",
+    "description": "Premium metall- och träsilhuettkonst som täcker anime, film, natur och liv. Varje stycke är precisionslaserskuret och redo att förvandla ditt utrymme.",
+    "primaryCTA": "Bläddra bland alla verk",
+    "secondaryCTA": "Se kollektioner",
+    "categories": {
+      "anime": "Anime",
+      "movies": "Film",
+      "gaming": "Gaming",
+      "nature": "Natur",
+      "sports": "Sport",
+      "abstract": "Abstrakt",
+      "islamic": "Islamisk",
+      "geometric": "Geometrisk"
+    },
+    "stats": {
+      "uniqueDesigns": "500+",
+      "uniqueDesignsLabel": "Unika designer",
+      "materialsLabel": "Material",
+      "materials": "Metall · Trä"
+    },
+    "artLabel": "Kid Goku — Dragon Ball-serien"
+  },
+  "materials": {
+    "precisionLaserCut": "Precisionslaserskärning",
+    "powderCoatedSteel": "Pulverlackerat stål",
+    "solidHardwood": "Massivt hårt trä",
+    "acrylicResin": "Akryl och harts",
+    "freeGiftPackaging": "Gratis presentförpackning",
+    "worldwideShipping": "Världsomspännande frakt"
+  },
+  "cart": {
+    "title": "Varukorg",
+    "empty": "Din varukorg är tom",
+    "subtotal": "Delsumma",
+    "shipping": "Frakt",
+    "shippingFree": "Gratis",
+    "total": "Totalt",
+    "checkout": "Gå till kassan",
+    "close": "Stäng varukorgen"
+  },
+  "footer": {
+    "tagline": "Precisionslaserskurna designer som förvandlar dina väggar till ett galleri. Premiummaterial, anpassade storlekar och världsomspännande frakt.",
+    "sections": {
+      "shop": "Butik",
+      "support": "Support",
+      "company": "Företag"
+    },
+    "links": {
+      "allProducts": "Alla produkter",
+      "bestsellers": "Bästsäljare",
+      "newArrivals": "Nyheter",
+      "collections": "Kollektioner",
+      "customOrder": "Anpassad beställning",
+      "trackOrder": "Spåra beställning",
+      "shippingInfo": "Fraktinfo",
+      "returns": "Returer",
+      "aboutUs": "Om oss",
+      "contact": "Kontakt",
+      "privacyPolicy": "Integritetspolicy",
+      "termsOfService": "Användarvillkor"
+    },
+    "newsletter": {
+      "title": "Håll dig inspirerad",
+      "description": "Få exklusiv tillgång till nya designer, specialerbjudanden och inredningsinspiration.",
+      "placeholder": "Ange din e-post",
+      "subscribe": "Prenumerera"
+    },
+    "privacy": "Integritet",
+    "terms": "Villkor",
+    "cookies": "Cookies",
+    "copyright": "© {{year}} OBSIDIAN. Alla rättigheter förbehållna.",
+    "madeIn": "Tillverkad med stolthet i Pakistan"
+  },
+  "language": {
+    "select": "Språk",
+    "search": "Sök språk..."
+  }
+}

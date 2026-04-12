@@ -1,6 +1,11 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import type { ProductDetailImage } from '@/types/products'
+
+export type CartItemImage = {
+  url: string
+  alt_text: string | null
+  blurhash: string | null
+}
 
 export type CartItem = {
   variantId: string
@@ -9,7 +14,7 @@ export type CartItem = {
   sku: string
   price: number
   quantity: number
-  image: ProductDetailImage | null
+  image: CartItemImage | null
 }
 
 type CartStore = {

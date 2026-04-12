@@ -56,10 +56,21 @@
   --color-brand-gold-dark: var(--brand-gold-dark);
 }
 
+/* ─── LIGHT THEME (default :root) ───────────────────────────────────────── */
 :root {
   --radius: 0.125rem;
 
-  /* OBSIDIAN Brand Colors - Dark Luxury Theme */
+  /* Themed gradient backgrounds */
+  --collections-hero-gradient: linear-gradient(135deg, #ede8df 0%, #e4ddd0 40%, #dfe4ea 100%);
+  --collection-card-gradients:
+    linear-gradient(135deg, #e8e0d0 0%, #d9d0bb 100%),
+    linear-gradient(135deg, #dde0e8 0%, #ccd1de 100%),
+    linear-gradient(135deg, #d8e0d8 0%, #c8d4c8 100%),
+    linear-gradient(135deg, #d0ddd8 0%, #bfd0c8 100%),
+    linear-gradient(135deg, #d8d8e0 0%, #c8c8d4 100%),
+    linear-gradient(135deg, #e0ddd0 0%, #d4cfbb 100%);
+
+  /* Brand Colors — unchanged across themes */
   --brand-navy: #1e3a5f;
   --brand-navy-light: #2d5282;
   --brand-navy-dark: #152a45;
@@ -67,7 +78,70 @@
   --brand-gold-light: #e8c96e;
   --brand-gold-dark: #b8942e;
 
-  /* OBSIDIAN Design System */
+  /* OBSIDIAN Design System — Light */
+  --obsidian-bg: #f5f3ef;
+  --obsidian-surface: #ffffff;
+  --obsidian-surface2: #ece8e1;
+  --obsidian-border: #d9d4cb;
+  --obsidian-gold: #b8942e;
+  --obsidian-gold-light: #c9a84c;
+  --obsidian-text: #1a1714;
+  --obsidian-text-muted: #6b6560;
+  --obsidian-text-dim: #a09890;
+  --obsidian-white: #ffffff;
+  --obsidian-red: #c94c4c;
+  --obsidian-glass-bg: rgba(245, 243, 239, 0.92);
+
+  /* shadcn/ui semantic tokens — Light */
+  --background: #f5f3ef;
+  --foreground: #1a1714;
+
+  --card: #ffffff;
+  --card-foreground: #1a1714;
+
+  --popover: #ffffff;
+  --popover-foreground: #1a1714;
+
+  --primary: #b8942e;
+  --primary-foreground: #ffffff;
+
+  --secondary: #ece8e1;
+  --secondary-foreground: #1a1714;
+
+  --muted: #ece8e1;
+  --muted-foreground: #6b6560;
+
+  --accent: #b8942e;
+  --accent-foreground: #ffffff;
+
+  --destructive: #c94c4c;
+
+  --border: #d9d4cb;
+  --input: #ece8e1;
+  --ring: #b8942e;
+
+  /* Charts */
+  --chart-1: #b8942e;
+  --chart-2: #c9a84c;
+  --chart-3: #6b6560;
+  --chart-4: #a09890;
+  --chart-5: #c94c4c;
+
+  /* Sidebar */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a1714;
+  --sidebar-primary: #b8942e;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ece8e1;
+  --sidebar-accent-foreground: #1a1714;
+  --sidebar-border: #d9d4cb;
+  --sidebar-ring: #b8942e;
+}
+
+/* ─── DARK THEME (.dark class via next-themes) ───────────────────────────── */
+.dark {
+  --collections-hero-gradient: linear-gradient(135deg, #0d0905 0%, #180e05 40%, #080a0d 100%);
+  /* OBSIDIAN Design System — Dark */
   --obsidian-bg: #080808;
   --obsidian-surface: #111111;
   --obsidian-surface2: #1a1a1a;
@@ -79,39 +153,32 @@
   --obsidian-text-dim: #3d3a36;
   --obsidian-white: #ffffff;
   --obsidian-red: #c94c4c;
+  --obsidian-glass-bg: rgba(8, 8, 8, 0.92);
 
-  /* Warm neutral backgrounds */
+  /* shadcn/ui semantic tokens — Dark */
   --background: #080808;
   --foreground: #f0ece4;
 
-  /* Card styling with subtle warmth */
   --card: #111111;
   --card-foreground: #f0ece4;
 
-  /* Popover */
   --popover: #111111;
   --popover-foreground: #f0ece4;
 
-  /* Primary = Gold */
   --primary: #c9a84c;
   --primary-foreground: #080808;
 
-  /* Secondary = Dark Surface */
   --secondary: #1a1a1a;
   --secondary-foreground: #f0ece4;
 
-  /* Muted = Dark gray */
   --muted: #1a1a1a;
   --muted-foreground: #7a7570;
 
-  /* Accent = Gold */
   --accent: #c9a84c;
   --accent-foreground: #080808;
 
-  /* Destructive */
   --destructive: #c94c4c;
 
-  /* Borders with warmth */
   --border: #252525;
   --input: #1a1a1a;
   --ring: #c9a84c;
@@ -133,8 +200,6 @@
   --sidebar-border: #252525;
   --sidebar-ring: #c9a84c;
 }
-
-/* OBSIDIAN theme only - no light mode toggle */
 
 @layer base {
   * {
@@ -192,9 +257,9 @@
     border-radius: 2px;
   }
 
-  /* Glass morphism effect */
+  /* Glass morphism effect — adapts to theme via CSS variable */
   .obsidian-glass {
-    background: rgba(8, 8, 8, 0.92);
+    background: var(--obsidian-glass-bg);
     backdrop-filter: blur(20px);
   }
 

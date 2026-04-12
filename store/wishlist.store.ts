@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import type { ProductDetailImage } from '@/types/products'
+import type { CartItemImage } from '@/store/cart.store'
 
 export type WishlistItem = {
   productId: string
@@ -9,7 +9,7 @@ export type WishlistItem = {
   variantDescription: string
   price: number
   oldPrice?: number
-  image: ProductDetailImage | null
+  image: CartItemImage | null
   addedAt: number
 }
 

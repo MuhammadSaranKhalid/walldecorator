@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "Boutique",
+    "collections": "Collections",
+    "custom": "Sur-mesure",
+    "track": "Suivi",
+    "searchPlaceholder": "Rechercher...",
+    "cart": "Panier",
+    "wishlist": "Favoris",
+    "toggleMenu": "Basculer le menu"
+  },
+  "hero": {
+    "eyebrow": "Pièces décoratives murales découpées au laser",
+    "title": "Là où",
+    "subtitle": "la passion",
+    "titleLine3": "rencontre le mur",
+    "description": "Art en métal et bois de qualité premium couvrant l'anime, le cinéma, la nature et la vie. Chaque pièce est découpée au laser avec précision.",
+    "primaryCTA": "Parcourir toutes les pièces",
+    "secondaryCTA": "Voir les collections",
+    "categories": {
+      "anime": "Animé",
+      "movies": "Films",
+      "gaming": "Jeux",
+      "nature": "Nature",
+      "sports": "Sports",
+      "abstract": "Abstrait",
+      "islamic": "Islamique",
+      "geometric": "Géométrique"
+    },
+    "stats": {
+      "uniqueDesigns": "500+",
+      "uniqueDesignsLabel": "Designs uniques",
+      "materialsLabel": "Matériaux",
+      "materials": "Métal · Bois"
+    },
+    "artLabel": "Kid Goku — Dragon Ball Séries"
+  },
+  "materials": {
+    "precisionLaserCut": "Découpe laser de précision",
+    "powderCoatedSteel": "Acier thermolaqué",
+    "solidHardwood": "Bois dur massif",
+    "acrylicResin": "Acrylique & Résine",
+    "freeGiftPackaging": "Emballage cadeau gratuit",
+    "worldwideShipping": "Livraison mondiale"
+  },
+  "cart": {
+    "title": "Panier",
+    "empty": "Votre panier est vide",
+    "subtotal": "Sous-total",
+    "shipping": "Livraison",
+    "shippingFree": "Gratuit",
+    "total": "Total",
+    "checkout": "Commander",
+    "close": "Fermer le panier"
+  },
+  "footer": {
+    "tagline": "Des designs découpés au laser avec précision qui transforment vos murs en galerie. Matériaux premium, dimensions sur-mesure, livraison mondiale.",
+    "sections": {
+      "shop": "Boutique",
+      "support": "Support",
+      "company": "Entreprise"
+    },
+    "links": {
+      "allProducts": "Tous les produits",
+      "bestsellers": "Meilleures ventes",
+      "newArrivals": "Nouveautés",
+      "collections": "Collections",
+      "customOrder": "Commande sur-mesure",
+      "trackOrder": "Suivre ma commande",
+      "shippingInfo": "Infos livraison",
+      "returns": "Retours",
+      "aboutUs": "À propos de nous",
+      "contact": "Contact",
+      "privacyPolicy": "Politique de confidentialité",
+      "termsOfService": "Conditions d'utilisation"
+    },
+    "newsletter": {
+      "title": "Restez inspiré",
+      "description": "Accédez en exclusivité aux nouveaux designs, offres spéciales et inspirations déco.",
+      "placeholder": "Entrez votre email",
+      "subscribe": "S'abonner"
+    },
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "cookies": "Cookies",
+    "copyright": "© {{year}} OBSIDIAN. Tous droits réservés.",
+    "madeIn": "Fabriqué avec fierté au Pakistan"
+  },
+  "language": {
+    "select": "Langue",
+    "search": "Rechercher une langue..."
+  }
+}

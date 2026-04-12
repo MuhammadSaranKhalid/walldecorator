@@ -7,7 +7,8 @@ import { OrderItem } from './order-item'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice } from '@/lib/currency'
+import { useCurrencyStore } from '@/store/currency.store'
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '@/lib/constants'
 
 type OrderSummaryProps = {
@@ -15,6 +16,7 @@ type OrderSummaryProps = {
 }
 
 export function OrderSummary({ items }: OrderSummaryProps) {
+  const { currency } = useCurrencyStore()
   const [discountCode, setDiscountCode] = useState('')
   const [showDiscountField, setShowDiscountField] = useState(false)
   const [isSummaryExpanded, setIsSummaryExpanded] = useState(false)
@@ -40,43 +42,43 @@ export function OrderSummary({ items }: OrderSummaryProps) {
   }
 
   return (
-    <div className="bg-white lg:rounded-lg lg:border border-gray-200 overflow-hidden">
+    <div className="bg-card lg:rounded-lg lg:border border-border overflow-hidden">
       {/* Mobile Toggle Button - Only visible on mobile */}
       <button
         type="button"
         onClick={() => setIsSummaryExpanded(!isSummaryExpanded)}
-        className="lg:hidden w-full flex items-center justify-between p-4 bg-gray-50 border-b border-gray-200 hover:bg-gray-100 transition-colors"
+        className="lg:hidden w-full flex items-center justify-between p-4 bg-muted border-b border-border hover:bg-muted/80 transition-colors"
       >
         <div className="flex items-center gap-3">
           <ShoppingBag className="h-5 w-5 text-brand-navy" />
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-900">
+            <span className="text-sm font-medium text-foreground">
               {isSummaryExpanded ? 'Hide' : 'Show'} order summary
             </span>
             {isSummaryExpanded ? (
-              <ChevronUp className="h-4 w-4 text-gray-600" />
+              <ChevronUp className="h-4 w-4 text-muted-foreground" />
             ) : (
-              <ChevronDown className="h-4 w-4 text-gray-600" />
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
             )}
           </div>
         </div>
         <div className="text-lg font-bold text-brand-navy">
-          {formatPrice(total)}
+          {formatPrice(total, currency)}
         </div>
       </button>
 
       {/* Order Summary Content - Hidden on mobile unless expanded */}
       <div className={`${isSummaryExpanded ? 'block' : 'hidden'} lg:block`}>
         {/* Order items */}
-        <div className="p-6 bg-gray-50/30 lg:bg-gray-50/30">
-          <h2 className="hidden lg:block text-lg font-semibold mb-4 text-gray-900">Order Summary</h2>
+        <div className="p-6 bg-muted/30">
+          <h2 className="hidden lg:block text-lg font-semibold mb-4 text-foreground">Order Summary</h2>
           <div className="max-h-[400px] overflow-y-auto -mx-2 px-2">
             {items.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">Your cart is empty</p>
+              <p className="text-center text-muted-foreground py-8">Your cart is empty</p>
             ) : (
               <div className="space-y-0">
                 {items.map((item) => (
-                  <OrderItem key={item.variantId} item={item} />
+                  <OrderItem key={item.variantId} item={item} currency={currency} />
                 ))}
               </div>
             )}
@@ -121,25 +123,25 @@ export function OrderSummary({ items }: OrderSummaryProps) {
           {/* Price breakdown */}
           <div className="space-y-3">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Subtotal</span>
-              <span className="font-medium">{formatPrice(subtotal)}</span>
+              <span className="text-muted-foreground">Subtotal</span>
+              <span className="font-medium">{formatPrice(subtotal, currency)}</span>
             </div>
 
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Shipping</span>
+              <span className="text-muted-foreground">Shipping</span>
               <span className="font-medium">
                 {shippingCost === 0 ? (
                   <span className="text-green-600 font-semibold">Free</span>
                 ) : (
-                  formatPrice(shippingCost)
+                  formatPrice(shippingCost, currency)
                 )}
               </span>
             </div>
 
             {subtotal > 0 && subtotal < FREE_SHIPPING_THRESHOLD && (
-              <div className="px-3 py-2 bg-blue-50 rounded-md">
-                <p className="text-xs text-blue-800">
-                  Add {formatPrice(FREE_SHIPPING_THRESHOLD - subtotal)} more for free shipping
+              <div className="px-3 py-2 bg-blue-50 dark:bg-blue-950/30 rounded-md">
+                <p className="text-xs text-blue-800 dark:text-blue-300">
+                  Add {formatPrice(FREE_SHIPPING_THRESHOLD - subtotal, currency)} more for free shipping
                 </p>
               </div>
             )}
@@ -149,9 +151,9 @@ export function OrderSummary({ items }: OrderSummaryProps) {
             <div className="flex justify-between items-center pt-2">
               <span className="text-base font-semibold">Total</span>
               <div className="text-right">
-                <div className="text-xs text-gray-500 mb-1">PKR</div>
+                <div className="text-xs text-muted-foreground mb-1">{currency}</div>
                 <div className="text-2xl font-bold text-brand-navy">
-                  {formatPrice(total)}
+                  {formatPrice(total, currency)}
                 </div>
               </div>
             </div>

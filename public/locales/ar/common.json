@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "shop": "تسوق",
+    "collections": "المجموعات",
+    "custom": "مخصص",
+    "track": "تتبع",
+    "searchPlaceholder": "ابحث...",
+    "cart": "السلة",
+    "wishlist": "المفضلة",
+    "toggleMenu": "فتح القائمة"
+  },
+  "hero": {
+    "eyebrow": "قطع ديكور جدارية مقطوعة بالليزر",
+    "title": "حيث",
+    "subtitle": "الشغف",
+    "titleLine3": "يلتقي بالجدار",
+    "description": "فن صامت فاخر من المعدن والخشب يمتد عبر الأنمي والسينما والطبيعة والحياة. كل قطعة مقطوعة بدقة بالليزر وجاهزة لتحويل مساحتك.",
+    "primaryCTA": "تصفح جميع القطع",
+    "secondaryCTA": "عرض المجموعات",
+    "categories": {
+      "anime": "أنمي",
+      "movies": "أفلام",
+      "gaming": "ألعاب",
+      "nature": "طبيعة",
+      "sports": "رياضة",
+      "abstract": "تجريدي",
+      "islamic": "إسلامي",
+      "geometric": "هندسي"
+    },
+    "stats": {
+      "uniqueDesigns": "+500",
+      "uniqueDesignsLabel": "تصميم فريد",
+      "materialsLabel": "المواد",
+      "materials": "معدن · خشب"
+    },
+    "artLabel": "كيد غوكو — سلسلة دراغون بول"
+  },
+  "materials": {
+    "precisionLaserCut": "قطع دقيق بالليزر",
+    "powderCoatedSteel": "فولاذ مطلي بالمسحوق",
+    "solidHardwood": "خشب صلب صلب",
+    "acrylicResin": "أكريليك وراتينج",
+    "freeGiftPackaging": "تغليف هدايا مجاني",
+    "worldwideShipping": "شحن دولي"
+  },
+  "cart": {
+    "title": "السلة",
+    "empty": "سلتك فارغة",
+    "subtotal": "المجموع الفرعي",
+    "shipping": "الشحن",
+    "shippingFree": "مجاني",
+    "total": "الإجمالي",
+    "checkout": "إتمام الشراء",
+    "close": "إغلاق السلة"
+  },
+  "footer": {
+    "tagline": "تصاميم مقطوعة بالليزر بدقة تحوّل جدرانك إلى معرض. مواد فاخرة وأحجام مخصصة وشحن دولي.",
+    "sections": {
+      "shop": "تسوق",
+      "support": "الدعم",
+      "company": "الشركة"
+    },
+    "links": {
+      "allProducts": "جميع المنتجات",
+      "bestsellers": "الأكثر مبيعاً",
+      "newArrivals": "الوافدون الجدد",
+      "collections": "المجموعات",
+      "customOrder": "طلب مخصص",
+      "trackOrder": "تتبع الطلب",
+      "shippingInfo": "معلومات الشحن",
+      "returns": "المرتجعات",
+      "aboutUs": "من نحن",
+      "contact": "اتصل بنا",
+      "privacyPolicy": "سياسة الخصوصية",
+      "termsOfService": "شروط الخدمة"
+    },
+    "newsletter": {
+      "title": "ابقَ مُلهَماً",
+      "description": "احصل على وصول حصري لتصاميم جديدة وعروض خاصة وإلهام في تصميم الديكور.",
+      "placeholder": "أدخل بريدك الإلكتروني",
+      "subscribe": "اشترك"
+    },
+    "privacy": "الخصوصية",
+    "terms": "الشروط",
+    "cookies": "ملفات تعريف الارتباط",
+    "copyright": "© {{year}} OBSIDIAN. جميع الحقوق محفوظة.",
+    "madeIn": "صُنع بفخر في باكستان"
+  },
+  "language": {
+    "select": "اللغة",
+    "search": "ابحث عن لغة..."
+  }
+}
