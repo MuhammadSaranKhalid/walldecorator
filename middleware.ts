@@ -81,6 +81,8 @@ export async function middleware(request: NextRequest) {
       request.headers.get('x-vercel-ip-country') ??
       undefined
 
+    console.log(`[Middleware] Detected country: ${country}, setting currency hint cookie.`)
+
     const detectedCurrency = countryToCurrency(country)
 
     response.cookies.set('obsidian-currency-hint', detectedCurrency, {
