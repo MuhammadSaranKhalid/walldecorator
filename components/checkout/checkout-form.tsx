@@ -1,5 +1,6 @@
 'use client'
 
+import { useRef, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useForm, FormProvider, Controller, type SubmitHandler } from 'react-hook-form'
@@ -11,6 +12,7 @@ import { toast } from 'sonner'
 import { checkoutSchema, type CheckoutFormData } from '@/lib/validations/checkout'
 import { useCartStore } from '@/store/cart.store'
 import { createOrder } from '@/actions/checkout'
+import { FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '@/lib/constants'
 
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
 import { Button } from '@/components/ui/button'
@@ -20,8 +22,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { ContactSection } from './contact-section'
 import { ShippingSection } from './shipping-section'
 import { BillingSection } from './billing-section'
-import { PaymentSection } from './payment-section'
+import { PaymentSection, type PaymentMethod } from './payment-section'
 import { OrderSummary } from './order-summary'
+import type { StripeCardSectionRef } from './stripe-card-section'
 
 type CheckoutFormProps = {
   ipAddress: string
@@ -32,7 +35,19 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
   const router = useRouter()
   const { items, clearCart } = useCartStore()
 
-  // React Hook Form with Zod validation
+  // Payment method state — lifted here so the submit handler can branch on it
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cod')
+
+  // Ref to the StripeCardSection imperative handle
+  const stripeRef = useRef<StripeCardSectionRef>(null)
+
+  // Compute total in PKR paisa for Stripe Elements amount hint
+  const amountInPaisa = useMemo(() => {
+    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST
+    return Math.round((subtotal + shipping) * 100)
+  }, [items])
+
   const methods = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
@@ -53,16 +68,39 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
     mode: 'onBlur',
   })
 
-  // Use react-hook-form's formState instead of manual state
   const { isSubmitting, errors } = methods.formState
-
-  const onInvalid = () => {
-    // Form validation failed — react-hook-form shows field errors automatically
-  }
 
   const onSubmit: SubmitHandler<CheckoutFormData> = async (data) => {
     try {
-      const result = await createOrder({
+      let paymentIntentId: string | undefined
+
+      if (paymentMethod === 'card') {
+        // ── Card payment ──────────────────────────────────────────────
+        if (!stripeRef.current) {
+          methods.setError('root.serverError', {
+            type: 'server',
+            message: 'Payment form is not ready. Please wait and try again.',
+          })
+          return
+        }
+
+        const cartItems = items.map((i) => ({ price: i.price, quantity: i.quantity }))
+        const result = await stripeRef.current.confirmPayment(cartItems)
+
+        if (!result.success) {
+          methods.setError('root.serverError', {
+            type: 'server',
+            message: result.error ?? 'Payment failed. Please try again.',
+          })
+          toast.error(result.error ?? 'Payment failed')
+          return
+        }
+
+        paymentIntentId = result.paymentIntentId
+      }
+
+      // ── Create order in DB ────────────────────────────────────────
+      const orderResult = await createOrder({
         email: data.email,
         name: data.name,
         phone: data.phone,
@@ -72,25 +110,20 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
         orderNotes: data.orderNotes,
         ipAddress,
         userAgent,
+        paymentMethod,
+        paymentIntentId,
       })
 
-      if (result.success) {
-        // Clear cart BEFORE redirect to prevent race conditions
+      if (orderResult.success) {
         clearCart()
-
-        // Show success toast
         toast.success('Order placed successfully!')
-
-        // Redirect to confirmation page
-        router.push(`/checkout/confirmation/${result.orderId}`)
+        router.push(`/checkout/confirmation/${orderResult.orderId}`)
       } else {
-        // Use react-hook-form's setError for better error handling
         methods.setError('root.serverError', {
           type: 'server',
-          message: result.error || 'Failed to place order',
+          message: orderResult.error ?? 'Failed to place order',
         })
-        // Also show toast for immediate feedback
-        toast.error(result.error || 'Failed to place order')
+        toast.error(orderResult.error ?? 'Failed to place order')
       }
     } catch (err) {
       console.error('Checkout error:', err)
@@ -117,7 +150,6 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
                 className="h-12 w-auto"
               />
             </Link>
-            {/* Breadcrumb - Hidden on mobile */}
             <nav className="hidden lg:flex items-center text-sm text-muted-foreground">
               <Link href="/" className="hover:text-primary transition-colors">
                 Home
@@ -134,12 +166,11 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
       </div>
 
       <FormProvider {...methods}>
-        <form onSubmit={methods.handleSubmit(onSubmit, onInvalid)}>
+        <form onSubmit={methods.handleSubmit(onSubmit)}>
           <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 lg:py-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-12">
               {/* Left Column - Form */}
               <div className="order-2 lg:order-1 px-4 py-6 lg:px-0">
-                {/* Return to cart link - Hidden on mobile */}
                 <Link
                   href="/products"
                   className="hidden lg:inline-flex items-center text-sm text-brand-navy hover:text-brand-gold transition-colors mb-6"
@@ -152,7 +183,13 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
                   <ContactSection />
                   <ShippingSection />
                   <BillingSection />
-                  <PaymentSection />
+
+                  <PaymentSection
+                    paymentMethod={paymentMethod}
+                    onPaymentMethodChange={setPaymentMethod}
+                    amountInPaisa={amountInPaisa}
+                    stripeRef={stripeRef}
+                  />
 
                   {/* Order Notes */}
                   <div className="space-y-4">
@@ -168,7 +205,8 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
                       render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                           <FieldLabel htmlFor={field.name} className="text-sm font-medium">
-                            Special Instructions <span className="text-muted-foreground font-normal">(Optional)</span>
+                            Special Instructions{' '}
+                            <span className="text-muted-foreground font-normal">(Optional)</span>
                           </FieldLabel>
                           <Textarea
                             {...field}
@@ -186,7 +224,7 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
                     />
                   </div>
 
-                  {/* Server error display using react-hook-form's formState */}
+                  {/* Server error */}
                   {errors.root?.serverError && (
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
@@ -194,7 +232,6 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
                     </Alert>
                   )}
 
-                  {/* Submit button using react-hook-form's isSubmitting state */}
                   <Button
                     type="submit"
                     size="lg"
@@ -204,17 +241,16 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
                     {isSubmitting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Processing Order...
+                        {paymentMethod === 'card' ? 'Processing Payment…' : 'Processing Order…'}
                       </>
                     ) : (
                       <>
                         <Lock className="mr-2 h-4 w-4" />
-                        Complete Order
+                        {paymentMethod === 'card' ? 'Pay & Complete Order' : 'Complete Order'}
                       </>
                     )}
                   </Button>
 
-                  {/* Trust indicators */}
                   <div className="flex items-center justify-center gap-4 text-xs text-gray-500 pt-4">
                     <div className="flex items-center gap-1">
                       <Lock className="h-3 w-3" />

@@ -4,10 +4,8 @@ import { createServerClient } from '@/lib/supabase/server'
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '@/lib/constants'
 import type { AddressData } from '@/lib/validations/checkout'
 import type { CartItem } from '@/store/cart.store'
+import type { PaymentMethod } from '@/components/checkout/payment-section'
 
-/**
- * Input types for createOrder action
- */
 type CreateOrderInput = {
   email: string
   name: string
@@ -18,11 +16,12 @@ type CreateOrderInput = {
   orderNotes?: string
   ipAddress: string
   userAgent: string
+  /** 'cod' | 'card' — defaults to 'cod' */
+  paymentMethod?: PaymentMethod
+  /** Stripe PaymentIntent ID — required when paymentMethod is 'card' */
+  paymentIntentId?: string
 }
 
-/**
- * Return type for createOrder action
- */
 type CreateOrderResult = {
   success: boolean
   orderId?: string
@@ -31,48 +30,36 @@ type CreateOrderResult = {
   error?: string
 }
 
-/**
- * Create order from checkout form data
- * Server Action for checkout page
- */
 export async function createOrder(
   input: CreateOrderInput
 ): Promise<CreateOrderResult> {
-  // Validate input
   if (!input.cartItems || input.cartItems.length === 0) {
-    return {
-      success: false,
-      error: 'Your cart is empty',
-    }
+    return { success: false, error: 'Your cart is empty' }
   }
 
   if (!input.email || !input.name || !input.phone || !input.shippingAddress) {
-    return {
-      success: false,
-      error: 'Missing required fields',
-    }
+    return { success: false, error: 'Missing required fields' }
   }
+
+  // Map payment method to the value the DB expects
+  const dbPaymentMethod =
+    input.paymentMethod === 'card' ? 'card' : 'cash_on_delivery'
 
   try {
     const supabase = await createServerClient()
 
-    // Transform cart items to database format
     const dbCartItems = input.cartItems.map((item) => ({
       variant_id: item.variantId,
       quantity: item.quantity,
       price: item.price,
     }))
 
-    // Calculate subtotal
     const subtotal = input.cartItems.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
     )
-
-    // Calculate shipping cost (free if >= threshold)
     const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST
 
-    // Format shipping address as JSONB
     const shippingAddressJson = {
       line1: input.shippingAddress.line1,
       line2: input.shippingAddress.line2 || null,
@@ -82,7 +69,6 @@ export async function createOrder(
       country: 'Pakistan',
     }
 
-    // Format billing address (use shipping if same)
     const billingAddressJson = input.billingAddress
       ? {
           line1: input.billingAddress.line1,
@@ -94,7 +80,6 @@ export async function createOrder(
         }
       : shippingAddressJson
 
-    // Call database function to create order
     const { data: orderId, error: createError } = await supabase.rpc(
       'create_order',
       {
@@ -104,11 +89,11 @@ export async function createOrder(
         p_shipping_address: shippingAddressJson,
         p_billing_address: billingAddressJson,
         p_cart_items: dbCartItems,
-        p_payment_intent_id: null, // COD has no payment intent
-        p_payment_method: 'cash_on_delivery',
+        p_payment_intent_id: input.paymentIntentId ?? null,
+        p_payment_method: dbPaymentMethod,
         p_shipping_cost: shippingCost,
-        p_discount_amount: 0, // No discount support yet
-        p_tax_rate: 0, // No sales tax for Pakistan
+        p_discount_amount: 0,
+        p_tax_rate: 0,
         p_ip_address: input.ipAddress,
         p_user_agent: input.userAgent,
       }
@@ -116,13 +101,16 @@ export async function createOrder(
 
     if (createError) {
       console.error('Order creation error:', createError)
-      return {
-        success: false,
-        error: 'Failed to create order. Please try again.',
-      }
+      // The RPC raises user-readable exceptions (SQLSTATE 22023) for domain
+      // errors such as missing variants. Surface those directly; fall back to
+      // a generic message for unexpected infrastructure errors.
+      const isUserError = createError.code === '22023' || createError.code === 'P0001'
+      const userMessage = isUserError
+        ? createError.message
+        : 'Failed to create order. Please try again.'
+      return { success: false, error: userMessage }
     }
 
-    // Fetch order details to get order number
     const { data: order, error: fetchError } = await supabase
       .from('orders')
       .select('order_number')
@@ -131,11 +119,10 @@ export async function createOrder(
 
     if (fetchError || !order) {
       console.error('Failed to fetch order details:', fetchError)
-      // Order was created but we couldn't fetch details
       return {
         success: true,
         orderId: orderId as string,
-        orderNumber: 'Unknown', // Fallback
+        orderNumber: 'Unknown',
         message: 'Order placed successfully!',
       }
     }
@@ -148,9 +135,6 @@ export async function createOrder(
     }
   } catch (error) {
     console.error('Unexpected error during order creation:', error)
-    return {
-      success: false,
-      error: 'An unexpected error occurred. Please try again.',
-    }
+    return { success: false, error: 'An unexpected error occurred. Please try again.' }
   }
 }
