@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Heart, ArrowLeft } from 'lucide-react'
+import { Heart, ArrowLeft, Eye } from 'lucide-react'
 import { getStorageUrl } from '@/lib/supabase/storage'
 import { useCartStore } from '@/store/cart.store'
 import { useWishlistStore } from '@/store/wishlist.store'
@@ -11,6 +11,7 @@ import { useToastStore } from '@/store/toast.store'
 import { useCurrencyStore } from '@/store/currency.store'
 import { formatPrice } from '@/lib/currency'
 import type { ProductDetail } from '@/types/products'
+import { WallViewerModal } from './wall-viewer-modal'
 
 interface ObsidianProductDetailPageProps {
   product: ProductDetail
@@ -90,6 +91,7 @@ export function ObsidianProductDetailPage({ product }: ObsidianProductDetailPage
   const { currency } = useCurrencyStore()
 
   const isWishlisted = isInWishlist(currentVariant?.id ?? product.id)
+  const [showWallViewer, setShowWallViewer] = useState(false)
 
   const handleAddToCart = () => {
     if (!currentVariant || !isInStock) return
@@ -348,6 +350,17 @@ export function ObsidianProductDetailPage({ product }: ObsidianProductDetailPage
           )}
 
           {/* ── Actions ───────────────────────────────────────────────────── */}
+          {/* View on Wall */}
+          {imageUrl && (
+            <button
+              onClick={() => setShowWallViewer(true)}
+              className="w-full mb-3 flex items-center justify-center gap-2 border border-[var(--obsidian-border)] px-7 py-3 text-[11px] tracking-[3px] uppercase font-medium font-[family-name:var(--font-dm-sans)] text-[var(--obsidian-text-muted)] hover:border-[var(--obsidian-gold)] hover:text-[var(--obsidian-gold)] transition-all duration-250"
+            >
+              <Eye className="w-4 h-4" />
+              View on Your Wall
+            </button>
+          )}
+
           <div className="flex gap-2.5 mb-6">
             <button
               onClick={handleAddToCart}
@@ -371,6 +384,15 @@ export function ObsidianProductDetailPage({ product }: ObsidianProductDetailPage
               <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
             </button>
           </div>
+
+          {/* Wall Viewer Modal */}
+          {showWallViewer && imageUrl && (
+            <WallViewerModal
+              productImageUrl={imageUrl}
+              productName={product.name}
+              onClose={() => setShowWallViewer(false)}
+            />
+          )}
 
           {/* ── Trust Badges ──────────────────────────────────────────────── */}
           <div className="flex gap-3.5 flex-wrap">
