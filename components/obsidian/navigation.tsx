@@ -55,7 +55,7 @@ export function ObsidianNavigation() {
           className="h-[38px] w-auto"
           priority
         />
-        <div className="flex flex-col">
+        <div className="hidden sm:flex flex-col">
           <div className="font-[family-name:var(--font-cormorant)] text-lg font-semibold tracking-[0.2em] text-[var(--obsidian-gold)] uppercase leading-none transition-colors group-hover:text-[var(--obsidian-gold-light)]">
             Wall Decorator
           </div>
