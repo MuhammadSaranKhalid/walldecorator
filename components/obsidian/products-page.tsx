@@ -164,8 +164,8 @@ export function ObsidianProductsPage({
       </div>
 
       {/* ── Products Grid ─────────────────────────────────────────────────── */}
-      <section className="px-6 sm:px-12 py-12">
-        <div className="flex items-end justify-between mb-10">
+      <section className="sm:px-12 py-12">
+        <div className="flex items-end justify-between mb-10 px-6 sm:px-0">
           <div className="font-[family-name:var(--font-cormorant)] text-[clamp(26px,5vw,42px)] font-light leading-tight">
             {activeParent
               ? activeSubSlug
@@ -198,7 +198,7 @@ export function ObsidianProductsPage({
 
         {/* ── Pagination ───────────────────────────────────────────────── */}
         {totalPages > 1 && (
-          <div className="flex flex-col items-center pt-12 gap-4">
+          <div className="flex flex-col items-center pt-12 gap-4 px-6 sm:px-0">
             {/* Progress bar */}
             <div className="w-[200px] h-px bg-[var(--obsidian-border)] relative overflow-hidden">
               <div
