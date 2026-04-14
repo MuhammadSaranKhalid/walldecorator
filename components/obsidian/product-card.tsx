@@ -2,8 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Heart, Eye } from 'lucide-react'
-import { useCartStore } from '@/store/cart.store'
+import { Heart } from 'lucide-react'
 import { useWishlistStore } from '@/store/wishlist.store'
 import { useToastStore } from '@/store/toast.store'
 import { getStorageUrl } from '@/lib/supabase/storage'
@@ -17,7 +16,6 @@ interface ProductCardProps {
 }
 
 export function ObsidianProductCard({ product, badge, animationDelay = 0 }: ProductCardProps) {
-  const { addItem: addToCart } = useCartStore()
   const { toggleItem: toggleWishlist, isInWishlist } = useWishlistStore()
   const { showSuccess } = useToastStore()
   const { currency } = useCurrencyStore()
@@ -48,23 +46,6 @@ export function ObsidianProductCard({ product, badge, animationDelay = 0 }: Prod
   }
 
   const imageData = getImageData()
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    addToCart({
-      variantId: product.id,
-      productName: product.name,
-      variantDescription: product.category?.name || 'Wall Art',
-      sku: product.id,
-      price: product.price,
-      quantity: 1,
-      image: imageData,
-    })
-
-    showSuccess('Added to Cart', product.name)
-  }
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -162,18 +143,6 @@ export function ObsidianProductCard({ product, badge, animationDelay = 0 }: Prod
           </div>
         )}
 
-        {/* Card Actions — desktop only, hover-reveal overlay on image */}
-        <div className="hidden md:flex absolute bottom-0 left-0 right-0 px-2.5 py-2.5 bg-[rgba(8,8,8,0.92)] gap-2 z-[4] opacity-0 translate-y-2 transition-all duration-[250ms] group-hover:opacity-100 group-hover:translate-y-0">
-          <button
-            onClick={handleAddToCart}
-            className="flex-1 bg-[var(--obsidian-gold)] text-[var(--obsidian-bg)] border-none px-2.5 py-2.5 cursor-pointer font-[family-name:var(--font-dm-sans)] text-[10px] tracking-[0.15625em] uppercase font-medium whitespace-nowrap transition-colors duration-200 hover:bg-[var(--obsidian-gold-light)]"
-          >
-            Add to Cart
-          </button>
-          <button className="flex bg-[var(--obsidian-surface2)] border border-[var(--obsidian-border)] text-[var(--obsidian-text)] px-3.5 py-2.5 cursor-pointer text-[13px] items-center transition-all duration-200 hover:border-[var(--obsidian-gold)] hover:text-[var(--obsidian-gold)]">
-            <Eye className="w-4 h-4" />
-          </button>
-        </div>
       </div>
 
       {/* Product Info */}
@@ -214,13 +183,6 @@ export function ObsidianProductCard({ product, badge, animationDelay = 0 }: Prod
           ))}
         </div> */}
 
-        {/* Add to Cart — mobile only, sits in info section below image */}
-        <button
-          onClick={handleAddToCart}
-          className="md:hidden w-full bg-[var(--obsidian-gold)] text-[var(--obsidian-bg)] border-none py-2.5 cursor-pointer font-[family-name:var(--font-dm-sans)] text-[10px] tracking-[0.15625em] uppercase font-medium transition-colors duration-200 active:bg-[var(--obsidian-gold-light)]"
-        >
-          Add to Cart
-        </button>
       </div>
     </Link>
   )
