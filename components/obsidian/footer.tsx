@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
 export function ObsidianFooter() {
@@ -35,14 +36,23 @@ export function ObsidianFooter() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-16">
           {/* Brand Column */}
           <div className="lg:col-span-5">
-            <div className="mb-6">
-              <div className="font-[family-name:var(--font-cormorant)] text-[24px] font-semibold tracking-[0.375em] text-[var(--obsidian-gold)] uppercase leading-none">
-                OBSIDIAN
+            <Link href="/" className="flex items-center gap-3 mb-6 group">
+              <Image
+                src="/logo.png"
+                alt="Wall Decorator"
+                width={48}
+                height={48}
+                className="h-12 w-auto"
+              />
+              <div className="flex flex-col">
+                <div className="font-[family-name:var(--font-cormorant)] text-[22px] font-semibold tracking-[0.2em] text-[var(--obsidian-gold)] uppercase leading-none transition-colors group-hover:text-[var(--obsidian-gold-light)]">
+                  Wall Decorator
+                </div>
+                <div className="text-[9px] tracking-[0.15em] uppercase text-[var(--obsidian-text-dim)] mt-1.5">
+                  Precision Wall Art
+                </div>
               </div>
-              <div className="text-[9px] tracking-[0.1875em] uppercase text-[var(--obsidian-text-dim)] mt-1.5">
-                Wall Art & Decor
-              </div>
-            </div>
+            </Link>
             <p className="text-[13px] leading-relaxed text-[var(--obsidian-text-muted)] max-w-md mb-6">
               {t('footer.tagline')}
             </p>

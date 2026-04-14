@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -45,12 +46,22 @@ export function ObsidianNavigation() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-4 sm:px-6 lg:px-12 py-5 obsidian-glass border-b border-[var(--obsidian-border)]">
       {/* Logo */}
-      <Link href="/" className="flex flex-col cursor-pointer group">
-        <div className="font-[family-name:var(--font-cormorant)] text-xl font-semibold tracking-[0.375em] text-[var(--obsidian-gold)] uppercase leading-none transition-colors group-hover:text-[var(--obsidian-gold-light)]">
-          OBSIDIAN
-        </div>
-        <div className="text-[8px] tracking-[0.1875em] uppercase text-[var(--obsidian-text-dim)] mt-0.5">
-          Wall Art & Decor
+      <Link href="/" className="flex items-center gap-2.5 cursor-pointer group">
+        <Image
+          src="/logo.png"
+          alt="Wall Decorator"
+          width={38}
+          height={38}
+          className="h-[38px] w-auto"
+          priority
+        />
+        <div className="flex flex-col">
+          <div className="font-[family-name:var(--font-cormorant)] text-lg font-semibold tracking-[0.2em] text-[var(--obsidian-gold)] uppercase leading-none transition-colors group-hover:text-[var(--obsidian-gold-light)]">
+            Wall Decorator
+          </div>
+          <div className="text-[8px] tracking-[0.15em] uppercase text-[var(--obsidian-text-dim)] mt-0.5">
+            Precision Wall Art
+          </div>
         </div>
       </Link>
 

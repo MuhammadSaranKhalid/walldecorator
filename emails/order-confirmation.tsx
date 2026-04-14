@@ -106,8 +106,15 @@ export const OrderConfirmationEmail = ({
                 <Container style={container}>
                     {/* Header with Logo */}
                     <Section style={header}>
-                        <Link href={SITE_URL} style={{ textDecoration: "none" }}>
-                            <Text style={logoText}>WallDecorator</Text>
+                        <Link href={SITE_URL} style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "10px" }}>
+                            <Img
+                                src={`${SITE_URL}/logo.png`}
+                                alt="Wall Decorator"
+                                width={44}
+                                height={44}
+                                style={{ display: "inline-block", verticalAlign: "middle" }}
+                            />
+                            <Text style={logoText}>Wall Decorator</Text>
                         </Link>
                         <Text style={tagline}>Art That Defines Your Space</Text>
                     </Section>

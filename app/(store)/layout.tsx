@@ -9,7 +9,7 @@ import { WhatsAppButton } from '@/components/obsidian/whatsapp-button'
 
 
 export const metadata: Metadata = {
-    title: "OBSIDIAN — Wall Art & Decor",
+    title: "Wall Decorator — Modern Wall Art",
     description: "Precision-crafted laser-cut designs that turn your walls into a gallery. Custom sizes and materials available.",
 };
 

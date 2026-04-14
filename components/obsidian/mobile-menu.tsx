@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useUIStore } from '@/store/ui.store'
 import { useCartStore } from '@/store/cart.store'
@@ -48,6 +49,20 @@ export function MobileMenu() {
           transform: isMobileMenuOpen ? 'translateX(0)' : 'translateX(-100%)',
         }}
       >
+        {/* Logo */}
+        <Link href="/" onClick={handleLinkClick} className="flex items-center gap-2.5 mb-10">
+          <Image
+            src="/logo.png"
+            alt="Wall Decorator"
+            width={44}
+            height={44}
+            className="h-11 w-auto"
+          />
+          <div className="font-[family-name:var(--font-cormorant)] text-2xl font-semibold tracking-[0.2em] text-[var(--obsidian-gold)] uppercase leading-none">
+            Wall Decorator
+          </div>
+        </Link>
+
         {/* Eyebrow */}
         <div className="text-[9px] tracking-[0.1875em] uppercase text-[var(--obsidian-text-dim)] mb-7">
           Navigation
