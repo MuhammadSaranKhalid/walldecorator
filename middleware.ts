@@ -22,6 +22,7 @@ const COUNTRY_CURRENCY: Record<string, string> = {
   BH: 'USD', // Bahrain
   OM: 'USD', // Oman
   JO: 'USD', // Jordan
+
   // ── EUR ──────────────────────────────────────────────────────────
   DE: 'EUR', // Germany
   FR: 'EUR', // France
@@ -43,8 +44,10 @@ const COUNTRY_CURRENCY: Record<string, string> = {
   MT: 'EUR', // Malta
   CY: 'EUR', // Cyprus
   HR: 'EUR', // Croatia
+
   // ── GBP ──────────────────────────────────────────────────────────
   GB: 'GBP', // United Kingdom
+  
   // Non-eurozone mapped to EUR
   SE: 'EUR', // Sweden
   NO: 'EUR', // Norway
