@@ -1,12 +1,13 @@
 import type { RatesMap, CurrencyMeta } from '@/lib/rates'
 
-export type CurrencyCode = 'PKR' | 'USD' | 'EUR'
+export type CurrencyCode = 'PKR' | 'USD' | 'EUR' | 'GBP'
 
 // Static display metadata — these values never change, only rates change
 export const CURRENCY_META: Record<CurrencyCode, Omit<CurrencyMeta, 'is_base' | 'is_active' | 'display_order'>> = {
   PKR: { code: 'PKR', symbol: 'Rs.', name: 'Pakistani Rupee', flag: '🇵🇰', locale: 'en-PK', decimals: 0 },
   USD: { code: 'USD', symbol: '$',   name: 'US Dollar',       flag: '🇺🇸', locale: 'en-US', decimals: 2 },
   EUR: { code: 'EUR', symbol: '€',   name: 'Euro',            flag: '🇪🇺', locale: 'de-DE', decimals: 2 },
+  GBP: { code: 'GBP', symbol: '£',  name: 'British Pound',   flag: '🇬🇧', locale: 'en-GB', decimals: 2 },
 }
 
 // ─── convertPrice ─────────────────────────────────────────────────────────────

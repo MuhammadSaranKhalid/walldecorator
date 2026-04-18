@@ -43,8 +43,9 @@ const COUNTRY_CURRENCY: Record<string, string> = {
   MT: 'EUR', // Malta
   CY: 'EUR', // Cyprus
   HR: 'EUR', // Croatia
-  // Non-eurozone but close enough to map to EUR
-  GB: 'EUR', // UK (GBP, but EUR is our closest supported)
+  // ── GBP ──────────────────────────────────────────────────────────
+  GB: 'GBP', // United Kingdom
+  // Non-eurozone mapped to EUR
   SE: 'EUR', // Sweden
   NO: 'EUR', // Norway
   DK: 'EUR', // Denmark

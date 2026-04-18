@@ -5,7 +5,7 @@ import { useCurrencyStore } from '@/store/currency.store'
 import type { CurrencyCode } from '@/lib/currency'
 import type { RatesMap, CurrencyMeta } from '@/lib/rates'
 
-const VALID_CURRENCIES: CurrencyCode[] = ['PKR', 'USD', 'EUR']
+const VALID_CURRENCIES: CurrencyCode[] = ['PKR', 'USD', 'EUR', 'GBP']
 const STORAGE_KEY = 'obsidian-currency'
 
 function readCookie(name: string): string | null {

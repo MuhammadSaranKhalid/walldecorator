@@ -20,7 +20,7 @@ export function ObsidianHeroSection({ categories }: HeroSectionProps) {
   const resolvedSecondaryCTA = { text: t('hero.secondaryCTA'), href: '/collections' }
 
   return (
-    <section className="pt-20 min-h-[96vh] grid grid-cols-1 lg:grid-cols-2 items-center overflow-hidden relative z-[1]">
+    <section className="min-h-[96vh] grid grid-cols-1 lg:grid-cols-2 items-center overflow-hidden relative z-[1]">
       {/* Left Content */}
       <div className="px-6 sm:px-10 lg:px-14 py-10 sm:py-14 lg:py-20">
         {/* Eyebrow */}

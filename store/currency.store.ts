@@ -21,6 +21,7 @@ const FALLBACK_RATES: RatesMap = {
   PKR: { id: 'base', rate: 1,          fetched_at: '' },
   USD: { id: 'seed', rate: 0.003597,   fetched_at: '' },
   EUR: { id: 'seed', rate: 0.003333,   fetched_at: '' },
+  GBP: { id: 'seed', rate: 0.002817,   fetched_at: '' },
 }
 
 export const useCurrencyStore = create<CurrencyStore>()(
