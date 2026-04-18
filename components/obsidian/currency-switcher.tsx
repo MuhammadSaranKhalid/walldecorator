@@ -6,7 +6,7 @@ import { useCurrencyStore } from '@/store/currency.store'
 import { CURRENCY_META, type CurrencyCode } from '@/lib/currency'
 
 export function CurrencySwitcher() {
-  const { currency, setCurrency, currencyList } = useCurrencyStore()
+  const { currency, selectCurrency, currencyList } = useCurrencyStore()
   const [open, setOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -38,7 +38,7 @@ export function CurrencySwitcher() {
   }, [])
 
   const handleSelect = (code: CurrencyCode) => {
-    setCurrency(code)
+    selectCurrency(code)
     setOpen(false)
   }
 

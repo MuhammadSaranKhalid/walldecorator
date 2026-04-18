@@ -30,12 +30,15 @@ export function CurrencyProvider({ children, initialRates, initialCurrencyList }
     setRates(initialRates, initialCurrencyList)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Apply geo-detected hint only when user has no persisted preference.
-  // Re-evaluates whenever localStorage is cleared — self-healing.
+  // Apply geo-detected hint only when user has never explicitly chosen a currency.
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    console.debug('CurrencyProvider: stored currency', stored)
-    if (stored) return // user has an explicit choice, never override
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY)
+      const parsed = raw ? JSON.parse(raw) : null
+      if (parsed?.state?.manuallySelected) return
+    } catch {
+      // corrupt storage — fall through and apply hint
+    }
 
     const hint = readCookie('obsidian-currency-hint')
     if (hint && VALID_CURRENCIES.includes(hint as CurrencyCode)) {

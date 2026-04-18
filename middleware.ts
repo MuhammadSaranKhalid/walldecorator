@@ -70,6 +70,8 @@ export async function middleware(request: NextRequest) {
   // The CurrencyProvider only applies it when the user has no localStorage
   // preference — so a manual selection is never overridden.
   const geoRequest = request as NextRequest & { geo?: { country?: string } }
+  console.log('Middleware: incoming request for', request.url)
+  console.log('Middleware: geo info', geoRequest.geo)
   const country =
     geoRequest.geo?.country ??
     request.headers.get('x-vercel-ip-country') ??

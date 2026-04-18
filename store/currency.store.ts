@@ -4,9 +4,10 @@ import type { CurrencyCode } from '@/lib/currency'
 import type { RatesMap, CurrencyMeta } from '@/lib/rates'
 
 type CurrencyStore = {
-  // User's selected currency — persisted to localStorage
   currency: CurrencyCode
-  setCurrency: (code: CurrencyCode) => void
+  manuallySelected: boolean
+  setCurrency: (code: CurrencyCode) => void      // geo/system use only
+  selectCurrency: (code: CurrencyCode) => void   // explicit user pick
 
   // Live rates injected from the server on every page load — NOT persisted
   rates: RatesMap
@@ -26,7 +27,9 @@ export const useCurrencyStore = create<CurrencyStore>()(
   persist(
     (set) => ({
       currency: 'PKR',
+      manuallySelected: false,
       setCurrency: (code) => set({ currency: code }),
+      selectCurrency: (code) => set({ currency: code, manuallySelected: true }),
 
       rates: FALLBACK_RATES,
       currencyList: [],
@@ -35,8 +38,7 @@ export const useCurrencyStore = create<CurrencyStore>()(
     {
       name: 'obsidian-currency',
       storage: createJSONStorage(() => localStorage),
-      // Only persist the user's currency choice — rates always come fresh from server
-      partialize: (state) => ({ currency: state.currency }),
+      partialize: (state) => ({ currency: state.currency, manuallySelected: state.manuallySelected }),
     }
   )
 )
