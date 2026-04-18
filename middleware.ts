@@ -69,13 +69,7 @@ export async function middleware(request: NextRequest) {
   // Always refresh the hint cookie so it stays accurate across visits.
   // The CurrencyProvider only applies it when the user has no localStorage
   // preference — so a manual selection is never overridden.
-  const geoRequest = request as NextRequest & { geo?: { country?: string } }
-  console.log('Middleware: incoming request for', request.url)
-  console.log('Middleware: geo info', geoRequest.geo)
-  const country =
-    geoRequest.geo?.country ??
-    request.headers.get('x-vercel-ip-country') ??
-    undefined
+  const country = request.headers.get('x-vercel-ip-country') ?? undefined
 
   const detectedCurrency = countryToCurrency(country)
   console.log('Middleware: detected country', country)
