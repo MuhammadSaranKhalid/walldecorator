@@ -76,6 +76,8 @@ export async function middleware(request: NextRequest) {
     undefined
 
   const detectedCurrency = countryToCurrency(country)
+  console.log('Middleware: detected country', country)
+  console.log('Middleware: mapped currency', detectedCurrency)
 
   response.cookies.set('obsidian-currency-hint', detectedCurrency, {
     path: '/',
