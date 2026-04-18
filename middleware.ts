@@ -66,32 +66,23 @@ export async function middleware(request: NextRequest) {
   const response = await updateSession(request)
 
   // ── Geo-based currency hint ────────────────────────────────────────────────
-  // Only set the hint if the user has NOT already had a currency persisted
-  // (obsidian-currency cookie is written by the CurrencyProvider after the
-  //  Zustand store is initialised from the hint for the first time).
-  const hasStoredCurrency = request.cookies.has('obsidian-currency-set')
+  // Always refresh the hint cookie so it stays accurate across visits.
+  // The CurrencyProvider only applies it when the user has no localStorage
+  // preference — so a manual selection is never overridden.
+  const geoRequest = request as NextRequest & { geo?: { country?: string } }
+  const country =
+    geoRequest.geo?.country ??
+    request.headers.get('x-vercel-ip-country') ??
+    undefined
 
-  if (!hasStoredCurrency) {
-    // Vercel populates request.geo on NextRequest at the edge (documented API).
-    // The TypeScript types may lag the runtime — cast to access geo safely,
-    // with a fallback to the raw x-vercel-ip-country header for local dev.
-    const geoRequest = request as NextRequest & { geo?: { country?: string } }
-    const country =
-      geoRequest.geo?.country ??
-      request.headers.get('x-vercel-ip-country') ??
-      undefined
+  const detectedCurrency = countryToCurrency(country)
 
-    console.log(`[Middleware] Detected country: ${country}, setting currency hint cookie.`)
-
-    const detectedCurrency = countryToCurrency(country)
-
-    response.cookies.set('obsidian-currency-hint', detectedCurrency, {
-      path: '/',
-      maxAge: 60 * 60 * 24, // 24 h — refreshed each visit until user stores a choice
-      sameSite: 'lax',
-      httpOnly: false, // must be readable by client JS
-    })
-  }
+  response.cookies.set('obsidian-currency-hint', detectedCurrency, {
+    path: '/',
+    maxAge: 60 * 60 * 24, // 24 h — refreshed on every visit
+    sameSite: 'lax',
+    httpOnly: false, // must be readable by client JS
+  })
 
   return response
 }

@@ -2,14 +2,16 @@ import Image from 'next/image'
 import type { CartItem } from '@/store/cart.store'
 import { formatPrice } from '@/lib/currency'
 import type { CurrencyCode } from '@/lib/currency'
+import type { RatesMap } from '@/lib/rates'
 import { blurhashToDataURL } from '@/lib/blurhash'
 
 type OrderItemProps = {
   item: CartItem
   currency: CurrencyCode
+  rates: RatesMap
 }
 
-export function OrderItem({ item, currency }: OrderItemProps) {
+export function OrderItem({ item, currency, rates }: OrderItemProps) {
   const blurUrl = item.image?.blurhash ? blurhashToDataURL(item.image.blurhash) : undefined
 
   return (
@@ -43,7 +45,7 @@ export function OrderItem({ item, currency }: OrderItemProps) {
           <p className="text-xs text-muted-foreground mt-1">{item.variantDescription}</p>
         </div>
         <p className="text-sm font-medium text-foreground shrink-0">
-          {formatPrice(item.price * item.quantity, currency)}
+          {formatPrice(item.price * item.quantity, currency, rates)}
         </p>
       </div>
     </div>

@@ -20,6 +20,10 @@ type CreateOrderInput = {
   paymentMethod?: PaymentMethod
   /** Stripe PaymentIntent ID — required when paymentMethod is 'card' */
   paymentIntentId?: string
+  /** Currency the user was viewing at checkout (display only) */
+  displayCurrency?: string
+  /** ID of the exchange_rate_snapshot active at purchase time */
+  rateSnapshotId?: string
 }
 
 type CreateOrderResult = {
@@ -109,6 +113,18 @@ export async function createOrder(
         ? createError.message
         : 'Failed to create order. Please try again.'
       return { success: false, error: userMessage }
+    }
+
+    // Stamp the display currency and rate snapshot onto the order.
+    // Done as a separate update so we don't need to modify the create_order RPC.
+    if (input.displayCurrency || input.rateSnapshotId) {
+      await supabase
+        .from('orders')
+        .update({
+          ...(input.displayCurrency && { display_currency: input.displayCurrency }),
+          ...(input.rateSnapshotId  && { exchange_rate_snapshot_id: input.rateSnapshotId }),
+        })
+        .eq('id', orderId)
     }
 
     const { data: order, error: fetchError } = await supabase

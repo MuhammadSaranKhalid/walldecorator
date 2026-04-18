@@ -3,14 +3,19 @@
 import { useState, useRef, useEffect } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { useCurrencyStore } from '@/store/currency.store'
-import { CURRENCY_LIST, type CurrencyCode } from '@/lib/currency'
+import { CURRENCY_META, type CurrencyCode } from '@/lib/currency'
 
 export function CurrencySwitcher() {
-  const { currency, setCurrency } = useCurrencyStore()
+  const { currency, setCurrency, currencyList } = useCurrencyStore()
   const [open, setOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  const current = CURRENCY_LIST.find((c) => c.code === currency) ?? CURRENCY_LIST[0]
+  // Use live DB currency list when available; fall back to static metadata
+  const list = currencyList.length > 0
+    ? currencyList
+    : Object.values(CURRENCY_META)
+
+  const current = list.find((c) => c.code === currency) ?? list[0]
 
   // Close on outside click
   useEffect(() => {
@@ -61,14 +66,14 @@ export function CurrencySwitcher() {
           role="listbox"
           aria-label="Currency"
         >
-          {CURRENCY_LIST.map((c) => {
+          {list.map((c) => {
             const isActive = c.code === currency
             return (
               <button
                 key={c.code}
                 role="option"
                 aria-selected={isActive}
-                onClick={() => handleSelect(c.code)}
+                onClick={() => handleSelect(c.code as CurrencyCode)}
                 className={`w-full flex items-center gap-3 px-4 py-2.5 text-left cursor-pointer transition-colors duration-150 ${
                   isActive
                     ? 'bg-[var(--obsidian-gold)]/10 text-[var(--obsidian-gold)]'

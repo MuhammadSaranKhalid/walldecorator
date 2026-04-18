@@ -18,10 +18,12 @@ interface ProductCardProps {
 export function ObsidianProductCard({ product, badge, animationDelay = 0 }: ProductCardProps) {
   const { toggleItem: toggleWishlist, isInWishlist } = useWishlistStore()
   const { showSuccess } = useToastStore()
-  const { currency } = useCurrencyStore()
+  const { currency, rates } = useCurrencyStore()
 
   const isWishlisted = isInWishlist(product.id)
-  const hasDiscount = product.compare_at_price && product.compare_at_price > product.price
+  // Support both camelCase (HomepageProduct) and snake_case (other query shapes)
+  const compareAtPrice = product.compareAtPrice ?? product.compare_at_price ?? null
+  const hasDiscount = compareAtPrice && compareAtPrice > product.price
 
   // Helper to get image data from either nested object or denormalized fields
   const getImageData = () => {
@@ -165,11 +167,11 @@ export function ObsidianProductCard({ product, badge, animationDelay = 0 }: Prod
         {/* Price Row */}
         <div className="flex items-center gap-2.5 mb-3">
           <div className="text-sm text-[var(--obsidian-gold)]">
-            {formatPrice(product.price, currency)}
+            {formatPrice(product.price, currency, rates)}
           </div>
-          {hasDiscount && product.compare_at_price && (
+          {hasDiscount && compareAtPrice && (
             <div className="text-xs text-[var(--obsidian-text-dim)] line-through">
-              {formatPrice(product.compare_at_price, currency)}
+              {formatPrice(compareAtPrice, currency, rates)}
             </div>
           )}
         </div>

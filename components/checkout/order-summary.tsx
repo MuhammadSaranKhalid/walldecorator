@@ -16,7 +16,7 @@ type OrderSummaryProps = {
 }
 
 export function OrderSummary({ items }: OrderSummaryProps) {
-  const { currency } = useCurrencyStore()
+  const { currency, rates } = useCurrencyStore()
   const [discountCode, setDiscountCode] = useState('')
   const [showDiscountField, setShowDiscountField] = useState(false)
   const [isSummaryExpanded, setIsSummaryExpanded] = useState(false)
@@ -63,7 +63,7 @@ export function OrderSummary({ items }: OrderSummaryProps) {
           </div>
         </div>
         <div className="text-lg font-bold text-brand-navy">
-          {formatPrice(total, currency)}
+          {formatPrice(total, currency, rates)}
         </div>
       </button>
 
@@ -78,7 +78,7 @@ export function OrderSummary({ items }: OrderSummaryProps) {
             ) : (
               <div className="space-y-0">
                 {items.map((item) => (
-                  <OrderItem key={item.variantId} item={item} currency={currency} />
+                  <OrderItem key={item.variantId} item={item} currency={currency} rates={rates} />
                 ))}
               </div>
             )}
@@ -124,7 +124,7 @@ export function OrderSummary({ items }: OrderSummaryProps) {
           <div className="space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Subtotal</span>
-              <span className="font-medium">{formatPrice(subtotal, currency)}</span>
+              <span className="font-medium">{formatPrice(subtotal, currency, rates)}</span>
             </div>
 
             <div className="flex justify-between text-sm">
@@ -133,7 +133,7 @@ export function OrderSummary({ items }: OrderSummaryProps) {
                 {shippingCost === 0 ? (
                   <span className="text-green-600 font-semibold">Free</span>
                 ) : (
-                  formatPrice(shippingCost, currency)
+                  formatPrice(shippingCost, currency, rates)
                 )}
               </span>
             </div>
@@ -141,7 +141,7 @@ export function OrderSummary({ items }: OrderSummaryProps) {
             {subtotal > 0 && subtotal < FREE_SHIPPING_THRESHOLD && (
               <div className="px-3 py-2 bg-blue-50 dark:bg-blue-950/30 rounded-md">
                 <p className="text-xs text-blue-800 dark:text-blue-300">
-                  Add {formatPrice(FREE_SHIPPING_THRESHOLD - subtotal, currency)} more for free shipping
+                  Add {formatPrice(FREE_SHIPPING_THRESHOLD - subtotal, currency, rates)} more for free shipping
                 </p>
               </div>
             )}
@@ -153,7 +153,7 @@ export function OrderSummary({ items }: OrderSummaryProps) {
               <div className="text-right">
                 <div className="text-xs text-muted-foreground mb-1">{currency}</div>
                 <div className="text-2xl font-bold text-brand-navy">
-                  {formatPrice(total, currency)}
+                  {formatPrice(total, currency, rates)}
                 </div>
               </div>
             </div>

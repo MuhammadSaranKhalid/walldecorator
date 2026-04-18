@@ -12,7 +12,7 @@ export function WishlistDrawer() {
   const { items, isOpen, closeWishlist, removeItem } = useWishlistStore()
   const { addItem: addToCart } = useCartStore()
   const { showSuccess } = useToastStore()
-  const { currency } = useCurrencyStore()
+  const { currency, rates } = useCurrencyStore()
 
   const handleMoveToCart = (item: typeof items[0]) => {
     addToCart({
@@ -99,10 +99,10 @@ export function WishlistDrawer() {
                       {item.variantDescription}
                     </div>
                     <div className="text-[var(--obsidian-gold)] text-[13px] mb-2.5 flex items-center gap-2">
-                      <span>{formatPrice(item.price, currency)}</span>
+                      <span>{formatPrice(item.price, currency, rates)}</span>
                       {item.oldPrice && (
                         <span className="text-[var(--obsidian-text-dim)] line-through text-xs">
-                          {formatPrice(item.oldPrice, currency)}
+                          {formatPrice(item.oldPrice, currency, rates)}
                         </span>
                       )}
                     </div>

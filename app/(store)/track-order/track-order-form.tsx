@@ -2,7 +2,8 @@
 
 import { useState, useTransition, useCallback } from 'react'
 import { trackOrder, type TrackOrderResult } from '@/actions/track-order'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice } from '@/lib/currency'
+import { useCurrencyStore } from '@/store/currency.store'
 
 // ─── Status Config ────────────────────────────────────────────────────────────
 
@@ -58,6 +59,7 @@ function getStepIndex(status: string) {
 // ─── Order Result Display ─────────────────────────────────────────────────────
 
 function OrderResult({ result }: { result: Extract<TrackOrderResult, { found: true }> }) {
+  const { currency, rates } = useCurrencyStore()
   const statusConfig = STATUS_CONFIG[result.status] ?? STATUS_CONFIG.pending
   const currentStepIndex = getStepIndex(result.status)
   const isCancelled = result.status === 'cancelled'
@@ -164,7 +166,7 @@ function OrderResult({ result }: { result: Extract<TrackOrderResult, { found: tr
                 <p className="text-xs text-muted-foreground mt-0.5">SKU: {item.sku} · Qty: {item.quantity}</p>
               </div>
               <p className="text-sm font-semibold text-foreground whitespace-nowrap">
-                {formatPrice(item.total_price)}
+                {formatPrice(Number(item.total_price), currency, rates)}
               </p>
             </div>
           ))}
@@ -173,15 +175,15 @@ function OrderResult({ result }: { result: Extract<TrackOrderResult, { found: tr
         <div className="px-5 py-4 bg-secondary/30 border-t border-border space-y-2">
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Subtotal</span>
-            <span>{formatPrice(result.subtotal)}</span>
+            <span>{formatPrice(Number(result.subtotal), currency, rates)}</span>
           </div>
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Shipping</span>
-            <span>{result.shipping_cost === 0 ? 'Free' : formatPrice(result.shipping_cost)}</span>
+            <span>{result.shipping_cost === 0 ? 'Free' : formatPrice(Number(result.shipping_cost), currency, rates)}</span>
           </div>
           <div className="flex justify-between text-sm font-bold text-foreground pt-2 border-t border-border">
             <span>Total</span>
-            <span>{formatPrice(result.total_amount)}</span>
+            <span>{formatPrice(Number(result.total_amount), currency, rates)}</span>
           </div>
         </div>
       </div>

@@ -1,7 +1,10 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { getStorageUrl } from '@/lib/supabase/storage'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice } from '@/lib/currency'
+import { useCurrencyStore } from '@/store/currency.store'
 import { blurhashToDataURL } from '@/lib/blurhash'
 
 type RelatedProduct = {
@@ -25,6 +28,8 @@ type RelatedProductsProps = {
 }
 
 export function RelatedProducts({ products }: RelatedProductsProps) {
+  const { currency, rates } = useCurrencyStore()
+
   if (products.length === 0) {
     return null
   }
@@ -66,11 +71,11 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
               {firstVariant ? (
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold">
-                    {formatPrice(firstVariant.price)}
+                    {formatPrice(firstVariant.price, currency, rates)}
                   </span>
                   {firstVariant.compare_at_price ? (
                     <span className="text-xs text-gray-400 line-through">
-                      {formatPrice(firstVariant.compare_at_price)}
+                      {formatPrice(firstVariant.compare_at_price, currency, rates)}
                     </span>
                   ) : null}
                 </div>

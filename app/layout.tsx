@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/seo/json-ld"
 import { I18nProvider } from "@/lib/i18n/provider"
 import { ThemeProvider } from "@/components/theme-provider"
 import { CurrencyProvider } from "@/components/obsidian/currency-provider"
+import { getRates } from "@/lib/rates"
 
 const cormorantGaramond = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -108,11 +109,15 @@ const organizationSchema = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const { rates, currencies } = await getRates()
+  console.log('RootLayout: fetched rates', rates)
+  console.log('RootLayout: fetched currencies', currencies)
+
   return (
     <html lang="en" className="obsidian-scrollbar" suppressHydrationWarning>
       <body className={`${cormorantGaramond.variable} ${dmSans.variable} font-[family-name:var(--font-dm-sans)] antialiased bg-[var(--obsidian-bg)] text-[var(--obsidian-text)] min-h-screen overflow-x-hidden obsidian-noise`}>
@@ -123,7 +128,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <I18nProvider>
-            <CurrencyProvider>
+            <CurrencyProvider initialRates={rates} initialCurrencyList={currencies}>
               <NuqsAdapter>
                 <JsonLd data={websiteSchema} />
                 <JsonLd data={organizationSchema} />

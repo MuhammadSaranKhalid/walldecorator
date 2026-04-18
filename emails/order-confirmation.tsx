@@ -37,6 +37,14 @@ interface ShippingAddress {
 }
 
 import { formatPrice as formatCurrencyPrice, type CurrencyCode } from "../lib/currency";
+import type { RatesMap } from "../lib/rates";
+
+// Fallback seed rates used when no live rates are passed (e.g., during preview)
+const FALLBACK_RATES: RatesMap = {
+    PKR: { id: 'base', rate: 1,        fetched_at: '' },
+    USD: { id: 'seed', rate: 0.003597, fetched_at: '' },
+    EUR: { id: 'seed', rate: 0.003333, fetched_at: '' },
+}
 
 interface OrderConfirmationEmailProps {
     orderNumber: string;
@@ -50,6 +58,7 @@ interface OrderConfirmationEmailProps {
     shippingAddress: ShippingAddress;
     trackingUrl?: string;
     currency?: CurrencyCode;
+    rates?: RatesMap;
 }
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -83,8 +92,10 @@ export const OrderConfirmationEmail = ({
     },
     trackingUrl,
     currency = 'PKR',
+    rates,
 }: OrderConfirmationEmailProps) => {
-    const formatPrice = (amount: number) => formatCurrencyPrice(amount, currency);
+    const liveRates = rates ?? FALLBACK_RATES
+    const formatPrice = (amount: number) => formatCurrencyPrice(amount, currency, liveRates);
     const previewText = `Order ${orderNumber} confirmed — Thank you for your purchase!`;
 
     return (

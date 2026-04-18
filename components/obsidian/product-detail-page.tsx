@@ -88,7 +88,7 @@ export function ObsidianProductDetailPage({ product }: ObsidianProductDetailPage
   const { addItem: addToCart, openCart } = useCartStore()
   const { toggleItem: toggleWishlist, isInWishlist } = useWishlistStore()
   const { showSuccess } = useToastStore()
-  const { currency } = useCurrencyStore()
+  const { currency, rates } = useCurrencyStore()
 
   const isWishlisted = isInWishlist(currentVariant?.id ?? product.id)
   const [showWallViewer, setShowWallViewer] = useState(false)
@@ -225,11 +225,11 @@ export function ObsidianProductDetailPage({ product }: ObsidianProductDetailPage
           {/* Price */}
           <div className="flex items-baseline gap-4 mb-7">
             <div className="font-[family-name:var(--font-cormorant)] text-[clamp(28px,5vw,40px)] font-light text-[var(--obsidian-gold)]">
-              {formatPrice(price, currency)}
+              {formatPrice(price, currency, rates)}
             </div>
             {compareAtPrice && compareAtPrice > price && (
               <div className="text-[clamp(15px,2.5vw,20px)] text-[var(--obsidian-text-dim)] line-through">
-                {formatPrice(compareAtPrice, currency)}
+                {formatPrice(compareAtPrice, currency, rates)}
               </div>
             )}
           </div>

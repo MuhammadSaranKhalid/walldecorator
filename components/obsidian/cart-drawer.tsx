@@ -28,7 +28,7 @@ function CartDrawerContent() {
   const { t } = useTranslation('common')
   const { isOpen, closeCart, items, getTotalItems, getTotalPrice, updateQuantity, removeItem } =
     useCartStore()
-  const { currency } = useCurrencyStore()
+  const { currency, rates } = useCurrencyStore()
   const router = useRouter()
 
   const total = getTotalPrice()
@@ -112,7 +112,7 @@ function CartDrawerContent() {
                         {item.variantDescription}
                       </div>
                       <div className="text-[var(--obsidian-gold)] text-[13px] mb-2.5">
-                        {formatPrice(item.price, currency)}
+                        {formatPrice(item.price, currency, rates)}
                       </div>
 
                       {/* Quantity controls */}
@@ -153,18 +153,18 @@ function CartDrawerContent() {
               <div className="mb-5">
                 <div className="flex justify-between text-xs text-[var(--obsidian-text-muted)] py-1.5 tracking-wide">
                   <span>{t('cart.subtotal')}</span>
-                  <span>{formatPrice(total, currency)}</span>
+                  <span>{formatPrice(total, currency, rates)}</span>
                 </div>
                 <div className="flex justify-between text-xs text-[var(--obsidian-text-muted)] py-1.5 tracking-wide">
                   <span>{t('cart.shipping')}</span>
                   <span className={shippingCost === 0 ? 'text-[var(--obsidian-gold)]' : ''}>
-                    {shippingCost === 0 ? t('cart.shippingFree') : formatPrice(shippingCost, currency)}
+                    {shippingCost === 0 ? t('cart.shippingFree') : formatPrice(shippingCost, currency, rates)}
                   </span>
                 </div>
                 <div className="flex justify-between font-[family-name:var(--font-cormorant)] text-xl pt-3.5 border-t border-[var(--obsidian-border)] mt-2">
                   <span>{t('cart.total')}</span>
                   <span className="text-[var(--obsidian-gold)]">
-                    {formatPrice(total + shippingCost, currency)}
+                    {formatPrice(total + shippingCost, currency, rates)}
                   </span>
                 </div>
               </div>

@@ -1,10 +1,12 @@
 import { relations } from 'drizzle-orm'
 import {
   categories,
+  currencies,
   custom_orders,
   discount_codes,
   discount_usages,
   email_logs,
+  exchange_rate_snapshots,
   images,
   inventory,
   inventory_transactions,
@@ -22,6 +24,21 @@ import {
   review_images,
   reviews,
 } from './schema'
+
+// ─── currencies ───────────────────────────────────────────────────────────────
+
+export const currenciesRelations = relations(currencies, ({ many }) => ({
+  exchange_rate_snapshots: many(exchange_rate_snapshots),
+}))
+
+// ─── exchange_rate_snapshots ─────────────────────────────────────────────────
+
+export const exchangeRateSnapshotsRelations = relations(exchange_rate_snapshots, ({ one }) => ({
+  currency: one(currencies, {
+    fields: [exchange_rate_snapshots.currency_code],
+    references: [currencies.code],
+  }),
+}))
 
 // ─── categories ──────────────────────────────────────────────────────────────
 
@@ -152,7 +169,7 @@ export const orderStatusHistoryRelations = relations(order_status_history, ({ on
 
 // ─── orders ──────────────────────────────────────────────────────────────────
 
-export const ordersRelations = relations(orders, ({ many }) => ({
+export const ordersRelations = relations(orders, ({ one, many }) => ({
   custom_orders: many(custom_orders),
   discount_usages: many(discount_usages),
   email_logs: many(email_logs),
@@ -161,6 +178,10 @@ export const ordersRelations = relations(orders, ({ many }) => ({
   payments: many(payments),
   refunds: many(refunds),
   reviews: many(reviews),
+  exchange_rate_snapshot: one(exchange_rate_snapshots, {
+    fields: [orders.exchange_rate_snapshot_id],
+    references: [exchange_rate_snapshots.id],
+  }),
 }))
 
 // ─── payments ────────────────────────────────────────────────────────────────

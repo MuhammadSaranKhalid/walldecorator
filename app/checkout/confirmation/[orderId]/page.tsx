@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation'
 import { CheckCircle2, Package, Phone, MapPin } from 'lucide-react'
 
 import { createServerClient } from '@/lib/supabase/server'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice } from '@/lib/currency'
+import { getRates } from '@/lib/rates'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
@@ -38,11 +39,13 @@ async function getOrderDetails(orderId: string) {
 
 export default async function OrderConfirmationPage({ params }: Props) {
   const { orderId } = await params
-  const order = await getOrderDetails(orderId)
+  const [order, { rates }] = await Promise.all([getOrderDetails(orderId), getRates()])
 
   if (!order) {
     notFound()
   }
+
+  const displayCurrency = (order as any).display_currency ?? 'PKR'
 
   const shippingAddress = order.shipping_address as {
     line1: string
@@ -132,7 +135,7 @@ export default async function OrderConfirmationPage({ params }: Props) {
                   <p className="text-sm text-muted-foreground">{item.variant_description}</p>
                   <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                 </div>
-                <p className="font-medium text-primary">{formatPrice(item.total_price)}</p>
+                <p className="font-medium text-primary">{formatPrice(Number(item.total_price), displayCurrency, rates)}</p>
               </div>
             ))}
 
@@ -141,7 +144,7 @@ export default async function OrderConfirmationPage({ params }: Props) {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span>{formatPrice(order.subtotal)}</span>
+                <span>{formatPrice(Number(order.subtotal), displayCurrency, rates)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Shipping</span>
@@ -149,14 +152,14 @@ export default async function OrderConfirmationPage({ params }: Props) {
                   {order.shipping_cost === 0 ? (
                     <span className="text-accent font-medium">Free</span>
                   ) : (
-                    formatPrice(order.shipping_cost)
+                    formatPrice(Number(order.shipping_cost), displayCurrency, rates)
                   )}
                 </span>
               </div>
               <Separator />
               <div className="flex justify-between font-semibold text-lg">
                 <span>Total</span>
-                <span>{formatPrice(order.total_amount)}</span>
+                <span>{formatPrice(Number(order.total_amount), displayCurrency, rates)}</span>
               </div>
             </div>
           </div>
@@ -205,7 +208,7 @@ export default async function OrderConfirmationPage({ params }: Props) {
             <li>Your order will be prepared and dispatched</li>
             <li>
               Please keep the exact payment amount ready (
-              <span className="font-medium">{formatPrice(order.total_amount)}</span>
+              <span className="font-medium">{formatPrice(Number(order.total_amount), displayCurrency, rates)}</span>
               )
             </li>
             <li>Pay the delivery person upon receiving your order</li>

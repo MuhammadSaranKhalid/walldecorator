@@ -15,6 +15,38 @@ import { sql } from 'drizzle-orm'
 // Helper for timestamptz(6) columns
 const tstz = (name: string) => timestamp(name, { withTimezone: true, mode: 'date', precision: 6 })
 
+// ─── currencies ───────────────────────────────────────────────────────────────
+// Static metadata per currency. Seeded once; rarely changes.
+
+export const currencies = pgTable('currencies', {
+  code: text('code').primaryKey(),             // 'PKR', 'USD', 'EUR'
+  symbol: text('symbol').notNull(),
+  name: text('name').notNull(),
+  flag: text('flag'),
+  locale: text('locale').notNull(),            // 'en-PK', 'en-US', 'de-DE'
+  decimals: integer('decimals').notNull().default(2),
+  is_base: boolean('is_base').notNull().default(false),
+  is_active: boolean('is_active').notNull().default(true),
+  display_order: integer('display_order').default(0),
+  created_at: tstz('created_at').notNull().defaultNow(),
+  updated_at: tstz('updated_at').notNull().defaultNow(),
+})
+
+// ─── exchange_rate_snapshots ──────────────────────────────────────────────────
+// Append-only log — every rate update (cron or manual) adds a row.
+// Current rate = latest row per currency_code (DISTINCT ON query).
+
+export const exchange_rate_snapshots = pgTable('exchange_rate_snapshots', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  currency_code: text('currency_code').notNull().references(() => currencies.code, { onDelete: 'cascade' }),
+  base_currency: text('base_currency').notNull().default('PKR'),
+  rate: numeric('rate', { precision: 18, scale: 8 }).notNull(), // 1 PKR = X of this currency
+  source: text('source').notNull(),            // 'cron_auto' | 'manual_override' | 'seed'
+  api_provider: text('api_provider'),          // 'exchangerate-api' | null for manual
+  fetched_at: tstz('fetched_at').notNull(),
+  created_at: tstz('created_at').notNull().defaultNow(),
+})
+
 // ─── images ───────────────────────────────────────────────────────────────────
 // Defined first — referenced by categories, custom_orders, product_images, review_images
 
@@ -199,6 +231,8 @@ export const orders = pgTable('orders', {
   tax_amount: numeric('tax_amount', { precision: 10, scale: 2 }).default('0'),
   total_amount: numeric('total_amount', { precision: 10, scale: 2 }).notNull(),
   currency: text('currency').notNull().default('PKR'),
+  display_currency: text('display_currency').notNull().default('PKR'),
+  exchange_rate_snapshot_id: uuid('exchange_rate_snapshot_id').references(() => exchange_rate_snapshots.id, { onDelete: 'set null' }),
   payment_status: text('payment_status').default('pending'),
   payment_intent_id: text('payment_intent_id').unique(),
   payment_method: text('payment_method'),
