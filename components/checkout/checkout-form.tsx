@@ -45,7 +45,7 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
   const amountInPaisa = useMemo(() => {
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
     const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST
-    return Math.round((subtotal + shipping) * 100)
+    return Math.max(1, Math.round((subtotal + shipping) * 100))
   }, [items])
 
   const methods = useForm<CheckoutFormData>({
