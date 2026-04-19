@@ -9,11 +9,11 @@ export const revalidate = 60;
 
 // SEO metadata
 export const metadata = {
-  title: "Shop Wall Art | OBSIDIAN",
+  title: "Shop Wall Art | Wall Decorator",
   description:
     "Shop our curated collection of premium laser-cut wall art. Explore anime, movies, gaming, nature and more. Free shipping over Rs. 5,000.",
   openGraph: {
-    title: "Shop Wall Art | OBSIDIAN",
+    title: "Shop Wall Art | Wall Decorator",
     description:
       "Shop our curated collection of premium laser-cut wall art. Explore anime, movies, gaming, nature and more.",
     type: "website",
@@ -22,7 +22,7 @@ export const metadata = {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "OBSIDIAN — Wall Art Collection",
+        alt: "Wall Decorator — Wall Art Collection",
       },
     ],
   },

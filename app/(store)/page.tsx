@@ -7,14 +7,14 @@ import { getProducts, getProductCategories } from '@/queries/products'
 import { getHomepageData } from '@/queries/home'
 
 export const metadata: Metadata = {
-  title: 'OBSIDIAN — Wall Art & Decor',
+  title: 'Wall Decorator — Modern Wall Art',
   description:
     'Precision-crafted laser-cut designs that turn your walls into a gallery. Premium materials, custom sizes. Free shipping over Rs. 5,000.',
   openGraph: {
-    title: 'OBSIDIAN — Wall Art & Decor',
+    title: 'Wall Decorator — Modern Wall Art',
     description: 'Precision-crafted laser-cut wall art. Premium materials, custom sizes.',
     type: 'website',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'OBSIDIAN — Wall Art & Decor' }],
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Wall Decorator — Modern Wall Art' }],
   },
 }
 

@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
 
     // Send email via Resend
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || "WallDecorator <orders@walldecorator.pk>",
+      from: process.env.RESEND_FROM_EMAIL || "Wall Decorator <orders@walldecorator.store>",
       to: order.customer_email,
       subject: `Order Confirmed - ${order.order_number}`,
       html: emailHtml,

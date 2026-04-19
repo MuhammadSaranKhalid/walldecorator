@@ -47,7 +47,7 @@ export function DeliveryMap({ addressQueryOptions, addressLabel }: Props) {
                             `https://nominatim.openstreetmap.org/search?${params.toString()}`,
                             {
                                 headers: {
-                                    'User-Agent': 'WallDecorator/1.0 (walldecorator.com)',
+                                    'User-Agent': 'WallDecorator/1.0 (walldecorator.store)',
                                     'Accept-Language': 'en-US,en;q=0.9',
                                 },
                             }

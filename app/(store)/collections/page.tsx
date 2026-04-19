@@ -3,14 +3,14 @@ import { CollectionsPageContent } from '@/components/obsidian/collections-page'
 import { getCollections } from '@/queries/collections'
 
 export const metadata = {
-  title: 'Collections | OBSIDIAN',
+  title: 'Collections | Wall Decorator',
   description:
     'Explore our curated collections of laser-cut wall art. From anime legends to nature & wildlife - discover precision-crafted designs for every passion.',
   openGraph: {
-    title: 'Collections | OBSIDIAN',
+    title: 'Collections | Wall Decorator',
     description: 'Explore our curated collections of laser-cut wall art.',
     type: 'website',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'OBSIDIAN — Collections' }],
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Wall Decorator — Collections' }],
   },
 }
 

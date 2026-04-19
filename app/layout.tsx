@@ -21,7 +21,7 @@ const dmSans = DM_Sans({
   weight: ["300", "400", "500"],
 })
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://walldecorator.com"
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.walldecorator.store"
 
 // ─── Viewport (must be separate from metadata in Next.js 14+) ─────────────────
 export const viewport: Viewport = {

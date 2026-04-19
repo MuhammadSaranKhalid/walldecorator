@@ -264,8 +264,8 @@ export const OrderConfirmationEmail = ({
                         </Link>
                         <Text style={footerText}>
                             If you have any questions about your order, please contact us at{" "}
-                            <Link href="mailto:support@walldecorator.pk" style={footerLink}>
-                                support@walldecorator.pk
+                            <Link href="mailto:support@walldecorator.store" style={footerLink}>
+                                support@walldecorator.store
                             </Link>
                         </Text>
                         <Text style={footerCopyright}>
