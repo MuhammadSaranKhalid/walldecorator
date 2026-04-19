@@ -115,8 +115,6 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const { rates, currencies } = await getRates()
-  console.log('RootLayout: fetched rates', rates)
-  console.log('RootLayout: fetched currencies', currencies)
 
   return (
     <html lang="en" className="obsidian-scrollbar" suppressHydrationWarning>
