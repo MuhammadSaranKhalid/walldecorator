@@ -138,7 +138,7 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
   return (
     <div className="w-full">
       {/* Header with Logo */}
-      <div className="border-b bg-background">
+      <div className="border-b border-[var(--obsidian-border)] bg-[var(--obsidian-bg)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center">
@@ -150,16 +150,16 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
                 className="h-12 w-auto"
               />
             </Link>
-            <nav className="hidden lg:flex items-center text-sm text-muted-foreground">
-              <Link href="/" className="hover:text-primary transition-colors">
+            <nav className="hidden lg:flex items-center text-sm text-[var(--obsidian-text-muted)]">
+              <Link href="/" className="hover:text-[var(--obsidian-gold)] transition-colors">
                 Home
               </Link>
               <ChevronRight className="h-4 w-4 mx-2" />
-              <Link href="/products" className="hover:text-primary transition-colors">
+              <Link href="/products" className="hover:text-[var(--obsidian-gold)] transition-colors">
                 Shop
               </Link>
               <ChevronRight className="h-4 w-4 mx-2" />
-              <span className="text-primary font-medium">Checkout</span>
+              <span className="text-[var(--obsidian-gold)] font-medium">Checkout</span>
             </nav>
           </div>
         </div>
@@ -173,7 +173,7 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
               <div className="order-2 lg:order-1 px-4 py-6 lg:px-0">
                 <Link
                   href="/products"
-                  className="hidden lg:inline-flex items-center text-sm text-brand-navy hover:text-brand-gold transition-colors mb-6"
+                  className="hidden lg:inline-flex items-center text-sm text-[var(--obsidian-text-muted)] hover:text-[var(--obsidian-gold)] transition-colors mb-6"
                 >
                   <ShoppingCart className="h-4 w-4 mr-2" />
                   Continue shopping
@@ -193,9 +193,9 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
 
                   {/* Order Notes */}
                   <div className="space-y-4">
-                    <div className="pb-2 border-b">
-                      <h2 className="text-xl font-semibold text-primary">Order Notes</h2>
-                      <p className="text-sm text-muted-foreground mt-1">
+                    <div className="pb-2 border-b border-[var(--obsidian-border)]">
+                      <h2 className="text-xl font-semibold text-[var(--obsidian-gold)]">Order Notes</h2>
+                      <p className="text-sm text-[var(--obsidian-text-muted)] mt-1">
                         Add any special instructions for your order (optional)
                       </p>
                     </div>
@@ -235,7 +235,7 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
                   <Button
                     type="submit"
                     size="lg"
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                    className="w-full bg-[var(--obsidian-gold)] hover:bg-[var(--obsidian-gold-light)] text-[var(--obsidian-bg)] font-[family-name:var(--font-dm-sans)] tracking-[0.1em] uppercase text-[11px]"
                     disabled={isSubmitting || items.length === 0}
                   >
                     {isSubmitting ? (
@@ -251,7 +251,7 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
                     )}
                   </Button>
 
-                  <div className="flex items-center justify-center gap-4 text-xs text-gray-500 pt-4">
+                  <div className="flex items-center justify-center gap-4 text-xs text-[var(--obsidian-text-muted)] pt-4">
                     <div className="flex items-center gap-1">
                       <Lock className="h-3 w-3" />
                       <span>Secure Checkout</span>

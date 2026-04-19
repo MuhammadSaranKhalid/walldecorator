@@ -3,30 +3,22 @@
 import { MapPin } from 'lucide-react'
 import { useFormContext, Controller } from 'react-hook-form'
 import type { CheckoutFormData } from '@/lib/validations/checkout'
-import { PAKISTAN_PROVINCES } from '@/lib/constants'
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 export function ShippingSection() {
   const { control } = useFormContext<CheckoutFormData>()
 
   return (
     <div className="space-y-4">
-      <div className="pb-2 border-b">
-        <h2 className="text-xl font-semibold">Delivery</h2>
-        <p className="text-sm text-muted-foreground mt-1">
+      <div className="pb-2 border-b border-[var(--obsidian-border)]">
+        <h2 className="text-xl font-semibold text-[var(--obsidian-gold)]">Delivery</h2>
+        <p className="text-sm text-[var(--obsidian-text-muted)] mt-1">
           Where should we deliver your order?
         </p>
       </div>
 
-      <div className="space-y-4 bg-card rounded-lg border p-6">
+      <div className="space-y-4 bg-[var(--obsidian-surface)] border border-[var(--obsidian-border)] p-6">
         <Controller
           name="shipping.line1"
           control={control}
@@ -111,25 +103,15 @@ export function ShippingSection() {
                 <FieldLabel htmlFor={field.name} className="text-sm font-medium">
                   Province
                 </FieldLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger
-                    id={field.name}
-                    className="h-11"
-                    aria-invalid={fieldState.invalid}
-                  >
-                    <SelectValue placeholder="Select province" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PAKISTAN_PROVINCES.map((province) => (
-                      <SelectItem key={province} value={province}>
-                        {province}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="text"
+                  placeholder="Punjab"
+                  className="h-11"
+                  autoComplete="address-level1"
+                  aria-invalid={fieldState.invalid}
+                />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}

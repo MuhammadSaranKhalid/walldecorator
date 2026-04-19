@@ -17,7 +17,7 @@ export function OrderItem({ item, currency, rates }: OrderItemProps) {
   return (
     <div className="flex gap-3 py-3">
       <div className="relative h-16 w-16 shrink-0">
-        <div className="h-full w-full overflow-hidden rounded-md border border-border bg-card">
+        <div className="h-full w-full overflow-hidden border border-[var(--obsidian-border)] bg-[var(--obsidian-surface)]">
           {item.image ? (
             <Image
               src={item.image.url}
@@ -29,22 +29,22 @@ export function OrderItem({ item, currency, rates }: OrderItemProps) {
               {...(blurUrl ? { placeholder: 'blur', blurDataURL: blurUrl } : {})}
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground text-xs">
+            <div className="flex h-full w-full items-center justify-center bg-[var(--obsidian-surface2)] text-[var(--obsidian-text-muted)] text-xs">
               No image
             </div>
           )}
         </div>
-        <div className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-muted-foreground text-xs font-medium text-background border-2 border-background shadow-sm z-10">
+        <div className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--obsidian-gold)] text-xs font-medium text-[var(--obsidian-bg)] border-2 border-[var(--obsidian-bg)] shadow-sm z-10">
           {item.quantity}
         </div>
       </div>
 
       <div className="flex flex-1 items-start justify-between gap-3 min-w-0">
         <div className="flex-1 min-w-0">
-          <h3 className="font-normal text-sm text-foreground leading-tight">{item.productName}</h3>
-          <p className="text-xs text-muted-foreground mt-1">{item.variantDescription}</p>
+          <h3 className="font-normal text-sm text-[var(--obsidian-text)] leading-tight">{item.productName}</h3>
+          <p className="text-xs text-[var(--obsidian-text-muted)] mt-1">{item.variantDescription}</p>
         </div>
-        <p className="text-sm font-medium text-foreground shrink-0">
+        <p className="text-sm font-medium text-[var(--obsidian-text)] shrink-0">
           {formatPrice(item.price * item.quantity, currency, rates)}
         </p>
       </div>

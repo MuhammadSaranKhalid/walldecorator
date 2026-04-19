@@ -42,27 +42,27 @@ export function OrderSummary({ items }: OrderSummaryProps) {
   }
 
   return (
-    <div className="bg-card lg:rounded-lg lg:border border-border overflow-hidden">
+    <div className="bg-[var(--obsidian-surface)] lg:border border-[var(--obsidian-border)] overflow-hidden">
       {/* Mobile Toggle Button - Only visible on mobile */}
       <button
         type="button"
         onClick={() => setIsSummaryExpanded(!isSummaryExpanded)}
-        className="lg:hidden w-full flex items-center justify-between p-4 bg-muted border-b border-border hover:bg-muted/80 transition-colors"
+        className="lg:hidden w-full flex items-center justify-between p-4 bg-[var(--obsidian-surface2)] border-b border-[var(--obsidian-border)] hover:bg-[var(--obsidian-surface2)]/80 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <ShoppingBag className="h-5 w-5 text-brand-navy" />
+          <ShoppingBag className="h-5 w-5 text-[var(--obsidian-gold)]" />
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-foreground">
               {isSummaryExpanded ? 'Hide' : 'Show'} order summary
             </span>
             {isSummaryExpanded ? (
-              <ChevronUp className="h-4 w-4 text-muted-foreground" />
+              <ChevronUp className="h-4 w-4 text-[var(--obsidian-text-muted)]" />
             ) : (
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              <ChevronDown className="h-4 w-4 text-[var(--obsidian-text-muted)]" />
             )}
           </div>
         </div>
-        <div className="text-lg font-bold text-brand-navy">
+        <div className="text-lg font-bold text-[var(--obsidian-gold)]">
           {formatPrice(total, currency, rates)}
         </div>
       </button>
@@ -70,11 +70,11 @@ export function OrderSummary({ items }: OrderSummaryProps) {
       {/* Order Summary Content - Hidden on mobile unless expanded */}
       <div className={`${isSummaryExpanded ? 'block' : 'hidden'} lg:block`}>
         {/* Order items */}
-        <div className="p-6 bg-muted/30">
-          <h2 className="hidden lg:block text-lg font-semibold mb-4 text-foreground">Order Summary</h2>
+        <div className="p-6 bg-[var(--obsidian-bg)]/40">
+          <h2 className="hidden lg:block text-lg font-semibold mb-4 text-[var(--obsidian-text)]">Order Summary</h2>
           <div className="max-h-[400px] overflow-y-auto -mx-2 px-2">
             {items.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">Your cart is empty</p>
+              <p className="text-center text-[var(--obsidian-text-muted)] py-8">Your cart is empty</p>
             ) : (
               <div className="space-y-0">
                 {items.map((item) => (
@@ -93,7 +93,7 @@ export function OrderSummary({ items }: OrderSummaryProps) {
             <button
               type="button"
               onClick={() => setShowDiscountField(true)}
-              className="flex items-center gap-2 text-sm text-brand-navy hover:text-brand-gold transition-colors"
+              className="flex items-center gap-2 text-sm text-[var(--obsidian-gold)] hover:text-brand-gold transition-colors"
             >
               <Tag className="h-4 w-4" />
               <span>Add discount code</span>
@@ -123,12 +123,12 @@ export function OrderSummary({ items }: OrderSummaryProps) {
           {/* Price breakdown */}
           <div className="space-y-3">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal</span>
+              <span className="text-[var(--obsidian-text-muted)]">Subtotal</span>
               <span className="font-medium">{formatPrice(subtotal, currency, rates)}</span>
             </div>
 
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Shipping</span>
+              <span className="text-[var(--obsidian-text-muted)]">Shipping</span>
               <span className="font-medium">
                 {shippingCost === 0 ? (
                   <span className="text-green-600 font-semibold">Free</span>
@@ -144,8 +144,8 @@ export function OrderSummary({ items }: OrderSummaryProps) {
             <div className="flex justify-between items-center pt-2">
               <span className="text-base font-semibold">Total</span>
               <div className="text-right">
-                <div className="text-xs text-muted-foreground mb-1">{currency}</div>
-                <div className="text-2xl font-bold text-brand-navy">
+                <div className="text-xs text-[var(--obsidian-text-muted)] mb-1">{currency}</div>
+                <div className="text-2xl font-bold text-[var(--obsidian-gold)]">
                   {formatPrice(total, currency, rates)}
                 </div>
               </div>

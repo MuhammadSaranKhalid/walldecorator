@@ -12,9 +12,7 @@ export type PaymentMethod = 'cod' | 'card'
 type PaymentSectionProps = {
   paymentMethod: PaymentMethod
   onPaymentMethodChange: (method: PaymentMethod) => void
-  /** Cart total in PKR paisa (integer). Required for Stripe Elements amount hint. */
   amountInPaisa: number
-  /** Ref forwarded to StripeCardSection for triggering confirmPayment() */
   stripeRef: RefObject<StripeCardSectionRef | null>
 }
 
@@ -31,81 +29,82 @@ export function PaymentSection({
     amount: amountInPaisa,
     currency: 'pkr',
     appearance: {
-      theme: 'stripe',
+      theme: 'night',
       variables: {
-        colorPrimary: '#1a2e4a', // brand-navy
-        borderRadius: '8px',
+        colorPrimary: '#c9a84c',
+        colorBackground: '#111111',
+        colorText: '#f0ece4',
+        borderRadius: '0px',
       },
     },
   }
 
   return (
     <div className="space-y-4">
-      <div className="pb-2 border-b">
-        <h2 className="text-xl font-semibold">Payment</h2>
-        <p className="text-sm text-muted-foreground mt-1">
+      <div className="pb-2 border-b border-[var(--obsidian-border)]">
+        <h2 className="text-xl font-semibold text-[var(--obsidian-gold)]">Payment</h2>
+        <p className="text-sm text-[var(--obsidian-text-muted)] mt-1">
           All transactions are secure and encrypted
         </p>
       </div>
 
-      {/* Payment method selector */}
       <div className="space-y-3">
-        {/* Cash on Delivery option */}
+        {/* Cash on Delivery */}
         <button
           type="button"
           onClick={() => onPaymentMethodChange('cod')}
-          className={`w-full rounded-lg border p-4 text-left transition-colors ${
+          className={`w-full border p-4 text-left transition-colors ${
             paymentMethod === 'cod'
-              ? 'border-brand-navy bg-brand-navy/5 ring-1 ring-brand-navy'
-              : 'border-border bg-card hover:border-brand-navy/50'
+              ? 'border-[var(--obsidian-gold)] bg-[var(--obsidian-gold)]/10'
+              : 'border-[var(--obsidian-border)] bg-[var(--obsidian-surface)] hover:border-[var(--obsidian-gold)]/50'
           }`}
         >
           <div className="flex items-center gap-3">
             <div
               className={`flex h-5 w-5 items-center justify-center rounded-full border-2 shrink-0 ${
                 paymentMethod === 'cod'
-                  ? 'border-brand-navy bg-brand-navy'
-                  : 'border-muted-foreground'
+                  ? 'border-[var(--obsidian-gold)] bg-[var(--obsidian-gold)]'
+                  : 'border-[var(--obsidian-text-muted)]'
               }`}
             >
               {paymentMethod === 'cod' && (
-                <div className="h-2 w-2 rounded-full bg-white" />
+                <div className="h-2 w-2 rounded-full bg-[var(--obsidian-bg)]" />
               )}
             </div>
-            <Banknote className="h-5 w-5 text-brand-navy shrink-0" />
+            <Banknote className="h-5 w-5 text-[var(--obsidian-gold)] shrink-0" />
             <div>
-              <p className="font-semibold text-sm">Cash on Delivery</p>
-              <p className="text-xs text-muted-foreground">Pay when your order arrives</p>
+              <p className="font-semibold text-sm text-[var(--obsidian-text)]">Cash on Delivery</p>
+              <p className="text-xs text-[var(--obsidian-text-muted)]">Pay when your order arrives</p>
             </div>
           </div>
         </button>
 
-        {/* Card Payment option */}
+        {/* Card Payment */}
         <button
           type="button"
           onClick={() => onPaymentMethodChange('card')}
-          className={`w-full rounded-lg border p-4 text-left transition-colors ${
+          className={`w-full border p-4 text-left transition-colors ${
             paymentMethod === 'card'
-              ? 'border-brand-navy bg-brand-navy/5 ring-1 ring-brand-navy'
-              : 'border-border bg-card hover:border-brand-navy/50'
+              ? 'border-[var(--obsidian-gold)] bg-[var(--obsidian-gold)]/10'
+              : 'border-[var(--obsidian-border)] bg-[var(--obsidian-surface)] hover:border-[var(--obsidian-gold)]/50'
           }`}
         >
           <div className="flex items-center gap-3">
             <div
               className={`flex h-5 w-5 items-center justify-center rounded-full border-2 shrink-0 ${
                 paymentMethod === 'card'
-                  ? 'border-brand-navy bg-brand-navy'
-                  : 'border-muted-foreground'
+                  ? 'border-[var(--obsidian-gold)] bg-[var(--obsidian-gold)]'
+                  : 'border-[var(--obsidian-text-muted)]'
               }`}
             >
               {paymentMethod === 'card' && (
-                <div className="h-2 w-2 rounded-full bg-white" />
+                <div className="h-2 w-2 rounded-full bg-[var(--obsidian-bg)]" />
               )}
             </div>
-            <CreditCard className="h-5 w-5 text-brand-navy shrink-0" />
+            <CreditCard className="h-5 w-5 text-[var(--obsidian-gold)] shrink-0" />
             <div>
-              <p className="font-semibold text-sm">Credit / Debit Card</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="font-semibold text-sm text-[var(--obsidian-text)]">Credit / Debit Card</p>
+              <p className="text-xs text-[var(--obsidian-text-muted)]">
                 Visa, Mastercard, and more — secured by Stripe
               </p>
             </div>
@@ -115,17 +114,17 @@ export function PaymentSection({
 
       {/* COD note */}
       {paymentMethod === 'cod' && (
-        <div className="rounded-md bg-blue-50 border border-blue-100 p-4">
-          <p className="text-sm text-blue-900">
-            <span className="font-semibold">Note:</span> Please have the exact amount
+        <div className="bg-[var(--obsidian-surface)] border border-[var(--obsidian-border)] p-4">
+          <p className="text-sm text-[var(--obsidian-text-muted)]">
+            <span className="font-semibold text-[var(--obsidian-text)]">Note:</span> Please have the exact amount
             ready when the delivery person arrives.
           </p>
         </div>
       )}
 
-      {/* Stripe card form — only mounts when card is selected */}
+      {/* Stripe card form */}
       {paymentMethod === 'card' && (
-        <div className="rounded-lg border bg-card p-4 space-y-4">
+        <div className="border border-[var(--obsidian-border)] bg-[var(--obsidian-surface)] p-4 space-y-4">
           <Elements stripe={stripePromise} options={elementsOptions}>
             <StripeCardSection ref={stripeRef} />
           </Elements>

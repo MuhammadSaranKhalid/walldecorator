@@ -11,14 +11,14 @@ export function ContactSection() {
 
   return (
     <div className="space-y-4">
-      <div className="pb-2 border-b">
-        <h2 className="text-xl font-semibold">Contact Information</h2>
-        <p className="text-sm text-muted-foreground mt-1">
+      <div className="pb-2 border-b border-[var(--obsidian-border)]">
+        <h2 className="text-xl font-semibold text-[var(--obsidian-gold)]">Contact Information</h2>
+        <p className="text-sm text-[var(--obsidian-text-muted)] mt-1">
           We'll use this to send you order updates
         </p>
       </div>
 
-      <div className="space-y-4 bg-card rounded-lg border p-6">
+      <div className="space-y-4 bg-[var(--obsidian-surface)] border border-[var(--obsidian-border)] p-6">
         <Controller
           name="email"
           control={control}

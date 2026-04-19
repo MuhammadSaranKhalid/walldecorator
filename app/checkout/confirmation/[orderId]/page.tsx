@@ -6,7 +6,6 @@ import { createServerClient } from '@/lib/supabase/server'
 import { formatPrice } from '@/lib/currency'
 import { getRates } from '@/lib/rates'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { DeliveryMap } from '@/components/checkout/delivery-map'
 
@@ -56,15 +55,12 @@ export default async function OrderConfirmationPage({ params }: Props) {
     country: string
   }
 
-  // Geocoding query fallbacks (from most specific to least specific)
-  // Nominatim often fails on highly specific house addresses in some countries.
   const addressQueryOptions = Array.from(new Set([
     [shippingAddress.line1, shippingAddress.city, shippingAddress.province, shippingAddress.country].filter(Boolean).join(', '),
     [shippingAddress.city, shippingAddress.province, shippingAddress.country].filter(Boolean).join(', '),
     [shippingAddress.city, shippingAddress.country].filter(Boolean).join(', '),
   ].filter(Boolean)))
 
-  // Human-readable label for the map banner
   const addressLabel = [
     shippingAddress.line1,
     shippingAddress.city,
@@ -74,35 +70,33 @@ export default async function OrderConfirmationPage({ params }: Props) {
     .join(', ')
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      {/* Success header */}
-      <div className="text-center mb-8">
-        <div className="flex justify-center mb-4">
-          <div className="rounded-full bg-accent/20 p-4">
-            <CheckCircle2 className="h-12 w-12 text-accent" />
+    <div className="min-h-screen bg-[var(--obsidian-bg)]">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Success header */}
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <div className="rounded-full bg-[var(--obsidian-gold)]/20 p-4">
+              <CheckCircle2 className="h-12 w-12 text-[var(--obsidian-gold)]" />
+            </div>
           </div>
+          <h1 className="text-3xl font-bold text-[var(--obsidian-gold)] mb-2">Order Confirmed!</h1>
+          <p className="text-[var(--obsidian-text-muted)]">
+            Thank you for your order. We've sent a confirmation to{' '}
+            <span className="font-medium text-[var(--obsidian-text)]">{order.customer_email}</span>
+          </p>
         </div>
-        <h1 className="text-3xl font-bold text-primary mb-2">Order Confirmed!</h1>
-        <p className="text-muted-foreground">
-          Thank you for your order. We've sent a confirmation to{' '}
-          <span className="font-medium text-foreground">{order.customer_email}</span>
-        </p>
-      </div>
 
-      {/* Order number */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-lg">Order Details</CardTitle>
-        </CardHeader>
-        <CardContent>
+        {/* Order number */}
+        <div className="bg-[var(--obsidian-surface)] border border-[var(--obsidian-border)] p-6 mb-6">
+          <h2 className="text-lg font-semibold text-[var(--obsidian-text)] mb-4">Order Details</h2>
           <div className="space-y-2">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Order Number</span>
-              <span className="font-mono font-medium">{order.order_number}</span>
+              <span className="text-[var(--obsidian-text-muted)]">Order Number</span>
+              <span className="font-mono font-medium text-[var(--obsidian-text)]">{order.order_number}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Order Date</span>
-              <span className="font-medium">
+              <span className="text-[var(--obsidian-text-muted)]">Order Date</span>
+              <span className="font-medium text-[var(--obsidian-text)]">
                 {new Date(order.created_at).toLocaleDateString('en-PK', {
                   year: 'numeric',
                   month: 'long',
@@ -111,31 +105,27 @@ export default async function OrderConfirmationPage({ params }: Props) {
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Payment Method</span>
-              <span className="font-medium">Cash on Delivery</span>
+              <span className="text-[var(--obsidian-text-muted)]">Payment Method</span>
+              <span className="font-medium text-[var(--obsidian-text)]">Cash on Delivery</span>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Order items */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Package className="h-5 w-5" />
+        {/* Order items */}
+        <div className="bg-[var(--obsidian-surface)] border border-[var(--obsidian-border)] p-6 mb-6">
+          <h2 className="text-lg font-semibold text-[var(--obsidian-text)] mb-4 flex items-center gap-2">
+            <Package className="h-5 w-5 text-[var(--obsidian-gold)]" />
             Items Ordered
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </h2>
           <div className="space-y-4">
             {order.order_items.map((item: any) => (
               <div key={item.id} className="flex justify-between items-start">
                 <div className="flex-1">
-                  <p className="font-medium">{item.product_name}</p>
-                  <p className="text-sm text-muted-foreground">{item.variant_description}</p>
-                  <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                  <p className="font-medium text-[var(--obsidian-text)]">{item.product_name}</p>
+                  <p className="text-sm text-[var(--obsidian-text-muted)]">{item.variant_description}</p>
+                  <p className="text-sm text-[var(--obsidian-text-muted)]">Qty: {item.quantity}</p>
                 </div>
-                <p className="font-medium text-primary">{formatPrice(Number(item.total_price), displayCurrency, rates)}</p>
+                <p className="font-medium text-[var(--obsidian-gold)]">{formatPrice(Number(item.total_price), displayCurrency, rates)}</p>
               </div>
             ))}
 
@@ -143,39 +133,35 @@ export default async function OrderConfirmationPage({ params }: Props) {
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span>{formatPrice(Number(order.subtotal), displayCurrency, rates)}</span>
+                <span className="text-[var(--obsidian-text-muted)]">Subtotal</span>
+                <span className="text-[var(--obsidian-text)]">{formatPrice(Number(order.subtotal), displayCurrency, rates)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Shipping</span>
+                <span className="text-[var(--obsidian-text-muted)]">Shipping</span>
                 <span>
                   {order.shipping_cost === 0 ? (
-                    <span className="text-accent font-medium">Free</span>
+                    <span className="text-[var(--obsidian-gold)] font-medium">Free</span>
                   ) : (
-                    formatPrice(Number(order.shipping_cost), displayCurrency, rates)
+                    <span className="text-[var(--obsidian-text)]">{formatPrice(Number(order.shipping_cost), displayCurrency, rates)}</span>
                   )}
                 </span>
               </div>
               <Separator />
               <div className="flex justify-between font-semibold text-lg">
-                <span>Total</span>
-                <span>{formatPrice(Number(order.total_amount), displayCurrency, rates)}</span>
+                <span className="text-[var(--obsidian-text)]">Total</span>
+                <span className="text-[var(--obsidian-gold)]">{formatPrice(Number(order.total_amount), displayCurrency, rates)}</span>
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Shipping address */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <MapPin className="h-5 w-5" />
+        {/* Shipping address */}
+        <div className="bg-[var(--obsidian-surface)] border border-[var(--obsidian-border)] p-6 mb-6">
+          <h2 className="text-lg font-semibold text-[var(--obsidian-text)] mb-4 flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-[var(--obsidian-gold)]" />
             Shipping Address
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-sm">
+          </h2>
+          <div className="text-sm text-[var(--obsidian-text)]">
             <p className="font-medium">{order.customer_name}</p>
             <p className="mt-1">{shippingAddress.line1}</p>
             {shippingAddress.line2 && <p>{shippingAddress.line2}</p>}
@@ -184,46 +170,51 @@ export default async function OrderConfirmationPage({ params }: Props) {
               {shippingAddress.postal_code}
             </p>
             <p>{shippingAddress.country}</p>
-            <p className="mt-2 flex items-center gap-2">
+            <p className="mt-2 flex items-center gap-2 text-[var(--obsidian-text-muted)]">
               <Phone className="h-4 w-4" />
               {order.customer_phone}
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Delivery map */}
-      <div className="mb-6">
-        <DeliveryMap addressQueryOptions={addressQueryOptions} addressLabel={addressLabel} />
-      </div>
+        {/* Delivery map */}
+        <div className="mb-6">
+          <DeliveryMap addressQueryOptions={addressQueryOptions} addressLabel={addressLabel} />
+        </div>
 
-      {/* What's next */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="text-lg">What's Next?</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
+        {/* What's next */}
+        <div className="bg-[var(--obsidian-surface)] border border-[var(--obsidian-border)] p-6 mb-8">
+          <h2 className="text-lg font-semibold text-[var(--obsidian-text)] mb-4">What's Next?</h2>
+          <ol className="list-decimal list-inside space-y-2 text-sm text-[var(--obsidian-text-muted)]">
             <li>You will receive a confirmation call from our team soon</li>
             <li>Your order will be prepared and dispatched</li>
             <li>
               Please keep the exact payment amount ready (
-              <span className="font-medium">{formatPrice(Number(order.total_amount), displayCurrency, rates)}</span>
+              <span className="font-medium text-[var(--obsidian-text)]">{formatPrice(Number(order.total_amount), displayCurrency, rates)}</span>
               )
             </li>
             <li>Pay the delivery person upon receiving your order</li>
           </ol>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Action buttons */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-center">
-        <Button asChild size="lg">
-          <Link href="/">Continue Shopping</Link>
-        </Button>
-        <Button asChild variant="outline" size="lg">
-          <Link href="/products">Browse Products</Link>
-        </Button>
+        {/* Action buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button
+            asChild
+            size="lg"
+            className="bg-[var(--obsidian-gold)] hover:bg-[var(--obsidian-gold-light)] text-[var(--obsidian-bg)] font-[family-name:var(--font-dm-sans)] tracking-[0.1em] uppercase text-[11px]"
+          >
+            <Link href="/">Continue Shopping</Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            size="lg"
+            className="border-[var(--obsidian-border)] text-[var(--obsidian-text)] hover:border-[var(--obsidian-gold)] hover:text-[var(--obsidian-gold)]"
+          >
+            <Link href="/products">Browse Products</Link>
+          </Button>
+        </div>
       </div>
     </div>
   )

@@ -18,7 +18,7 @@ export default async function CheckoutPage() {
   const userAgent = headersList.get('user-agent') || 'unknown'
 
   return (
-    <div className="min-h-screen bg-secondary/30">
+    <div className="min-h-screen bg-[var(--obsidian-bg)]">
       <Suspense fallback={<CheckoutSkeleton />}>
         <CheckoutForm ipAddress={ipAddress} userAgent={userAgent} />
       </Suspense>
