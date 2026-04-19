@@ -8,9 +8,6 @@ export function MaterialStrip() {
   const materials = [
     { icon: '⚙️', key: 'materials.precisionLaserCut' },
     { icon: '🔩', key: 'materials.powderCoatedSteel' },
-    { icon: '🪵', key: 'materials.solidHardwood' },
-    { icon: '💎', key: 'materials.acrylicResin' },
-    { icon: '📦', key: 'materials.freeGiftPackaging' },
     { icon: '✈️', key: 'materials.worldwideShipping' },
   ]
 
