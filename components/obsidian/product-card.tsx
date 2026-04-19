@@ -131,8 +131,8 @@ export function ObsidianProductCard({ product, badge, animationDelay = 0 }: Prod
           className={`absolute top-3.5 right-3.5 z-[3] w-[34px] h-[34px] rounded-full flex items-center justify-center cursor-pointer text-[15px] transition-all duration-200 backdrop-blur-sm
             ${
               isWishlisted
-                ? 'bg-[rgba(201,76,76,0.2)] border-[var(--obsidian-red)] text-[var(--obsidian-red)]'
-                : 'bg-[rgba(8,8,8,0.65)] border border-[var(--obsidian-border)] text-[var(--obsidian-text)] hover:border-[var(--obsidian-red)] hover:scale-110'
+                ? 'bg-[rgba(201,76,76,0.15)] border border-[var(--obsidian-red)] text-[var(--obsidian-red)]'
+                : 'bg-[var(--obsidian-bg)]/80 border border-[var(--obsidian-border)] text-[var(--obsidian-text-muted)] hover:border-[var(--obsidian-red)] hover:text-[var(--obsidian-red)] hover:scale-110'
             }`}
         >
           <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
