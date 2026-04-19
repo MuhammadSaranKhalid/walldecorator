@@ -138,13 +138,6 @@ export function OrderSummary({ items }: OrderSummaryProps) {
               </span>
             </div>
 
-            {subtotal > 0 && subtotal < FREE_SHIPPING_THRESHOLD && (
-              <div className="px-3 py-2 bg-blue-50 dark:bg-blue-950/30 rounded-md">
-                <p className="text-xs text-blue-800 dark:text-blue-300">
-                  Add {formatPrice(FREE_SHIPPING_THRESHOLD - subtotal, currency, rates)} more for free shipping
-                </p>
-              </div>
-            )}
 
             <Separator />
 

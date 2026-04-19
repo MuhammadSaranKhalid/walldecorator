@@ -52,7 +52,7 @@ export function ObsidianHeroSection({ categories }: HeroSectionProps) {
             <Link
               key={category.id}
               href={`/products?category=${category.slug}`}
-              className="text-[9px] tracking-[0.125em] uppercase px-3 py-1.5 border border-[var(--obsidian-border)] text-[var(--obsidian-text-dim)] transition-all duration-200 hover:border-[var(--obsidian-gold)] hover:text-[var(--obsidian-gold)]"
+              className="text-[9px] tracking-[0.125em] uppercase px-3 py-1.5 border border-[var(--obsidian-text)]/30 text-[var(--obsidian-text)]/70 bg-[var(--obsidian-bg)]/40 backdrop-blur-sm transition-all duration-200 hover:border-[var(--obsidian-gold)] hover:text-[var(--obsidian-gold)]"
             >
               {category.name}
             </Link>

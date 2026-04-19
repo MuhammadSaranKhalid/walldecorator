@@ -2,9 +2,9 @@
  * Shared constants for the walldecorator application
  */
 
-// Shipping configuration
-export const FREE_SHIPPING_THRESHOLD = 5000 // Free shipping for orders >= Rs 5,000
-export const SHIPPING_COST = 200 // Standard shipping cost in PKR
+// Shipping configuration — always free
+export const FREE_SHIPPING_THRESHOLD = 0
+export const SHIPPING_COST = 0
 
 // Pakistan provinces for address forms
 export const PAKISTAN_PROVINCES = [

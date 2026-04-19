@@ -44,7 +44,7 @@ export function ObsidianNavigation() {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-4 sm:px-6 lg:px-12 py-5 obsidian-glass border-b border-[var(--obsidian-border)]">
+    <nav className="fixed top-8 left-0 right-0 z-[100] flex items-center justify-between px-4 sm:px-6 lg:px-12 py-5 obsidian-glass border-b border-[var(--obsidian-border)]">
       {/* Logo */}
       <Link href="/" className="flex items-center gap-2.5 cursor-pointer group">
         <Image

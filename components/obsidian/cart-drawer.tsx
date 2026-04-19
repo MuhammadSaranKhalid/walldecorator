@@ -10,8 +10,6 @@ import { formatPrice } from '@/lib/currency'
 import { X, ShoppingCart, Minus, Plus, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 
-const FREE_SHIPPING_THRESHOLD = 5000
-
 export function ObsidianCartDrawer() {
   const [isMounted, setIsMounted] = useState(false)
 
@@ -33,7 +31,7 @@ function CartDrawerContent() {
 
   const total = getTotalPrice()
   const itemCount = getTotalItems()
-  const shippingCost = total >= FREE_SHIPPING_THRESHOLD ? 0 : 250
+  const shippingCost = 0
 
   const handleCheckout = () => {
     closeCart()
@@ -167,6 +165,12 @@ function CartDrawerContent() {
                     {formatPrice(total + shippingCost, currency, rates)}
                   </span>
                 </div>
+              </div>
+
+              {/* Free shipping badge */}
+              <div className="flex items-center justify-center gap-2 py-2.5 mb-3 border border-[var(--obsidian-gold)]/40 bg-[var(--obsidian-gold)]/5 text-[var(--obsidian-gold)] text-[9px] tracking-[0.15em] uppercase">
+                <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8l1 12h12l1-12" /></svg>
+                <span>{t('cart.freeShippingBadge')}</span>
               </div>
 
               {/* Checkout button */}

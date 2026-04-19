@@ -11,7 +11,7 @@ export const revalidate = 60;
 export const metadata = {
   title: "Shop Wall Art | Wall Decorator",
   description:
-    "Shop our curated collection of premium laser-cut wall art. Explore anime, movies, gaming, nature and more. Free shipping over Rs. 5,000.",
+    "Shop our curated collection of premium laser-cut wall art. Explore anime, movies, gaming, nature and more. Free shipping on all orders.",
   openGraph: {
     title: "Shop Wall Art | Wall Decorator",
     description:

@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     template: "%s | Wall Decorator",
   },
   description:
-    "Precision-crafted laser-cut metal wall art. Custom sizes, premium materials. Free shipping over Rs. 5,000.",
+    "Precision-crafted laser-cut metal wall art. Custom sizes, premium materials. Free shipping on all orders.",
   keywords: [
     "metal wall art",
     "laser cut wall decor",
@@ -58,14 +58,14 @@ export const metadata: Metadata = {
     siteName: "Wall Decorator",
     title: "Wall Decorator — Modern Wall Art",
     description:
-      "Precision-crafted laser-cut metal wall art. Custom sizes, premium materials. Free shipping over Rs. 5,000.",
+      "Precision-crafted laser-cut metal wall art. Custom sizes, premium materials. Free shipping on all orders.",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Wall Decorator — Metal Wall Art" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Wall Decorator — Modern Wall Art",
     description:
-      "Precision-crafted laser-cut metal wall art. Custom sizes, premium materials. Free shipping over Rs. 5,000.",
+      "Precision-crafted laser-cut metal wall art. Custom sizes, premium materials. Free shipping on all orders.",
     images: ["/og-image.jpg"],
   },
   robots: {

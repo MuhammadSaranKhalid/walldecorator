@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ObsidianCartDrawer } from '@/components/obsidian/cart-drawer'
 import { WishlistDrawer } from '@/components/obsidian/wishlist-drawer'
 import { ObsidianNavigation } from '@/components/obsidian/navigation'
+import { AnnouncementBar } from '@/components/obsidian/announcement-bar'
 import { MobileMenu } from '@/components/obsidian/mobile-menu'
 import { ObsidianFooter } from '@/components/obsidian/footer'
 import { ToastContainer } from '@/components/obsidian/toast-container'
@@ -20,9 +21,10 @@ export default function RootLayout({
 }>) {
     return (
         <div className="min-h-screen flex flex-col relative">
+            <AnnouncementBar />
             <ObsidianNavigation />
             <MobileMenu />
-            <div className="flex-1 pt-20">
+            <div className="flex-1 pt-28">
                 {children}
             </div>
             <ObsidianFooter />

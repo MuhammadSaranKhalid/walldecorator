@@ -1,4 +1,7 @@
 {
+  "announcement": {
+    "freeShipping": "Free Shipping on All Orders — Worldwide"
+  },
   "nav": {
     "shop": "Shop",
     "collections": "Collections",
@@ -49,6 +52,7 @@
     "subtotal": "Subtotal",
     "shipping": "Shipping",
     "shippingFree": "Free",
+    "freeShippingBadge": "Free Shipping on This Order",
     "total": "Total",
     "checkout": "Checkout",
     "close": "Close cart"

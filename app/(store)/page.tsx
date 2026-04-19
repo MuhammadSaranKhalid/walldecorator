@@ -9,7 +9,7 @@ import { getHomepageData } from '@/queries/home'
 export const metadata: Metadata = {
   title: 'Wall Decorator — Modern Wall Art',
   description:
-    'Precision-crafted laser-cut designs that turn your walls into a gallery. Premium materials, custom sizes. Free shipping over Rs. 5,000.',
+    'Precision-crafted laser-cut designs that turn your walls into a gallery. Premium materials, custom sizes. Free shipping on all orders.',
   openGraph: {
     title: 'Wall Decorator — Modern Wall Art',
     description: 'Precision-crafted laser-cut wall art. Premium materials, custom sizes.',
