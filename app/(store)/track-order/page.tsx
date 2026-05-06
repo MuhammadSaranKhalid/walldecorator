@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { TrackOrderForm } from './track-order-form'
 
 export const metadata: Metadata = {
@@ -9,5 +10,9 @@ export const metadata: Metadata = {
 }
 
 export default function TrackOrderPage() {
-  return <TrackOrderForm />
+  return (
+    <Suspense>
+      <TrackOrderForm />
+    </Suspense>
+  )
 }

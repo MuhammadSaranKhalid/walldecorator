@@ -2,6 +2,7 @@
 
 import { z } from 'zod'
 import { createServerClient } from '@/lib/supabase/server'
+import { sendNewsletterWelcomeEmail } from '@/lib/email/send-newsletter-welcome'
 
 // Zod schema for email validation (React 19 + Vercel best practice)
 // Zod v4: Use z.email() instead of z.string().email()
@@ -64,9 +65,14 @@ export async function subscribeToNewsletter(
       }
     }
 
+    // Send welcome email (non-blocking)
+    sendNewsletterWelcomeEmail(normalizedEmail).catch((err) =>
+      console.error('[email] Unexpected error sending newsletter welcome', err)
+    )
+
     return {
       success: true,
-      message: 'Successfully subscribed! Check your inbox for your discount code.',
+      message: 'Successfully subscribed! Check your inbox for a welcome email.',
     }
   } catch (error) {
     console.error('Newsletter subscription error:', error)

@@ -43,13 +43,15 @@ interface OrderItemWithImage {
   quantity: number;
   unit_price: number;
   total_price: number;
-  product_id: string;
-  products?: {
-    product_images?: Array<{
-      storage_path: string;
-      display_order: number;
+  product_variants?: Array<{
+    products?: Array<{
+      product_images?: Array<{
+        display_order: number;
+        is_primary: boolean;
+        images?: Array<{ storage_path: string; medium_path: string | null }>;
+      }>;
     }>;
-  };
+  }>;
 }
 
 export async function POST(request: NextRequest) {
@@ -77,11 +79,16 @@ export async function POST(request: NextRequest) {
         quantity,
         unit_price,
         total_price,
-        product_id,
-        products (
-          product_images (
-            storage_path,
-            display_order
+        product_variants (
+          products (
+            product_images (
+              display_order,
+              is_primary,
+              images (
+                storage_path,
+                medium_path
+              )
+            )
           )
         )
       `)
@@ -96,11 +103,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Format items for email with product images
-    const emailItems = (orderItems as OrderItemWithImage[]).map((item) => {
+    const emailItems = (orderItems as unknown as OrderItemWithImage[]).map((item) => {
       // Get the primary image (lowest display_order)
-      const primaryImage = item.products?.product_images?.sort(
-        (a, b) => a.display_order - b.display_order
-      )[0];
+      const productImages = item.product_variants?.[0]?.products?.[0]?.product_images ?? [];
+      const primaryImage =
+        productImages.find((pi) => pi.is_primary) ??
+        productImages.slice().sort((a, b) => a.display_order - b.display_order)[0];
+      const img = primaryImage?.images?.[0];
+      const imagePath = img?.medium_path ?? img?.storage_path;
 
       return {
         name: item.product_name,
@@ -108,9 +118,7 @@ export async function POST(request: NextRequest) {
         quantity: item.quantity,
         unitPrice: Number(item.unit_price),
         totalPrice: Number(item.total_price),
-        imageUrl: primaryImage
-          ? getStorageUrl(primaryImage.storage_path, 'product-images')
-          : undefined,
+        imageUrl: imagePath ? getStorageUrl(imagePath, 'product-images') : undefined,
       };
     });
 
@@ -133,7 +141,7 @@ export async function POST(request: NextRequest) {
         taxAmount: Number(order.tax_amount),
         total: Number(order.total_amount),
         shippingAddress: order.shipping_address,
-        trackingUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/orders/track?order=${order.order_number}`,
+        trackingUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/track-order?order=${order.order_number}&email=${encodeURIComponent(order.customer_email)}`,
       })
     );
 

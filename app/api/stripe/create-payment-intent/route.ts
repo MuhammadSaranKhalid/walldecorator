@@ -30,6 +30,12 @@ export async function POST(request: NextRequest) {
       amount: amountInPaisa,
       currency: 'pkr',
       automatic_payment_methods: { enabled: true },
+      statement_descriptor_suffix: 'WALLDECOR',
+      metadata: {
+        source: 'walldecorator',
+        item_count: cartItems.length.toString(),
+        subtotal: subtotal.toString(),
+      },
     })
 
     return NextResponse.json({

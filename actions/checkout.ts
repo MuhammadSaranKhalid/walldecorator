@@ -5,6 +5,7 @@ import { FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '@/lib/constants'
 import type { AddressData } from '@/lib/validations/checkout'
 import type { CartItem } from '@/store/cart.store'
 import type { PaymentMethod } from '@/components/checkout/payment-section'
+import { sendOrderConfirmationEmail } from '@/lib/email/send-order-confirmation'
 
 type CreateOrderInput = {
   email: string
@@ -142,6 +143,19 @@ export async function createOrder(
         message: 'Order placed successfully!',
       }
     }
+
+    // Send confirmation email (non-blocking — failure doesn't affect order result)
+    sendOrderConfirmationEmail({
+      orderId: orderId as string,
+      orderNumber: order.order_number,
+      customerName: input.name,
+      customerEmail: input.email,
+      shippingAddress: input.shippingAddress,
+      subtotal,
+      shippingCost,
+      taxAmount: 0,
+      total: subtotal + shippingCost,
+    }).catch((err) => console.error('[email] Unexpected error sending order confirmation', err))
 
     return {
       success: true,

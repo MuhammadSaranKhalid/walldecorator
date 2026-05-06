@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useTransition, useCallback } from 'react'
+import { useState, useTransition, useCallback, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { trackOrder, type TrackOrderResult } from '@/actions/track-order'
 import { formatPrice } from '@/lib/currency'
 import { useCurrencyStore } from '@/store/currency.store'
@@ -208,10 +209,19 @@ function OrderResult({ result }: { result: Extract<TrackOrderResult, { found: tr
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export function TrackOrderForm() {
-  const [orderNumber, setOrderNumber] = useState('')
-  const [email, setEmail] = useState('')
+  const searchParams = useSearchParams()
+  const [orderNumber, setOrderNumber] = useState(() => searchParams.get('order') ?? '')
+  const [email, setEmail] = useState(() => searchParams.get('email') ?? '')
   const [result, setResult] = useState<TrackOrderResult | null>(null)
   const [isPending, startTransition] = useTransition()
+
+  // Keep in sync if query param changes (e.g. browser back/forward)
+  useEffect(() => {
+    const order = searchParams.get('order')
+    if (order) setOrderNumber(order)
+    const emailParam = searchParams.get('email')
+    if (emailParam) setEmail(emailParam)
+  }, [searchParams])
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
