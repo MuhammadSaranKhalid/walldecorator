@@ -36,7 +36,7 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
   const { items, clearCart } = useCartStore()
 
   // Payment method state — lifted here so the submit handler can branch on it
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cod')
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card')
 
   // Ref to the StripeCardSection imperative handle
   const stripeRef = useRef<StripeCardSectionRef>(null)

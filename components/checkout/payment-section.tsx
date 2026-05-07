@@ -49,7 +49,8 @@ export function PaymentSection({
       </div>
 
       <div className="space-y-3">
-        {/* Cash on Delivery */}
+        {/* Cash on Delivery — DISABLED */}
+        {/*
         <button
           type="button"
           onClick={() => onPaymentMethodChange('cod')}
@@ -78,6 +79,7 @@ export function PaymentSection({
             </div>
           </div>
         </button>
+        */}
 
         {/* Card Payment */}
         <button
@@ -112,7 +114,8 @@ export function PaymentSection({
         </button>
       </div>
 
-      {/* COD note */}
+      {/* COD note — DISABLED */}
+      {/*
       {paymentMethod === 'cod' && (
         <div className="bg-[var(--obsidian-surface)] border border-[var(--obsidian-border)] p-4">
           <p className="text-sm text-[var(--obsidian-text-muted)]">
@@ -121,6 +124,7 @@ export function PaymentSection({
           </p>
         </div>
       )}
+      */}
 
       {/* Stripe card form */}
       {paymentMethod === 'card' && (
