@@ -1,6 +1,7 @@
 'use server'
 
 import { z } from 'zod'
+import { cookies } from 'next/headers'
 import { createServerClient } from '@/lib/supabase/server'
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '@/lib/constants'
 import { getRates } from '@/lib/rates'
@@ -9,6 +10,32 @@ import type { AddressData } from '@/lib/validations/checkout'
 import type { CartItem } from '@/store/cart.store'
 import type { PaymentMethod } from '@/components/checkout/payment-section'
 import { sendOrderConfirmationEmail } from '@/lib/email/send-order-confirmation'
+
+const VALID_CURRENCIES = ['PKR', 'USD', 'EUR', 'GBP'] as const
+
+/**
+ * Resolve the buyer's display currency.
+ * Prefer the explicit value the client sent (which reflects manual selection).
+ * If the client sent nothing or 'PKR' (the Zustand default which can leak when
+ * the form submits before persist hydrates), fall back to the geo-detected
+ * obsidian-currency-hint cookie that middleware refreshes on every request.
+ */
+async function resolveDisplayCurrency(
+  clientValue: string | undefined
+): Promise<CurrencyCode> {
+  const fromClient = (clientValue ?? '').toUpperCase()
+  if (fromClient && fromClient !== 'PKR' && VALID_CURRENCIES.includes(fromClient as CurrencyCode)) {
+    return fromClient as CurrencyCode
+  }
+
+  const cookieStore = await cookies()
+  const hint = cookieStore.get('obsidian-currency-hint')?.value?.toUpperCase()
+  if (hint && VALID_CURRENCIES.includes(hint as CurrencyCode)) {
+    return hint as CurrencyCode
+  }
+
+  return 'PKR'
+}
 
 type CreateOrderInput = {
   email: string
@@ -68,6 +95,10 @@ export async function createOrder(
   const dbPaymentMethod = isCard ? 'card' : 'cash_on_delivery'
   const initialStatus = isCard ? 'pending' : 'confirmed'
   const initialPaymentStatus = isCard ? 'pending' : 'paid'
+
+  // Resolve currency once from {client value, geo cookie}. Used both for the
+  // persisted display_currency and for the inline COD email below.
+  const resolvedCurrency = await resolveDisplayCurrency(input.displayCurrency)
 
   try {
     const supabase = await createServerClient()
@@ -141,15 +172,15 @@ export async function createOrder(
       return { success: false, error: userMessage }
     }
 
-    if (input.displayCurrency || input.rateSnapshotId) {
-      await supabase
-        .from('orders')
-        .update({
-          ...(input.displayCurrency && { display_currency: input.displayCurrency }),
-          ...(input.rateSnapshotId  && { exchange_rate_snapshot_id: input.rateSnapshotId }),
-        })
-        .eq('id', orderId)
-    }
+    // Always stamp the resolved display_currency. Snapshot is best-effort —
+    // we'll fall back to live rates if it's missing or stale.
+    await supabase
+      .from('orders')
+      .update({
+        display_currency: resolvedCurrency,
+        ...(input.rateSnapshotId && { exchange_rate_snapshot_id: input.rateSnapshotId }),
+      })
+      .eq('id', orderId)
 
     const { data: order, error: fetchError } = await supabase
       .from('orders')
@@ -188,7 +219,7 @@ export async function createOrder(
         shippingCost: Number(order.shipping_cost ?? 0),
         taxAmount: Number(order.tax_amount ?? 0),
         total: Number(order.total_amount),
-        displayCurrency: (input.displayCurrency ?? 'PKR') as CurrencyCode,
+        displayCurrency: resolvedCurrency,
         rates,
       }).catch((err) => console.error('[email] Unexpected error sending order confirmation', err))
     }
