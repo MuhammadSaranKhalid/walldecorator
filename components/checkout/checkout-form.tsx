@@ -11,6 +11,7 @@ import { toast } from 'sonner'
 
 import { checkoutSchema, type CheckoutFormData } from '@/lib/validations/checkout'
 import { useCartStore } from '@/store/cart.store'
+import { useCurrencyStore } from '@/store/currency.store'
 import { createOrder, markOrderPaid, markOrderFailed } from '@/actions/checkout'
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '@/lib/constants'
 
@@ -34,6 +35,7 @@ type CheckoutFormProps = {
 export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
   const router = useRouter()
   const { items, clearCart } = useCartStore()
+  const { currency, rates } = useCurrencyStore()
 
   // Payment method state — lifted here so the submit handler can branch on it
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card')
@@ -86,6 +88,11 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
         ipAddress,
         userAgent,
         paymentMethod,
+        // Persist the currency the buyer was viewing so the confirmation
+        // page and email render in the same currency. Snapshot id is the
+        // latest rate row for that currency at submit time.
+        displayCurrency: currency,
+        rateSnapshotId: rates[currency]?.id,
       })
 
       if (!orderResult.success) {

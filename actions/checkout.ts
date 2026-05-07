@@ -3,6 +3,8 @@
 import { z } from 'zod'
 import { createServerClient } from '@/lib/supabase/server'
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '@/lib/constants'
+import { getRates } from '@/lib/rates'
+import type { CurrencyCode } from '@/lib/currency'
 import type { AddressData } from '@/lib/validations/checkout'
 import type { CartItem } from '@/store/cart.store'
 import type { PaymentMethod } from '@/components/checkout/payment-section'
@@ -172,6 +174,10 @@ export async function createOrder(
     // mark_order_paid flips status from 'pending' → 'confirmed' (DB trigger
     // calls /api/send-order-confirmation).
     if (!isCard) {
+      // Load live rates so the email renders in the same currency the buyer
+      // saw at checkout. Failure to load rates falls back to PKR formatting.
+      const { rates } = await getRates().catch(() => ({ rates: undefined }))
+
       sendOrderConfirmationEmail({
         orderId: orderId as string,
         orderNumber: order.order_number,
@@ -182,6 +188,8 @@ export async function createOrder(
         shippingCost: Number(order.shipping_cost ?? 0),
         taxAmount: Number(order.tax_amount ?? 0),
         total: Number(order.total_amount),
+        displayCurrency: (input.displayCurrency ?? 'PKR') as CurrencyCode,
+        rates,
       }).catch((err) => console.error('[email] Unexpected error sending order confirmation', err))
     }
 

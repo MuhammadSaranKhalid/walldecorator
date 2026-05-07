@@ -4,6 +4,8 @@ import { getStorageUrl } from '@/lib/supabase/storage'
 import { getResend, FROM_EMAIL } from '@/lib/email'
 import OrderConfirmationEmail from '@/emails/order-confirmation'
 import type { AddressData } from '@/lib/validations/checkout'
+import type { CurrencyCode } from '@/lib/currency'
+import type { RatesMap } from '@/lib/rates'
 
 interface SendOrderConfirmationParams {
   orderId: string
@@ -15,6 +17,10 @@ interface SendOrderConfirmationParams {
   shippingCost: number
   taxAmount: number
   total: number
+  /** Currency the buyer was viewing at checkout. Defaults to PKR. */
+  displayCurrency?: CurrencyCode
+  /** Live rates map; PKR + the display currency must be present. */
+  rates?: RatesMap
 }
 
 interface OrderItemRow {
@@ -49,6 +55,8 @@ export async function sendOrderConfirmationEmail(
     shippingCost,
     taxAmount,
     total,
+    displayCurrency,
+    rates,
   } = params
 
   const supabase = getAdminClient()
@@ -136,6 +144,8 @@ export async function sendOrderConfirmationEmail(
       total,
       shippingAddress: emailAddress,
       trackingUrl: `${siteUrl}/track-order?order=${orderNumber}&email=${encodeURIComponent(customerEmail)}`,
+      currency: displayCurrency,
+      rates,
     })
   )
 

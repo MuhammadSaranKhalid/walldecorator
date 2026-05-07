@@ -4,6 +4,8 @@ import { render } from "@react-email/components";
 import OrderConfirmationEmail from "@/emails/order-confirmation";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { getStorageUrl } from "@/lib/supabase/storage";
+import { getRates } from "@/lib/rates";
+import type { CurrencyCode } from "@/lib/currency";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -69,8 +71,17 @@ export async function POST(request: NextRequest) {
 
     const order = payload.record;
 
-    // Fetch order items from database (using admin client to bypass RLS)
+    // The trigger payload doesn't include display_currency — re-query it
+    // (and live rates) so the email renders in the buyer's chosen currency.
     const supabase = getAdminClient();
+    const { data: orderMeta } = await supabase
+      .from("orders")
+      .select("display_currency")
+      .eq("id", order.id)
+      .maybeSingle();
+    const displayCurrency = ((orderMeta?.display_currency as string | null) ?? "PKR") as CurrencyCode;
+    const { rates } = await getRates().catch(() => ({ rates: undefined }));
+
     const { data: orderItems, error: itemsError } = await supabase
       .from("order_items")
       .select(`
@@ -142,6 +153,8 @@ export async function POST(request: NextRequest) {
         total: Number(order.total_amount),
         shippingAddress: order.shipping_address,
         trackingUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/track-order?order=${order.order_number}&email=${encodeURIComponent(order.customer_email)}`,
+        currency: displayCurrency,
+        rates,
       })
     );
 
