@@ -53,17 +53,23 @@ export async function createOrder(
   try {
     const supabase = await createServerClient()
 
+    // Send only variant_id + quantity to the RPC.
+    // The unit price is looked up server-side inside create_order — anything
+    // the client sends here is ignored as untrusted.
     const dbCartItems = input.cartItems.map((item) => ({
       variant_id: item.variantId,
       quantity: item.quantity,
-      price: item.price,
     }))
 
-    const subtotal = input.cartItems.reduce(
+    // Provisional subtotal (client estimate) used only to pick a shipping
+    // band before we know the authoritative total. We re-read the canonical
+    // subtotal/total from the orders row right after creation.
+    const estimatedSubtotal = input.cartItems.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
     )
-    const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST
+    const shippingCost =
+      estimatedSubtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST
 
     const shippingAddressJson = {
       line1: input.shippingAddress.line1,
@@ -130,7 +136,7 @@ export async function createOrder(
 
     const { data: order, error: fetchError } = await supabase
       .from('orders')
-      .select('order_number')
+      .select('order_number, subtotal, shipping_cost, tax_amount, total_amount')
       .eq('id', orderId)
       .single()
 
@@ -144,17 +150,18 @@ export async function createOrder(
       }
     }
 
-    // Send confirmation email (non-blocking — failure doesn't affect order result)
+    // Send confirmation email (non-blocking — failure doesn't affect order result).
+    // Use authoritative totals from the DB, NOT the client-estimated subtotal.
     sendOrderConfirmationEmail({
       orderId: orderId as string,
       orderNumber: order.order_number,
       customerName: input.name,
       customerEmail: input.email,
       shippingAddress: input.shippingAddress,
-      subtotal,
-      shippingCost,
-      taxAmount: 0,
-      total: subtotal + shippingCost,
+      subtotal: Number(order.subtotal),
+      shippingCost: Number(order.shipping_cost ?? 0),
+      taxAmount: Number(order.tax_amount ?? 0),
+      total: Number(order.total_amount),
     }).catch((err) => console.error('[email] Unexpected error sending order confirmation', err))
 
     return {

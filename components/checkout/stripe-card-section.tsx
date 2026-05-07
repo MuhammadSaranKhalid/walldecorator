@@ -12,8 +12,11 @@ export type StripeCardSectionRef = {
   /**
    * Validates the PaymentElement, creates a PaymentIntent, and confirms payment.
    * Returns the Stripe paymentIntentId on success, or an error message.
+   *
+   * Cart items carry only the variant + quantity — prices are looked up
+   * server-side. Anything else from the client is ignored as untrusted.
    */
-  confirmPayment(cartItems: { price: number; quantity: number }[]): Promise<{
+  confirmPayment(cartItems: { variantId: string; quantity: number }[]): Promise<{
     success: boolean
     paymentIntentId?: string
     error?: string

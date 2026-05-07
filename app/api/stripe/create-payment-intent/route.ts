@@ -1,30 +1,80 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+import { inArray, eq, and } from 'drizzle-orm'
 import { stripe } from '@/lib/stripe'
+import { db } from '@/lib/db/client'
+import { product_variants, products } from '@/lib/db/schema'
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '@/lib/constants'
 
-type CartItem = {
-  price: number
-  quantity: number
-}
+const cartItemSchema = z.object({
+  variantId: z.string().uuid(),
+  quantity: z.number().int().positive().max(99),
+})
+
+const requestSchema = z.object({
+  cartItems: z.array(cartItemSchema).min(1),
+})
 
 export async function POST(request: NextRequest) {
   try {
-    const { cartItems } = (await request.json()) as { cartItems: CartItem[] }
+    const json = await request.json().catch(() => null)
+    const parsed = requestSchema.safeParse(json)
 
-    if (!cartItems?.length) {
-      return NextResponse.json({ error: 'Cart is empty' }, { status: 400 })
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? 'Invalid cart payload' },
+        { status: 400 }
+      )
     }
 
-    const subtotal = cartItems.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
+    const { cartItems } = parsed.data
+
+    // Look up authoritative prices server-side. The client-sent price is
+    // intentionally NOT trusted — only variantId + quantity.
+    const variantIds = cartItems.map((i) => i.variantId)
+    const variantRows = await db
+      .select({
+        id: product_variants.id,
+        price: product_variants.price,
+      })
+      .from(product_variants)
+      .innerJoin(products, eq(products.id, product_variants.product_id))
+      .where(
+        and(
+          inArray(product_variants.id, variantIds),
+          eq(products.status, 'active')
+        )
+      )
+
+    if (variantRows.length !== variantIds.length) {
+      return NextResponse.json(
+        { error: 'One or more items in your cart are unavailable. Please refresh your cart.' },
+        { status: 400 }
+      )
+    }
+
+    const priceByVariant = new Map(
+      variantRows.map((row) => [row.id, Number(row.price)])
     )
+
+    const subtotal = cartItems.reduce((sum, item) => {
+      const unitPrice = priceByVariant.get(item.variantId) ?? 0
+      return sum + unitPrice * item.quantity
+    }, 0)
+
     const shippingCost =
       subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST
     const total = subtotal + shippingCost
 
-    // Stripe requires amount in smallest currency unit (paisa for PKR: 1 PKR = 100 paisa)
+    // Stripe requires amount in smallest currency unit (paisa for PKR)
     const amountInPaisa = Math.round(total * 100)
+
+    if (amountInPaisa < 1) {
+      return NextResponse.json(
+        { error: 'Order total is too small to process.' },
+        { status: 400 }
+      )
+    }
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amountInPaisa,

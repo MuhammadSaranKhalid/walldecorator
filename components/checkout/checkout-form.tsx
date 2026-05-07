@@ -84,7 +84,10 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
           return
         }
 
-        const cartItems = items.map((i) => ({ price: i.price, quantity: i.quantity }))
+        const cartItems = items.map((i) => ({
+          variantId: i.variantId,
+          quantity: i.quantity,
+        }))
         const result = await stripeRef.current.confirmPayment(cartItems)
 
         if (!result.success) {
