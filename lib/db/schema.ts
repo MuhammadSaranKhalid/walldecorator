@@ -440,3 +440,12 @@ export const image_processing_configs = pgTable('image_processing_configs', {
   created_at: tstz('created_at').notNull().defaultNow(),
   updated_at: tstz('updated_at').notNull().defaultNow(),
 })
+
+// ─── stripe_events ────────────────────────────────────────────────────────────
+// Idempotency log: webhook handler INSERTs event.id; duplicate deliveries
+// hit the unique-violation path and short-circuit.
+export const stripe_events = pgTable('stripe_events', {
+  id: text('id').primaryKey(),
+  type: text('type').notNull(),
+  processed_at: tstz('processed_at').notNull().defaultNow(),
+})

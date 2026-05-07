@@ -11,7 +11,7 @@ import { toast } from 'sonner'
 
 import { checkoutSchema, type CheckoutFormData } from '@/lib/validations/checkout'
 import { useCartStore } from '@/store/cart.store'
-import { createOrder } from '@/actions/checkout'
+import { createOrder, markOrderPaid, markOrderFailed } from '@/actions/checkout'
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '@/lib/constants'
 
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
@@ -72,37 +72,9 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
 
   const onSubmit: SubmitHandler<CheckoutFormData> = async (data) => {
     try {
-      let paymentIntentId: string | undefined
-
-      if (paymentMethod === 'card') {
-        // ── Card payment ──────────────────────────────────────────────
-        if (!stripeRef.current) {
-          methods.setError('root.serverError', {
-            type: 'server',
-            message: 'Payment form is not ready. Please wait and try again.',
-          })
-          return
-        }
-
-        const cartItems = items.map((i) => ({
-          variantId: i.variantId,
-          quantity: i.quantity,
-        }))
-        const result = await stripeRef.current.confirmPayment(cartItems)
-
-        if (!result.success) {
-          methods.setError('root.serverError', {
-            type: 'server',
-            message: result.error ?? 'Payment failed. Please try again.',
-          })
-          toast.error(result.error ?? 'Payment failed')
-          return
-        }
-
-        paymentIntentId = result.paymentIntentId
-      }
-
-      // ── Create order in DB ────────────────────────────────────────
+      // Step 1: create the order. For card, this returns a PENDING order
+      // which becomes confirmed only when payment succeeds. The card is
+      // never charged before the order row exists.
       const orderResult = await createOrder({
         email: data.email,
         name: data.name,
@@ -114,20 +86,52 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
         ipAddress,
         userAgent,
         paymentMethod,
-        paymentIntentId,
       })
 
-      if (orderResult.success) {
-        clearCart()
-        toast.success('Order placed successfully!')
-        router.push(`/checkout/confirmation/${orderResult.orderId}`)
-      } else {
+      if (!orderResult.success) {
         methods.setError('root.serverError', {
           type: 'server',
           message: orderResult.error ?? 'Failed to place order',
         })
         toast.error(orderResult.error ?? 'Failed to place order')
+        return
       }
+
+      const { orderId, requiresPayment } = orderResult
+
+      // Step 2 (card only): confirm payment against the pending order.
+      if (requiresPayment) {
+        if (!stripeRef.current) {
+          await markOrderFailed(orderId, 'Stripe form was not ready')
+          methods.setError('root.serverError', {
+            type: 'server',
+            message: 'Payment form is not ready. Please wait and try again.',
+          })
+          return
+        }
+
+        const result = await stripeRef.current.confirmPayment(orderId)
+
+        if (!result.success) {
+          await markOrderFailed(orderId, result.error ?? 'Payment failed')
+          methods.setError('root.serverError', {
+            type: 'server',
+            message: result.error ?? 'Payment failed. Please try again.',
+          })
+          toast.error(result.error ?? 'Payment failed')
+          return
+        }
+
+        // Step 3: mark the order paid. The webhook also calls this
+        // idempotently — whoever wins, the row is correct.
+        if (result.paymentIntentId) {
+          await markOrderPaid(orderId, result.paymentIntentId)
+        }
+      }
+
+      clearCart()
+      toast.success('Order placed successfully!')
+      router.push(`/checkout/confirmation/${orderId}`)
     } catch (err) {
       console.error('Checkout error:', err)
       methods.setError('root.serverError', {

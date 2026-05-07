@@ -14,12 +14,12 @@ This is the working punch-list. Each item links to the offending file/line and a
   - Cart prices live in `localStorage` (Zustand persist) — any user can edit them. Both the Stripe charge amount and `order_items.unit_price` come from `cartItems` sent by the browser. A buyer can checkout a Rs. 50,000 product for Rs. 1.
   - **Fix:** Both the PI route and `create_order` RPC must look up `price` from `product_variants` by `variant_id` and ignore client-supplied prices entirely. Cart payload reduces to `{ variantId, quantity }`.
 
-- [ ] **#2 — Order is created _after_ payment, not idempotently linked to PaymentIntent**
+- [x] **#2 — Order is created _after_ payment, not idempotently linked to PaymentIntent** ✅ shipped 2026-05-07
   - Files: [components/checkout/stripe-card-section.tsx:74](components/checkout/stripe-card-section.tsx#L74), [actions/checkout.ts](actions/checkout.ts)
   - Customer is charged, _then_ the order insert runs. If the insert fails the customer is charged with no order row. The webhook can't reconcile because no order has the `payment_intent_id` yet.
   - **Fix:** Create the order in `pending` first → create PI with `metadata.order_id` and `metadata.order_number` → confirm payment → set `paid` either via the server action's success path _or_ the webhook (idempotent on `payment_intent_id`).
 
-- [ ] **#3 — Stripe webhook lacks idempotency**
+- [x] **#3 — Stripe webhook lacks idempotency** ✅ shipped 2026-05-07
   - File: [app/api/stripe/webhooks/route.ts](app/api/stripe/webhooks/route.ts)
   - Stripe retries; we'd process the same event multiple times. Currently safe only because of the narrow status-filter; will break the moment we add inventory adjustments / refund handling / email triggers.
   - **Fix:** New `stripe_events(id PRIMARY KEY, type, processed_at)` table. Insert `event.id` first inside a transaction; skip if it already exists.

@@ -1,20 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { inArray, eq, and } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { stripe } from '@/lib/stripe'
 import { db } from '@/lib/db/client'
-import { product_variants, products } from '@/lib/db/schema'
-import { FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '@/lib/constants'
-
-const cartItemSchema = z.object({
-  variantId: z.string().uuid(),
-  quantity: z.number().int().positive().max(99),
-})
+import { orders } from '@/lib/db/schema'
 
 const requestSchema = z.object({
-  cartItems: z.array(cartItemSchema).min(1),
+  orderId: z.uuid(),
 })
 
+/**
+ * Creates a Stripe PaymentIntent for an EXISTING pending order.
+ *
+ * The order is created first by the `createOrder` server action; this route
+ * looks up the canonical `total_amount` from the orders row, so neither the
+ * cart contents nor the price ever round-trip through the client.
+ */
 export async function POST(request: NextRequest) {
   try {
     const json = await request.json().catch(() => null)
@@ -22,52 +23,38 @@ export async function POST(request: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? 'Invalid cart payload' },
+        { error: 'Invalid request payload' },
         { status: 400 }
       )
     }
 
-    const { cartItems } = parsed.data
+    const { orderId } = parsed.data
 
-    // Look up authoritative prices server-side. The client-sent price is
-    // intentionally NOT trusted — only variantId + quantity.
-    const variantIds = cartItems.map((i) => i.variantId)
-    const variantRows = await db
-      .select({
-        id: product_variants.id,
-        price: product_variants.price,
-      })
-      .from(product_variants)
-      .innerJoin(products, eq(products.id, product_variants.product_id))
-      .where(
-        and(
-          inArray(product_variants.id, variantIds),
-          eq(products.status, 'active')
-        )
-      )
+    const order = await db.query.orders.findFirst({
+      where: (o, { eq: e }) => e(o.id, orderId),
+      columns: {
+        id: true,
+        order_number: true,
+        total_amount: true,
+        payment_status: true,
+        status: true,
+        payment_intent_id: true,
+      },
+    })
 
-    if (variantRows.length !== variantIds.length) {
+    if (!order) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+    }
+
+    if (order.payment_status !== 'pending' || order.status !== 'pending') {
       return NextResponse.json(
-        { error: 'One or more items in your cart are unavailable. Please refresh your cart.' },
-        { status: 400 }
+        { error: 'Order is not awaiting payment.' },
+        { status: 409 }
       )
     }
 
-    const priceByVariant = new Map(
-      variantRows.map((row) => [row.id, Number(row.price)])
-    )
-
-    const subtotal = cartItems.reduce((sum, item) => {
-      const unitPrice = priceByVariant.get(item.variantId) ?? 0
-      return sum + unitPrice * item.quantity
-    }, 0)
-
-    const shippingCost =
-      subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST
-    const total = subtotal + shippingCost
-
-    // Stripe requires amount in smallest currency unit (paisa for PKR)
-    const amountInPaisa = Math.round(total * 100)
+    const totalPkr = Number(order.total_amount)
+    const amountInPaisa = Math.round(totalPkr * 100)
 
     if (amountInPaisa < 1) {
       return NextResponse.json(
@@ -83,10 +70,17 @@ export async function POST(request: NextRequest) {
       statement_descriptor_suffix: 'WALLDECOR',
       metadata: {
         source: 'walldecorator',
-        item_count: cartItems.length.toString(),
-        subtotal: subtotal.toString(),
+        order_id: order.id,
+        order_number: order.order_number,
       },
     })
+
+    // Stamp the PI id onto the order so the webhook can reconcile by either
+    // metadata.order_id OR payment_intent_id.
+    await db
+      .update(orders)
+      .set({ payment_intent_id: paymentIntent.id })
+      .where(eq(orders.id, order.id))
 
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,

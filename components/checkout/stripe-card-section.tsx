@@ -10,13 +10,15 @@ import { Loader2 } from 'lucide-react'
 
 export type StripeCardSectionRef = {
   /**
-   * Validates the PaymentElement, creates a PaymentIntent, and confirms payment.
-   * Returns the Stripe paymentIntentId on success, or an error message.
+   * Validates the PaymentElement, creates a PaymentIntent for the given
+   * pending order, and confirms payment. Returns the Stripe paymentIntentId
+   * on success, or an error message.
    *
-   * Cart items carry only the variant + quantity — prices are looked up
-   * server-side. Anything else from the client is ignored as untrusted.
+   * The order must already exist in 'pending' status — the PI route reads
+   * its authoritative `total_amount` from the DB. Nothing about price or
+   * cart contents goes through this function from the client.
    */
-  confirmPayment(cartItems: { variantId: string; quantity: number }[]): Promise<{
+  confirmPayment(orderId: string): Promise<{
     success: boolean
     paymentIntentId?: string
     error?: string
@@ -34,7 +36,7 @@ export function StripeCardSection({ ref }: Props) {
   const [isReady, setIsReady] = useState(false)
 
   useImperativeHandle(ref, () => ({
-    async confirmPayment(cartItems) {
+    async confirmPayment(orderId) {
       if (!stripe || !elements) {
         return { success: false, error: 'Stripe has not loaded yet. Please try again.' }
       }
@@ -45,13 +47,13 @@ export function StripeCardSection({ ref }: Props) {
         return { success: false, error: submitError.message }
       }
 
-      // Step 2: Create the PaymentIntent server-side (deferred intent pattern)
+      // Step 2: Create the PaymentIntent server-side using the pending order
       let clientSecret: string
       try {
         const res = await fetch('/api/stripe/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ cartItems }),
+          body: JSON.stringify({ orderId }),
         })
 
         if (!res.ok) {

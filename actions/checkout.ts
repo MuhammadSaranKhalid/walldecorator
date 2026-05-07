@@ -1,5 +1,6 @@
 'use server'
 
+import { z } from 'zod'
 import { createServerClient } from '@/lib/supabase/server'
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '@/lib/constants'
 import type { AddressData } from '@/lib/validations/checkout'
@@ -19,22 +20,37 @@ type CreateOrderInput = {
   userAgent: string
   /** 'cod' | 'card' — defaults to 'cod' */
   paymentMethod?: PaymentMethod
-  /** Stripe PaymentIntent ID — required when paymentMethod is 'card' */
-  paymentIntentId?: string
   /** Currency the user was viewing at checkout (display only) */
   displayCurrency?: string
   /** ID of the exchange_rate_snapshot active at purchase time */
   rateSnapshotId?: string
 }
 
-type CreateOrderResult = {
-  success: boolean
-  orderId?: string
-  orderNumber?: string
-  message?: string
-  error?: string
-}
+type CreateOrderResult =
+  | {
+      success: true
+      orderId: string
+      orderNumber: string
+      totalAmount: number
+      /** True when the order is in 'pending' awaiting card payment. */
+      requiresPayment: boolean
+      message?: string
+    }
+  | {
+      success: false
+      error: string
+    }
 
+/**
+ * Creates the order in the DB.
+ *
+ * For card flow: order is created in `pending` status; payment is confirmed
+ * separately (see `markOrderPaid`). The order exists BEFORE the card is
+ * charged so a failed post-charge update never produces a phantom charge.
+ *
+ * For COD: order is created in `confirmed`/`paid` directly (existing
+ * behaviour) and a confirmation email is sent inline.
+ */
 export async function createOrder(
   input: CreateOrderInput
 ): Promise<CreateOrderResult> {
@@ -46,9 +62,10 @@ export async function createOrder(
     return { success: false, error: 'Missing required fields' }
   }
 
-  // Map payment method to the value the DB expects
-  const dbPaymentMethod =
-    input.paymentMethod === 'card' ? 'card' : 'cash_on_delivery'
+  const isCard = input.paymentMethod === 'card'
+  const dbPaymentMethod = isCard ? 'card' : 'cash_on_delivery'
+  const initialStatus = isCard ? 'pending' : 'confirmed'
+  const initialPaymentStatus = isCard ? 'pending' : 'paid'
 
   try {
     const supabase = await createServerClient()
@@ -100,21 +117,21 @@ export async function createOrder(
         p_shipping_address: shippingAddressJson,
         p_billing_address: billingAddressJson,
         p_cart_items: dbCartItems,
-        p_payment_intent_id: input.paymentIntentId ?? null,
+        // For card flow: payment_intent_id is set later by mark_order_paid.
+        p_payment_intent_id: null,
         p_payment_method: dbPaymentMethod,
         p_shipping_cost: shippingCost,
         p_discount_amount: 0,
         p_tax_rate: 0,
         p_ip_address: input.ipAddress,
         p_user_agent: input.userAgent,
+        p_initial_status: initialStatus,
+        p_initial_payment_status: initialPaymentStatus,
       }
     )
 
     if (createError) {
       console.error('Order creation error:', createError)
-      // The RPC raises user-readable exceptions (SQLSTATE 22023) for domain
-      // errors such as missing variants. Surface those directly; fall back to
-      // a generic message for unexpected infrastructure errors.
       const isUserError = createError.code === '22023' || createError.code === 'P0001'
       const userMessage = isUserError
         ? createError.message
@@ -122,8 +139,6 @@ export async function createOrder(
       return { success: false, error: userMessage }
     }
 
-    // Stamp the display currency and rate snapshot onto the order.
-    // Done as a separate update so we don't need to modify the create_order RPC.
     if (input.displayCurrency || input.rateSnapshotId) {
       await supabase
         .from('orders')
@@ -146,32 +161,107 @@ export async function createOrder(
         success: true,
         orderId: orderId as string,
         orderNumber: 'Unknown',
-        message: 'Order placed successfully!',
+        totalAmount: 0,
+        requiresPayment: isCard,
       }
     }
 
-    // Send confirmation email (non-blocking — failure doesn't affect order result).
-    // Use authoritative totals from the DB, NOT the client-estimated subtotal.
-    sendOrderConfirmationEmail({
-      orderId: orderId as string,
-      orderNumber: order.order_number,
-      customerName: input.name,
-      customerEmail: input.email,
-      shippingAddress: input.shippingAddress,
-      subtotal: Number(order.subtotal),
-      shippingCost: Number(order.shipping_cost ?? 0),
-      taxAmount: Number(order.tax_amount ?? 0),
-      total: Number(order.total_amount),
-    }).catch((err) => console.error('[email] Unexpected error sending order confirmation', err))
+    // For COD only: send confirmation email inline. The order is INSERTed
+    // directly as 'confirmed' which doesn't fire the DB trigger.
+    // For card: the confirmation email is sent automatically when
+    // mark_order_paid flips status from 'pending' → 'confirmed' (DB trigger
+    // calls /api/send-order-confirmation).
+    if (!isCard) {
+      sendOrderConfirmationEmail({
+        orderId: orderId as string,
+        orderNumber: order.order_number,
+        customerName: input.name,
+        customerEmail: input.email,
+        shippingAddress: input.shippingAddress,
+        subtotal: Number(order.subtotal),
+        shippingCost: Number(order.shipping_cost ?? 0),
+        taxAmount: Number(order.tax_amount ?? 0),
+        total: Number(order.total_amount),
+      }).catch((err) => console.error('[email] Unexpected error sending order confirmation', err))
+    }
 
     return {
       success: true,
       orderId: orderId as string,
       orderNumber: order.order_number,
-      message: 'Order placed successfully!',
+      totalAmount: Number(order.total_amount),
+      requiresPayment: isCard,
     }
   } catch (error) {
     console.error('Unexpected error during order creation:', error)
     return { success: false, error: 'An unexpected error occurred. Please try again.' }
+  }
+}
+
+// ── Mark order paid / failed (card flow) ────────────────────────────────────
+
+const orderIdSchema = z.uuid()
+const paymentIntentIdSchema = z.string().min(1).max(200)
+
+/**
+ * Marks a previously-pending card order as confirmed/paid.
+ * Idempotent: safe to call after the webhook has already flipped the row.
+ * The DB trigger fires the order-confirmation email on the status transition.
+ */
+export async function markOrderPaid(
+  orderId: string,
+  paymentIntentId: string
+): Promise<{ success: boolean; error?: string }> {
+  const idCheck = orderIdSchema.safeParse(orderId)
+  const piCheck = paymentIntentIdSchema.safeParse(paymentIntentId)
+  if (!idCheck.success || !piCheck.success) {
+    return { success: false, error: 'Invalid order or payment reference' }
+  }
+
+  try {
+    const supabase = await createServerClient()
+    const { error } = await supabase.rpc('mark_order_paid', {
+      p_order_id: idCheck.data,
+      p_payment_intent_id: piCheck.data,
+    })
+    if (error) {
+      console.error('mark_order_paid error:', error)
+      return { success: false, error: 'Failed to confirm payment.' }
+    }
+    return { success: true }
+  } catch (err) {
+    console.error('Unexpected mark_order_paid error:', err)
+    return { success: false, error: 'An unexpected error occurred.' }
+  }
+}
+
+/**
+ * Marks a pending card order as failed/cancelled, restoring inventory.
+ * Idempotent. Called from the client when Stripe rejects the card and from
+ * the webhook on `payment_intent.payment_failed`.
+ */
+export async function markOrderFailed(
+  orderId: string,
+  reason: string
+): Promise<{ success: boolean }> {
+  const idCheck = orderIdSchema.safeParse(orderId)
+  if (!idCheck.success) return { success: false }
+
+  const safeReason = (reason ?? 'Payment failed').slice(0, 500)
+
+  try {
+    const supabase = await createServerClient()
+    const { error } = await supabase.rpc('mark_order_failed', {
+      p_order_id: idCheck.data,
+      p_reason: safeReason,
+    })
+    if (error) {
+      console.error('mark_order_failed error:', error)
+      return { success: false }
+    }
+    return { success: true }
+  } catch (err) {
+    console.error('Unexpected mark_order_failed error:', err)
+    return { success: false }
   }
 }
