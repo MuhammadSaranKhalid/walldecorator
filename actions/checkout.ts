@@ -2,7 +2,10 @@
 
 import { z } from 'zod'
 import { cookies } from 'next/headers'
+import { eq } from 'drizzle-orm'
 import { createServerClient } from '@/lib/supabase/server'
+import { db } from '@/lib/db/client'
+import { orders } from '@/lib/db/schema'
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '@/lib/constants'
 import { getRates } from '@/lib/rates'
 import type { CurrencyCode } from '@/lib/currency'
@@ -174,13 +177,20 @@ export async function createOrder(
 
     // Always stamp the resolved display_currency. Snapshot is best-effort —
     // we'll fall back to live rates if it's missing or stale.
-    await supabase
-      .from('orders')
-      .update({
-        display_currency: resolvedCurrency,
-        ...(input.rateSnapshotId && { exchange_rate_snapshot_id: input.rateSnapshotId }),
-      })
-      .eq('id', orderId)
+    // Use Drizzle (direct Postgres connection) so RLS doesn't silently drop
+    // this — the orders table has no UPDATE policy for anon, and the
+    // user-session Supabase client would fail without raising an error.
+    try {
+      await db
+        .update(orders)
+        .set({
+          display_currency: resolvedCurrency,
+          ...(input.rateSnapshotId && { exchange_rate_snapshot_id: input.rateSnapshotId }),
+        })
+        .where(eq(orders.id, orderId as string))
+    } catch (err) {
+      console.error('Failed to persist display_currency on order', orderId, err)
+    }
 
     const { data: order, error: fetchError } = await supabase
       .from('orders')
