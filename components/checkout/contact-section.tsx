@@ -1,12 +1,18 @@
 'use client'
 
-import { Mail, User, Phone } from 'lucide-react'
+import { Mail, User } from 'lucide-react'
 import { useFormContext, Controller } from 'react-hook-form'
+import type { Country } from 'react-phone-number-input'
 import type { CheckoutFormData } from '@/lib/validations/checkout'
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { PhoneInput } from '@/components/ui/phone-input'
 
-export function ContactSection() {
+type Props = {
+  initialCountry: Country
+}
+
+export function ContactSection({ initialCountry }: Props) {
   const { control } = useFormContext<CheckoutFormData>()
 
   return (
@@ -84,20 +90,14 @@ export function ContactSection() {
                 <FieldLabel htmlFor={field.name} className="text-sm font-medium">
                   Phone Number
                 </FieldLabel>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    {...field}
-                    id={field.name}
-                    type="tel"
-                    placeholder="03001234567"
-                    className="pl-10 h-11"
-                    autoComplete="tel"
-                    inputMode="tel"
-                    spellCheck={false}
-                    aria-invalid={fieldState.invalid}
-                  />
-                </div>
+                <PhoneInput
+                  id={field.name}
+                  value={field.value}
+                  onChange={(v) => field.onChange(v ?? '')}
+                  onBlur={field.onBlur}
+                  defaultCountry={initialCountry}
+                  aria-invalid={fieldState.invalid}
+                />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}

@@ -76,8 +76,6 @@ export async function middleware(request: NextRequest) {
   const country = request.headers.get('x-vercel-ip-country') ?? undefined
 
   const detectedCurrency = countryToCurrency(country)
-  console.log('Middleware: detected country', country)
-  console.log('Middleware: mapped currency', detectedCurrency)
 
   response.cookies.set('obsidian-currency-hint', detectedCurrency, {
     path: '/',
@@ -85,6 +83,18 @@ export async function middleware(request: NextRequest) {
     sameSite: 'lax',
     httpOnly: false, // must be readable by client JS
   })
+
+  // Expose the raw ISO-3166-1 alpha-2 country code so the client can default
+  // the phone-input flag/prefix to the buyer's locale. Falls back to 'PK' if
+  // the edge header is missing (local dev, non-Vercel environments).
+  if (country) {
+    response.cookies.set('obsidian-country-hint', country.toUpperCase(), {
+      path: '/',
+      maxAge: 60 * 60 * 24,
+      sameSite: 'lax',
+      httpOnly: false,
+    })
+  }
 
   return response
 }

@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2, AlertCircle, ChevronRight, ShoppingCart, Lock } from 'lucide-react'
 import Image from 'next/image'
 import { toast } from 'sonner'
+import type { Country } from 'react-phone-number-input'
 
 import { checkoutSchema, type CheckoutFormData } from '@/lib/validations/checkout'
 import { useCartStore } from '@/store/cart.store'
@@ -30,9 +31,11 @@ import type { StripeCardSectionRef } from './stripe-card-section'
 type CheckoutFormProps = {
   ipAddress: string
   userAgent: string
+  /** Geo-detected ISO-3166-1 alpha-2 country code, used as the phone-input default. */
+  initialCountry: Country
 }
 
-export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
+export function CheckoutForm({ ipAddress, userAgent, initialCountry }: CheckoutFormProps) {
   const router = useRouter()
   const { items, clearCart } = useCartStore()
   const { currency, rates } = useCurrencyStore()
@@ -194,7 +197,7 @@ export function CheckoutForm({ ipAddress, userAgent }: CheckoutFormProps) {
                 </Link>
 
                 <div className="space-y-6">
-                  <ContactSection />
+                  <ContactSection initialCountry={initialCountry} />
                   <ShippingSection />
                   <BillingSection />
 

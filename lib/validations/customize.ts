@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { isValidPhoneNumber } from 'libphonenumber-js/min'
 
 // ─── Custom Order Form Schema ─────────────────────────────────────────────────
 
@@ -12,6 +13,10 @@ export const CustomOrderSchema = z.object({
 
     customer_phone: z
         .string()
+        .refine(
+            (v) => v === '' || v === undefined || isValidPhoneNumber(v),
+            'Please enter a valid phone number'
+        )
         .optional()
         .or(z.literal('')),
 

@@ -1,12 +1,5 @@
 import { z } from 'zod'
-
-/**
- * Checkout form validation schemas
- */
-
-// Pakistan phone number regex
-// Accepts: 03001234567, +923001234567, 00923001234567
-const pakistanPhoneRegex = /^(03\d{9}|(\+92|0092)3\d{9})$/
+import { isValidPhoneNumber } from 'libphonenumber-js/min'
 
 // Address validation schema
 const addressSchema = z.object({
@@ -34,9 +27,10 @@ export const checkoutSchema = z
       .max(100, 'Name is too long'),
     phone: z
       .string()
-      .regex(
-        pakistanPhoneRegex,
-        'Please enter a valid Pakistan phone number (e.g., 03001234567 or +923001234567)'
+      .min(1, 'Phone number is required')
+      .refine(
+        (v) => isValidPhoneNumber(v),
+        'Please enter a valid phone number for the selected country'
       ),
 
     // Shipping Address

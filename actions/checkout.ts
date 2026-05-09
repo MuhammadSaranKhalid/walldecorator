@@ -3,6 +3,7 @@
 import { z } from 'zod'
 import { cookies } from 'next/headers'
 import { eq } from 'drizzle-orm'
+import { isValidPhoneNumber } from 'libphonenumber-js/min'
 import { createServerClient } from '@/lib/supabase/server'
 import { db } from '@/lib/db/client'
 import { orders } from '@/lib/db/schema'
@@ -92,6 +93,13 @@ export async function createOrder(
 
   if (!input.email || !input.name || !input.phone || !input.shippingAddress) {
     return { success: false, error: 'Missing required fields' }
+  }
+
+  // Re-validate the phone number server-side. The client form already runs
+  // this check via Zod; doing it again here defends against a tampered or
+  // stale client state submitting a malformed number.
+  if (!isValidPhoneNumber(input.phone)) {
+    return { success: false, error: 'Please enter a valid phone number.' }
   }
 
   const isCard = input.paymentMethod === 'card'
