@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Cormorant_Garamond, DM_Sans } from "next/font/google"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { JsonLd } from "@/components/seo/json-ld"
 import { I18nProvider } from "@/lib/i18n/provider"
@@ -131,6 +132,7 @@ export default async function RootLayout({
                 <JsonLd data={websiteSchema} />
                 <JsonLd data={organizationSchema} />
                 {children}
+                <Analytics />
               </NuqsAdapter>
             </CurrencyProvider>
           </I18nProvider>
