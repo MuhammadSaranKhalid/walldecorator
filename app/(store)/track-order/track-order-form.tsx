@@ -197,7 +197,8 @@ function OrderResult({ result }: { result: Extract<TrackOrderResult, { found: tr
           <p>{result.shipping_address.line1}</p>
           {result.shipping_address.line2 && <p>{result.shipping_address.line2}</p>}
           <p>
-            {result.shipping_address.city}, {result.shipping_address.province}
+            {result.shipping_address.city}
+            {result.shipping_address.postal_code && <>, {result.shipping_address.postal_code}</>}
           </p>
           <p>{result.shipping_address.country}</p>
         </address>

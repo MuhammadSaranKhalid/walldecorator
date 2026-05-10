@@ -19,14 +19,12 @@ interface WebhookPayload {
     customer_email: string;
     customer_name: string;
     shipping_address: {
-      firstName: string;
-      lastName: string;
-      addressLine1: string;
-      addressLine2?: string;
+      line1: string;
+      line2?: string | null;
       city: string;
-      state: string;
-      postalCode: string;
+      postal_code?: string | null;
       country: string;
+      country_code?: string;
     };
     subtotal: number;
     shipping_cost: number;
@@ -140,6 +138,18 @@ export async function POST(request: NextRequest) {
       day: "numeric",
     });
 
+    // Map the DB shipping_address shape to the email template's shape.
+    const nameParts = order.customer_name.trim().split(/\s+/);
+    const emailShippingAddress = {
+      firstName: nameParts[0] ?? order.customer_name,
+      lastName: nameParts.slice(1).join(' ') || '',
+      addressLine1: order.shipping_address.line1,
+      addressLine2: order.shipping_address.line2 ?? null,
+      city: order.shipping_address.city,
+      postalCode: order.shipping_address.postal_code || null,
+      country: order.shipping_address.country,
+    };
+
     // Render email HTML
     const emailHtml = await render(
       OrderConfirmationEmail({
@@ -151,7 +161,7 @@ export async function POST(request: NextRequest) {
         shippingCost: Number(order.shipping_cost),
         taxAmount: Number(order.tax_amount),
         total: Number(order.total_amount),
-        shippingAddress: order.shipping_address,
+        shippingAddress: emailShippingAddress,
         trackingUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/track-order?order=${order.order_number}&email=${encodeURIComponent(order.customer_email)}`,
         currency: displayCurrency,
         rates,

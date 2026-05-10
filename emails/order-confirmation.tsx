@@ -29,10 +29,10 @@ interface ShippingAddress {
     firstName: string;
     lastName: string;
     addressLine1: string;
-    addressLine2?: string;
+    addressLine2?: string | null;
     city: string;
-    state: string;
-    postalCode: string;
+    state?: string | null;
+    postalCode?: string | null;
     country: string;
 }
 
@@ -233,8 +233,8 @@ export const OrderConfirmationEmail = ({
                                     <br />
                                 </>
                             )}
-                            {shippingAddress.city}, {shippingAddress.state}{" "}
-                            {shippingAddress.postalCode}
+                            {shippingAddress.city}
+                            {shippingAddress.postalCode ? `, ${shippingAddress.postalCode}` : ''}
                             <br />
                             {shippingAddress.country}
                         </Text>

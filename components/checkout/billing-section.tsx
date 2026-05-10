@@ -2,10 +2,12 @@
 
 import { MapPin } from 'lucide-react'
 import { useFormContext, Controller } from 'react-hook-form'
+import type { Country } from 'react-phone-number-input'
 import type { CheckoutFormData } from '@/lib/validations/checkout'
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
+import { CountrySelect } from '@/components/ui/country-select'
 
 export function BillingSection() {
   const { control, watch, setValue } = useFormContext<CheckoutFormData>()
@@ -22,7 +24,7 @@ export function BillingSection() {
         line1: '',
         line2: '',
         city: '',
-        province: '',
+        country: '',
         postalCode: '',
       })
     }
@@ -124,8 +126,9 @@ export function BillingSection() {
                       value={field.value || ''}
                       id={field.name}
                       type="text"
-                      placeholder="Lahore"
+                      placeholder="City"
                       className="h-11"
+                      autoComplete="address-level2"
                       aria-invalid={fieldState.invalid}
                     />
                     {fieldState.invalid && (
@@ -136,21 +139,18 @@ export function BillingSection() {
               />
 
               <Controller
-                name="billing.province"
+                name="billing.country"
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name} className="text-sm font-medium">
-                      Province
+                      Country
                     </FieldLabel>
-                    <Input
-                      {...field}
-                      value={field.value || ''}
+                    <CountrySelect
                       id={field.name}
-                      type="text"
-                      placeholder="Punjab"
-                      className="h-11"
-                      autoComplete="address-level1"
+                      value={(field.value || undefined) as Country | undefined}
+                      onChange={(c) => field.onChange(c)}
+                      onBlur={field.onBlur}
                       aria-invalid={fieldState.invalid}
                     />
                     {fieldState.invalid && (
@@ -167,16 +167,17 @@ export function BillingSection() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name} className="text-sm font-medium">
-                    Postal Code
+                    Postal Code <span className="text-muted-foreground font-normal">(Optional)</span>
                   </FieldLabel>
                   <Input
                     {...field}
                     value={field.value || ''}
                     id={field.name}
                     type="text"
-                    placeholder="54000"
-                    maxLength={5}
+                    placeholder="Postal / ZIP code"
+                    maxLength={20}
                     className="h-11"
+                    autoComplete="postal-code"
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (

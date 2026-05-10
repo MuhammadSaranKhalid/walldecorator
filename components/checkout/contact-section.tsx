@@ -88,11 +88,11 @@ export function ContactSection({ initialCountry }: Props) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor={field.name} className="text-sm font-medium">
-                  Phone Number
+                  Phone Number <span className="text-muted-foreground font-normal">(Optional)</span>
                 </FieldLabel>
                 <PhoneInput
                   id={field.name}
-                  value={field.value}
+                  value={field.value || undefined}
                   onChange={(v) => field.onChange(v ?? '')}
                   onBlur={field.onBlur}
                   defaultCountry={initialCountry}

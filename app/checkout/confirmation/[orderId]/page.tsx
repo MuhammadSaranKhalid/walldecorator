@@ -48,23 +48,21 @@ export default async function OrderConfirmationPage({ params }: Props) {
 
   const shippingAddress = order.shipping_address as {
     line1: string
-    line2?: string
+    line2?: string | null
     city: string
-    province: string
-    postal_code: string
+    postal_code?: string | null
     country: string
+    country_code?: string
   }
 
   const addressQueryOptions = Array.from(new Set([
-    [shippingAddress.line1, shippingAddress.city, shippingAddress.province, shippingAddress.country].filter(Boolean).join(', '),
-    [shippingAddress.city, shippingAddress.province, shippingAddress.country].filter(Boolean).join(', '),
+    [shippingAddress.line1, shippingAddress.city, shippingAddress.country].filter(Boolean).join(', '),
     [shippingAddress.city, shippingAddress.country].filter(Boolean).join(', '),
   ].filter(Boolean)))
 
   const addressLabel = [
     shippingAddress.line1,
     shippingAddress.city,
-    shippingAddress.province,
   ]
     .filter(Boolean)
     .join(', ')
@@ -166,21 +164,23 @@ export default async function OrderConfirmationPage({ params }: Props) {
             <p className="mt-1">{shippingAddress.line1}</p>
             {shippingAddress.line2 && <p>{shippingAddress.line2}</p>}
             <p>
-              {shippingAddress.city}, {shippingAddress.province}{' '}
-              {shippingAddress.postal_code}
+              {shippingAddress.city}
+              {shippingAddress.postal_code && <>, {shippingAddress.postal_code}</>}
             </p>
             <p>{shippingAddress.country}</p>
-            <p className="mt-2 flex items-center gap-2 text-[var(--obsidian-text-muted)]">
-              <Phone className="h-4 w-4" />
-              {order.customer_phone}
-            </p>
+            {order.customer_phone && (
+              <p className="mt-2 flex items-center gap-2 text-[var(--obsidian-text-muted)]">
+                <Phone className="h-4 w-4" />
+                {order.customer_phone}
+              </p>
+            )}
           </div>
         </div>
 
         {/* Delivery map */}
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <DeliveryMap addressQueryOptions={addressQueryOptions} addressLabel={addressLabel} />
-        </div>
+        </div> */}
 
         {/* What's next */}
         <div className="bg-[var(--obsidian-surface)] border border-[var(--obsidian-border)] p-6 mb-8">

@@ -6,6 +6,7 @@ import OrderConfirmationEmail from '@/emails/order-confirmation'
 import type { AddressData } from '@/lib/validations/checkout'
 import type { CurrencyCode } from '@/lib/currency'
 import type { RatesMap } from '@/lib/rates'
+import { getCountryName } from '@/lib/countries'
 
 interface SendOrderConfirmationParams {
   orderId: string
@@ -117,11 +118,10 @@ export async function sendOrderConfirmationEmail(
     firstName,
     lastName,
     addressLine1: shippingAddress.line1,
-    addressLine2: shippingAddress.line2,
+    addressLine2: shippingAddress.line2 ?? null,
     city: shippingAddress.city,
-    state: shippingAddress.province,
-    postalCode: shippingAddress.postalCode,
-    country: 'Pakistan',
+    postalCode: shippingAddress.postalCode || null,
+    country: getCountryName(shippingAddress.country),
   }
 
   const orderDate = new Date().toLocaleDateString('en-PK', {

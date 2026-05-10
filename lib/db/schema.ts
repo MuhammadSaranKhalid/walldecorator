@@ -219,11 +219,11 @@ export const orders = pgTable('orders', {
   customer_phone: text('customer_phone').notNull(),
   shipping_address: jsonb('shipping_address').notNull().$type<{
     line1: string; line2?: string | null; city: string
-    province: string; postal_code: string; country: string
+    postal_code?: string | null; country: string; country_code?: string
   }>(),
   billing_address: jsonb('billing_address').$type<{
     line1: string; line2?: string | null; city: string
-    province: string; postal_code: string; country: string
+    postal_code?: string | null; country: string; country_code?: string
   }>(),
   subtotal: numeric('subtotal', { precision: 10, scale: 2 }).notNull(),
   discount_amount: numeric('discount_amount', { precision: 10, scale: 2 }).default('0'),

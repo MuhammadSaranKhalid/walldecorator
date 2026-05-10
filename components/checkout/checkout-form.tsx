@@ -63,7 +63,7 @@ export function CheckoutForm({ ipAddress, userAgent, initialCountry }: CheckoutF
         line1: '',
         line2: '',
         city: '',
-        province: '',
+        country: initialCountry,
         postalCode: '',
       },
       billing: undefined,
@@ -83,7 +83,7 @@ export function CheckoutForm({ ipAddress, userAgent, initialCountry }: CheckoutF
       const orderResult = await createOrder({
         email: data.email,
         name: data.name,
-        phone: data.phone,
+        phone: data.phone || '',
         shippingAddress: data.shipping,
         billingAddress: data.useSameAddress ? null : data.billing!,
         cartItems: items,

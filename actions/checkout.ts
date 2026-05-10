@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { cookies } from 'next/headers'
 import { eq } from 'drizzle-orm'
 import { isValidPhoneNumber } from 'libphonenumber-js/min'
+import { getCountryName } from '@/lib/countries'
 import { createServerClient } from '@/lib/supabase/server'
 import { db } from '@/lib/db/client'
 import { orders } from '@/lib/db/schema'
@@ -91,15 +92,21 @@ export async function createOrder(
     return { success: false, error: 'Your cart is empty' }
   }
 
-  if (!input.email || !input.name || !input.phone || !input.shippingAddress) {
+  if (!input.email || !input.name || !input.shippingAddress) {
     return { success: false, error: 'Missing required fields' }
   }
 
-  // Re-validate the phone number server-side. The client form already runs
-  // this check via Zod; doing it again here defends against a tampered or
-  // stale client state submitting a malformed number.
-  if (!isValidPhoneNumber(input.phone)) {
+  // Phone is optional. If provided, re-validate server-side — the client
+  // form already runs this check via Zod, but we defend against a tampered
+  // or stale client state submitting a malformed number.
+  if (input.phone && !isValidPhoneNumber(input.phone)) {
     return { success: false, error: 'Please enter a valid phone number.' }
+  }
+
+  // Country is required (the form has it default to the geo-detected one,
+  // but we still re-check in case of a tampered submission).
+  if (!input.shippingAddress.country) {
+    return { success: false, error: 'Please select a country.' }
   }
 
   const isCard = input.paymentMethod === 'card'
@@ -136,9 +143,10 @@ export async function createOrder(
       line1: input.shippingAddress.line1,
       line2: input.shippingAddress.line2 || null,
       city: input.shippingAddress.city,
-      province: input.shippingAddress.province,
-      postal_code: input.shippingAddress.postalCode,
-      country: 'Pakistan',
+      postal_code: input.shippingAddress.postalCode || null,
+      // Store both ISO code (machine-friendly) and display name (human-friendly).
+      country_code: input.shippingAddress.country,
+      country: getCountryName(input.shippingAddress.country),
     }
 
     const billingAddressJson = input.billingAddress
@@ -146,9 +154,9 @@ export async function createOrder(
           line1: input.billingAddress.line1,
           line2: input.billingAddress.line2 || null,
           city: input.billingAddress.city,
-          province: input.billingAddress.province,
-          postal_code: input.billingAddress.postalCode,
-          country: 'Pakistan',
+          postal_code: input.billingAddress.postalCode || null,
+          country_code: input.billingAddress.country,
+          country: getCountryName(input.billingAddress.country),
         }
       : shippingAddressJson
 

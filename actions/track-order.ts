@@ -27,9 +27,9 @@ export type TrackOrderResult =
         line1: string
         line2?: string | null
         city: string
-        province: string
-        postal_code: string
+        postal_code?: string | null
         country: string
+        country_code?: string
       }
       items: OrderItem[]
       subtotal: number
