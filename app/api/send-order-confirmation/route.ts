@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
 import { render } from "@react-email/components";
 import OrderConfirmationEmail from "@/emails/order-confirmation";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { getStorageUrl } from "@/lib/supabase/storage";
 import { getRates } from "@/lib/rates";
+import { getResend, FROM_EMAIL } from "@/lib/email";
 import type { CurrencyCode } from "@/lib/currency";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface WebhookPayload {
   type: "INSERT" | "UPDATE";
@@ -169,8 +167,8 @@ export async function POST(request: NextRequest) {
     );
 
     // Send email via Resend
-    const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || "Wall Decorator <orders@walldecorator.store>",
+    const { data, error } = await getResend().emails.send({
+      from: FROM_EMAIL,
       to: order.customer_email,
       subject: `Order Confirmed - ${order.order_number}`,
       html: emailHtml,
