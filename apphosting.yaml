@@ -1,0 +1,77 @@
+# Firebase App Hosting configuration
+# Docs: https://firebase.google.com/docs/app-hosting/configure
+#
+# SECURITY: Never put raw secret values in this file — it's committed to git.
+# The `secret:` field is a *reference* to a secret name in Google Secret Manager.
+# Create secrets with:  firebase apphosting:secrets:set <NAME>
+
+runConfig:
+  cpu: 1
+  memoryMiB: 1024
+  maxInstances: 10
+  minInstances: 0
+  concurrency: 80
+  timeoutSeconds: 60
+
+env:
+  # ---- Public (plaintext, inlined into client bundle at build time) ----
+  - variable: NEXT_PUBLIC_SITE_URL
+    value: "https://www.walldecorator.store"
+    availability: [BUILD, RUNTIME]
+
+  - variable: NEXT_PUBLIC_APP_URL
+    value: "https://www.walldecorator.store"
+    availability: [BUILD, RUNTIME]
+
+  - variable: NEXT_PUBLIC_SUPABASE_URL
+    value: "https://srjfclplxoonrzczpfyz.supabase.co"
+    availability: [BUILD, RUNTIME]
+
+  - variable: NEXT_PUBLIC_SUPABASE_ANON_KEY
+    value: "sb_publishable_tXKlG5Dlk0Pk10u_-_edwQ_Pn6VC79w"
+    availability: [BUILD, RUNTIME]
+
+  - variable: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+    secret: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+    availability: [BUILD, RUNTIME]
+
+  - variable: RESEND_FROM_EMAIL
+    value: "orders@walldecorator.store"
+    availability: [RUNTIME]
+
+  # ---- Secrets (stored in Google Secret Manager — `secret:` is the name only) ----
+  - variable: DATABASE_URL
+    secret: DATABASE_URL
+    availability: [BUILD, RUNTIME]
+
+  - variable: DIRECT_URL
+    secret: DIRECT_URL
+    availability: [BUILD, RUNTIME]
+
+  - variable: SUPABASE_SERVICE_ROLE_KEY
+    secret: SUPABASE_SERVICE_ROLE_KEY
+    availability: [RUNTIME]
+
+  - variable: UPSTASH_REDIS_REST_URL
+    secret: UPSTASH_REDIS_REST_URL
+    availability: [BUILD, RUNTIME]
+
+  - variable: UPSTASH_REDIS_REST_TOKEN
+    secret: UPSTASH_REDIS_REST_TOKEN
+    availability: [BUILD, RUNTIME]
+
+  - variable: STRIPE_SECRET_KEY
+    secret: STRIPE_SECRET_KEY
+    availability: [RUNTIME]
+
+  - variable: STRIPE_WEBHOOK_SECRET
+    secret: STRIPE_WEBHOOK_SECRET
+    availability: [RUNTIME]
+
+  - variable: RESEND_API_KEY
+    secret: RESEND_API_KEY
+    availability: [RUNTIME]
+
+  - variable: REVALIDATE_SECRET
+    secret: REVALIDATE_SECRET
+    availability: [RUNTIME]
