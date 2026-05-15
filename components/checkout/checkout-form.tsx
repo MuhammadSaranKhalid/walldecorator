@@ -13,7 +13,7 @@ import type { Country } from 'react-phone-number-input'
 import { checkoutSchema, type CheckoutFormData } from '@/lib/validations/checkout'
 import { useCartStore } from '@/store/cart.store'
 import { useCurrencyStore } from '@/store/currency.store'
-import { createOrder, markOrderPaid, markOrderFailed } from '@/actions/checkout'
+import { createOrder, markOrderFailed } from '@/actions/checkout'
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '@/lib/constants'
 
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
@@ -110,6 +110,18 @@ export function CheckoutForm({ ipAddress, userAgent, initialCountry }: CheckoutF
       const { orderId, requiresPayment } = orderResult
 
       // Step 2 (card only): confirm payment against the pending order.
+      // Stripe disabled — card flow short-circuited. Restore from git history
+      // if Stripe is reintroduced.
+      if (requiresPayment) {
+        await markOrderFailed(orderId, 'Card payments are currently unavailable')
+        methods.setError('root.serverError', {
+          type: 'server',
+          message: 'Card payments are currently unavailable.',
+        })
+        toast.error('Card payments are currently unavailable.')
+        return
+      }
+      /*
       if (requiresPayment) {
         if (!stripeRef.current) {
           await markOrderFailed(orderId, 'Stripe form was not ready')
@@ -132,12 +144,11 @@ export function CheckoutForm({ ipAddress, userAgent, initialCountry }: CheckoutF
           return
         }
 
-        // Step 3: mark the order paid. The webhook also calls this
-        // idempotently — whoever wins, the row is correct.
         if (result.paymentIntentId) {
           await markOrderPaid(orderId, result.paymentIntentId)
         }
       }
+      */
 
       clearCart()
       toast.success('Order placed successfully!')

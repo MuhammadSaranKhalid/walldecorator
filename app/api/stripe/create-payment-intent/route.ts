@@ -1,4 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
+
+// Stripe disabled — payment processing removed.
+// Restore from git history if Stripe is reintroduced.
+export async function POST() {
+  return NextResponse.json(
+    { error: 'Payment processing is currently unavailable.' },
+    { status: 410 }
+  )
+}
+
+/*
+import { NextRequest } from 'next/server'
 import { z } from 'zod'
 import { eq } from 'drizzle-orm'
 import { stripe } from '@/lib/stripe'
@@ -9,13 +21,6 @@ const requestSchema = z.object({
   orderId: z.uuid(),
 })
 
-/**
- * Creates a Stripe PaymentIntent for an EXISTING pending order.
- *
- * The order is created first by the `createOrder` server action; this route
- * looks up the canonical `total_amount` from the orders row, so neither the
- * cart contents nor the price ever round-trip through the client.
- */
 export async function POST(request: NextRequest) {
   try {
     const json = await request.json().catch(() => null)
@@ -75,8 +80,6 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // Stamp the PI id onto the order so the webhook can reconcile by either
-    // metadata.order_id OR payment_intent_id.
     await db
       .update(orders)
       .set({ payment_intent_id: paymentIntent.id })
@@ -94,3 +97,4 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+*/

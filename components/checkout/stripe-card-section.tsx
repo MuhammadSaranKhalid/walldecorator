@@ -1,5 +1,22 @@
 'use client'
 
+// Stripe disabled — payment processing removed.
+// Type export preserved so dependents still compile.
+// Restore the implementation from git history if Stripe is reintroduced.
+
+export type StripeCardSectionRef = {
+  confirmPayment(orderId: string): Promise<{
+    success: boolean
+    paymentIntentId?: string
+    error?: string
+  }>
+}
+
+export function StripeCardSection() {
+  return null
+}
+
+/*
 import {
   useStripe,
   useElements,
@@ -7,23 +24,6 @@ import {
 } from '@stripe/react-stripe-js'
 import { useImperativeHandle, useState, type Ref } from 'react'
 import { Loader2 } from 'lucide-react'
-
-export type StripeCardSectionRef = {
-  /**
-   * Validates the PaymentElement, creates a PaymentIntent for the given
-   * pending order, and confirms payment. Returns the Stripe paymentIntentId
-   * on success, or an error message.
-   *
-   * The order must already exist in 'pending' status — the PI route reads
-   * its authoritative `total_amount` from the DB. Nothing about price or
-   * cart contents goes through this function from the client.
-   */
-  confirmPayment(orderId: string): Promise<{
-    success: boolean
-    paymentIntentId?: string
-    error?: string
-  }>
-}
 
 type Props = {
   ref: Ref<StripeCardSectionRef | null>
@@ -41,13 +41,11 @@ export function StripeCardSection({ ref }: Props) {
         return { success: false, error: 'Stripe has not loaded yet. Please try again.' }
       }
 
-      // Step 1: Validate the PaymentElement before hitting the server
       const { error: submitError } = await elements.submit()
       if (submitError) {
         return { success: false, error: submitError.message }
       }
 
-      // Step 2: Create the PaymentIntent server-side using the pending order
       let clientSecret: string
       try {
         const res = await fetch('/api/stripe/create-payment-intent', {
@@ -67,16 +65,12 @@ export function StripeCardSection({ ref }: Props) {
         return { success: false, error: 'Network error. Please try again.' }
       }
 
-      // Step 3: Confirm the payment with the newly created clientSecret
       const { paymentIntent, error: confirmError } = await stripe.confirmPayment({
         elements,
         clientSecret,
         confirmParams: {
-          // For 3DS flows: user is redirected here then back, so keep
-          // the return_url pointing at the checkout page so they can retry.
           return_url: `${window.location.origin}/checkout`,
         },
-        // Avoids a page redirect for straightforward card payments (no 3DS).
         redirect: 'if_required',
       })
 
@@ -110,3 +104,4 @@ export function StripeCardSection({ ref }: Props) {
     </div>
   )
 }
+*/

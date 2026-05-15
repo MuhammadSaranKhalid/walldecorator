@@ -1,3 +1,7 @@
+// Stripe disabled — payment processing removed.
+// Restore from git history if Stripe is reintroduced.
+
+/*
 import { loadStripe } from '@stripe/stripe-js'
 import type { Stripe } from '@stripe/stripe-js'
 
@@ -9,3 +13,6 @@ export function getStripe() {
   }
   return stripePromise
 }
+*/
+
+export {}

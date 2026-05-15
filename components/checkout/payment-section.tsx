@@ -2,10 +2,11 @@
 
 import { type RefObject } from 'react'
 import { Banknote, CreditCard } from 'lucide-react'
-import { Elements } from '@stripe/react-stripe-js'
-import type { StripeElementsOptions } from '@stripe/stripe-js'
-import { getStripe } from '@/lib/stripe-client'
-import { StripeCardSection, type StripeCardSectionRef } from './stripe-card-section'
+// Stripe disabled — payment processing removed.
+// import { Elements } from '@stripe/react-stripe-js'
+// import type { StripeElementsOptions } from '@stripe/stripe-js'
+// import { getStripe } from '@/lib/stripe-client'
+import { type StripeCardSectionRef } from './stripe-card-section'
 
 export type PaymentMethod = 'cod' | 'card'
 
@@ -16,28 +17,28 @@ type PaymentSectionProps = {
   stripeRef: RefObject<StripeCardSectionRef | null>
 }
 
-const stripePromise = getStripe()
+// const stripePromise = getStripe()
 
 export function PaymentSection({
   paymentMethod,
   onPaymentMethodChange,
-  amountInPaisa,
-  stripeRef,
+  amountInPaisa: _amountInPaisa,
+  stripeRef: _stripeRef,
 }: PaymentSectionProps) {
-  const elementsOptions: StripeElementsOptions = {
-    mode: 'payment',
-    amount: amountInPaisa,
-    currency: 'pkr',
-    appearance: {
-      theme: 'night',
-      variables: {
-        colorPrimary: '#c9a84c',
-        colorBackground: '#111111',
-        colorText: '#f0ece4',
-        borderRadius: '0px',
-      },
-    },
-  }
+  // const elementsOptions: StripeElementsOptions = {
+  //   mode: 'payment',
+  //   amount: amountInPaisa,
+  //   currency: 'pkr',
+  //   appearance: {
+  //     theme: 'night',
+  //     variables: {
+  //       colorPrimary: '#c9a84c',
+  //       colorBackground: '#111111',
+  //       colorText: '#f0ece4',
+  //       borderRadius: '0px',
+  //     },
+  //   },
+  // }
 
   return (
     <div className="space-y-4">
@@ -126,7 +127,15 @@ export function PaymentSection({
       )}
       */}
 
-      {/* Stripe card form */}
+      {/* Stripe card form — DISABLED */}
+      {paymentMethod === 'card' && (
+        <div className="border border-[var(--obsidian-border)] bg-[var(--obsidian-surface)] p-4">
+          <p className="text-sm text-[var(--obsidian-text-muted)]">
+            Card payments are temporarily unavailable.
+          </p>
+        </div>
+      )}
+      {/*
       {paymentMethod === 'card' && (
         <div className="border border-[var(--obsidian-border)] bg-[var(--obsidian-surface)] p-4 space-y-4">
           <Elements stripe={stripePromise} options={elementsOptions}>
@@ -134,6 +143,7 @@ export function PaymentSection({
           </Elements>
         </div>
       )}
+      */}
     </div>
   )
 }

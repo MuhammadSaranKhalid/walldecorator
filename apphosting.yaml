@@ -31,9 +31,10 @@ env:
     value: "sb_publishable_tXKlG5Dlk0Pk10u_-_edwQ_Pn6VC79w"
     availability: [BUILD, RUNTIME]
 
-  - variable: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-    secret: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-    availability: [BUILD, RUNTIME]
+  # Stripe disabled — payment processing removed.
+  # - variable: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  #   secret: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  #   availability: [BUILD, RUNTIME]
 
   - variable: RESEND_FROM_EMAIL
     value: "orders@walldecorator.store"
@@ -60,13 +61,14 @@ env:
     secret: UPSTASH_REDIS_REST_TOKEN
     availability: [BUILD, RUNTIME]
 
-  - variable: STRIPE_SECRET_KEY
-    secret: STRIPE_SECRET_KEY
-    availability: [RUNTIME]
+  # Stripe disabled — payment processing removed.
+  # - variable: STRIPE_SECRET_KEY
+  #   secret: STRIPE_SECRET_KEY
+  #   availability: [RUNTIME]
 
-  - variable: STRIPE_WEBHOOK_SECRET
-    secret: STRIPE_WEBHOOK_SECRET
-    availability: [RUNTIME]
+  # - variable: STRIPE_WEBHOOK_SECRET
+  #   secret: STRIPE_WEBHOOK_SECRET
+  #   availability: [RUNTIME]
 
   - variable: RESEND_API_KEY
     secret: RESEND_API_KEY

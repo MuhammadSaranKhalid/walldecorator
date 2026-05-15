@@ -1,20 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
+
+// Stripe disabled — webhook handling removed.
+// Restore from git history if Stripe is reintroduced.
+export async function POST() {
+  return NextResponse.json(
+    { received: false, disabled: true },
+    { status: 410 }
+  )
+}
+
+/*
+import { NextRequest } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { stripe } from '@/lib/stripe'
 import type Stripe from 'stripe'
 
-/**
- * Stripe webhook handler.
- *
- * Reconciles order payment_status with Stripe's view of the world. Two
- * sources can flip a 'pending' order to 'confirmed': the client's
- * post-charge `markOrderPaid` server action and this webhook. Both call
- * the same `mark_order_paid` RPC, which is idempotent — only the first
- * caller actually mutates the row.
- *
- * Idempotency at the event level is enforced by inserting `event.id` into
- * `stripe_events` first; duplicate deliveries return 200 immediately.
- */
 export async function POST(request: NextRequest) {
   const body = await request.text()
   const sig = request.headers.get('stripe-signature')
@@ -46,24 +46,19 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // Service role for writes — bypasses RLS for orders + stripe_events.
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  // ── Idempotency: dedupe by event.id ────────────────────────────────────
   const { error: dupErr } = await supabase
     .from('stripe_events')
     .insert({ id: event.id, type: event.type })
 
   if (dupErr) {
     if (dupErr.code === '23505') {
-      // Duplicate delivery — safe to acknowledge without re-processing.
       return NextResponse.json({ received: true, duplicate: true })
     }
-    // Don't drop the event on other DB errors; log and continue. The handler
-    // is still individually idempotent via mark_order_paid.
     console.error('stripe_events insert error:', dupErr)
   }
 
@@ -81,7 +76,6 @@ export async function POST(request: NextRequest) {
           console.error('mark_order_paid (webhook) error:', error)
         }
       } else {
-        // Legacy / unlinked PI — fall back to matching by payment_intent_id.
         const { error } = await supabase
           .from('orders')
           .update({ payment_status: 'paid', status: 'confirmed' })
@@ -113,9 +107,9 @@ export async function POST(request: NextRequest) {
     }
 
     default:
-      // Unhandled event type — silently ignore.
       break
   }
 
   return NextResponse.json({ received: true })
 }
+*/
