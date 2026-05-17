@@ -167,13 +167,21 @@ export async function createOrder(
 
     // Persist the resolved display_currency via Drizzle (direct Postgres) so
     // RLS doesn't silently drop the update — the orders table has no UPDATE
-    // policy for anon.
+    // policy for anon. Snapshot id is only applied when it's a real UUID;
+    // the rates store uses placeholder ids ('base', 'seed') for fallback
+    // rates which would fail the column's uuid type check.
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    const validSnapshotId =
+      input.rateSnapshotId && UUID_RE.test(input.rateSnapshotId)
+        ? input.rateSnapshotId
+        : undefined
+
     try {
       await db
         .update(orders)
         .set({
           display_currency: resolvedCurrency,
-          ...(input.rateSnapshotId && { exchange_rate_snapshot_id: input.rateSnapshotId }),
+          ...(validSnapshotId && { exchange_rate_snapshot_id: validSnapshotId }),
         })
         .where(eq(orders.id, orderId as string))
     } catch (err) {
