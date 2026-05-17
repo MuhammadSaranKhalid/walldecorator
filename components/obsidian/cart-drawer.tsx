@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
@@ -28,20 +28,49 @@ function CartDrawerContent() {
     useCartStore()
   const { currency, rates } = useCurrencyStore()
   const router = useRouter()
+  const drawerRef = useRef<HTMLDivElement>(null)
+  const previouslyFocused = useRef<HTMLElement | null>(null)
 
   const total = getTotalPrice()
   const itemCount = getTotalItems()
   const shippingCost = 0
+
+  // Escape closes; return focus to whatever opened the drawer on close.
+  useEffect(() => {
+    if (!isOpen) return
+    previouslyFocused.current = document.activeElement as HTMLElement | null
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeCart()
+    }
+    window.addEventListener('keydown', onKey)
+
+    // Lock body scroll while open
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prevOverflow
+      previouslyFocused.current?.focus?.()
+    }
+  }, [isOpen, closeCart])
 
   const handleCheckout = () => {
     closeCart()
     router.push('/checkout')
   }
 
+  const handleEmptyCartBrowse = () => {
+    closeCart()
+    router.push('/products')
+  }
+
   return (
     <>
       {/* Overlay */}
       <div
+        aria-hidden="true"
         className={`fixed inset-0 bg-black/50 dark:bg-black/70 z-[200] transition-opacity duration-300 backdrop-blur-sm ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
@@ -50,6 +79,10 @@ function CartDrawerContent() {
 
       {/* Drawer */}
       <div
+        ref={drawerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('cart.title')}
         className={`fixed top-0 right-0 bottom-0 w-[420px] max-w-full bg-[var(--obsidian-surface)] border-l border-[var(--obsidian-border)] z-[201] flex flex-col transition-transform duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
@@ -73,9 +106,15 @@ function CartDrawerContent() {
 
         {items.length === 0 ? (
           // Empty state
-          <div className="flex flex-col items-center justify-center flex-1 text-[var(--obsidian-text-muted)] gap-3">
+          <div className="flex flex-col items-center justify-center flex-1 text-[var(--obsidian-text-muted)] gap-4 px-8">
             <ShoppingCart className="w-12 h-12 opacity-30" />
             <p className="text-xs tracking-wide uppercase">{t('cart.empty')}</p>
+            <button
+              onClick={handleEmptyCartBrowse}
+              className="mt-2 px-6 py-3 bg-[var(--obsidian-gold)] text-[var(--obsidian-bg)] text-[11px] tracking-[0.1875em] uppercase font-medium transition-colors duration-200 hover:bg-[var(--obsidian-gold-light)]"
+            >
+              Browse Products
+            </button>
           </div>
         ) : (
           <>

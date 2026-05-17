@@ -149,6 +149,14 @@ export default async function OrderConfirmationPage({ params }: Props) {
                 <span className="text-[var(--obsidian-text)]">Total</span>
                 <span className="text-[var(--obsidian-gold)]">{formatPrice(Number(order.total_amount), displayCurrency, rates)}</span>
               </div>
+              {displayCurrency !== 'PKR' && (
+                <div className="flex justify-between text-sm pt-1">
+                  <span className="text-[var(--obsidian-text-muted)]">You'll pay on delivery</span>
+                  <span className="font-medium text-[var(--obsidian-text)]">
+                    {formatPrice(Number(order.total_amount), 'PKR', rates)}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -186,14 +194,19 @@ export default async function OrderConfirmationPage({ params }: Props) {
         <div className="bg-[var(--obsidian-surface)] border border-[var(--obsidian-border)] p-6 mb-8">
           <h2 className="text-lg font-semibold text-[var(--obsidian-text)] mb-4">What's Next?</h2>
           <ol className="list-decimal list-inside space-y-2 text-sm text-[var(--obsidian-text-muted)]">
-            <li>You will receive a confirmation call from our team soon</li>
-            <li>Your order will be prepared and dispatched</li>
+            <li>Your order is being prepared and will be dispatched via courier</li>
             <li>
-              Please keep the exact payment amount ready (
-              <span className="font-medium text-[var(--obsidian-text)]">{formatPrice(Number(order.total_amount), displayCurrency, rates)}</span>
-              )
+              Our courier will call
+              {order.customer_phone ? (
+                <> <span className="font-medium text-[var(--obsidian-text)]">{order.customer_phone}</span></>
+              ) : (
+                <> you</>
+              )}{' '}
+              before delivery
             </li>
-            <li>Pay the delivery person upon receiving your order</li>
+            <li>
+              Please have <span className="font-medium text-[var(--obsidian-text)]">{formatPrice(Number(order.total_amount), 'PKR', rates)}</span> in cash ready for the courier
+            </li>
           </ol>
         </div>
 

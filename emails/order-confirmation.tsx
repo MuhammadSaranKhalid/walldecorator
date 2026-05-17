@@ -96,6 +96,8 @@ export const OrderConfirmationEmail = ({
 }: OrderConfirmationEmailProps) => {
     const liveRates = rates ?? FALLBACK_RATES
     const formatPrice = (amount: number) => formatCurrencyPrice(amount, currency, liveRates);
+    const formatPricePKR = (amount: number) => formatCurrencyPrice(amount, 'PKR', liveRates);
+    const showPkrEquivalent = currency !== 'PKR';
     const previewText = `Order ${orderNumber} confirmed — Thank you for your purchase!`;
 
     return (
@@ -162,7 +164,15 @@ export const OrderConfirmationEmail = ({
                             <Text style={codNoticeLabel}>Payment Method</Text>
                             <Text style={codNoticeValue}>Cash on Delivery</Text>
                             <Text style={codNoticeBody}>
-                                Please have <strong>{formatPrice(total)}</strong> ready in cash when your courier arrives. Our team will call you to confirm the delivery window.
+                                Please have <strong>{formatPricePKR(total)}</strong> in cash ready when our courier arrives. The courier will call you before delivery.
+                                {showPkrEquivalent && (
+                                    <>
+                                        <br />
+                                        <span style={{ fontSize: '12px', color: BRAND_MUTED }}>
+                                            (You viewed this order as {formatPrice(total)}.)
+                                        </span>
+                                    </>
+                                )}
                             </Text>
                         </Section>
                     </Section>

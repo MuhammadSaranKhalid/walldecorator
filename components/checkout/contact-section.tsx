@@ -88,7 +88,10 @@ export function ContactSection({ initialCountry }: Props) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor={field.name} className="text-sm font-medium">
-                  Phone Number <span className="text-muted-foreground font-normal">(Optional)</span>
+                  Phone Number
+                  <span className="block text-xs text-muted-foreground font-normal mt-0.5">
+                    Our courier will call before delivery
+                  </span>
                 </FieldLabel>
                 <PhoneInput
                   id={field.name}

@@ -24,8 +24,6 @@ export function ObsidianFooter() {
     company: [
       { nameKey: 'footer.links.aboutUs', href: '/about' },
       { nameKey: 'footer.links.contact', href: '/contact' },
-      { nameKey: 'footer.links.privacyPolicy', href: '/privacy' },
-      { nameKey: 'footer.links.termsOfService', href: '/terms' },
     ],
   }
 
@@ -155,17 +153,6 @@ export function ObsidianFooter() {
         <div className="border-t border-[var(--obsidian-border)] pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="text-[11px] text-[var(--obsidian-text-dim)]">
             {t('footer.copyright', { year: currentYear })}
-          </div>
-          <div className="flex flex-wrap gap-4 sm:gap-6 text-[11px] text-[var(--obsidian-text-dim)]">
-            <Link href="/privacy" className="hover:text-[var(--obsidian-gold)] transition-colors duration-200">
-              {t('footer.privacy')}
-            </Link>
-            <Link href="/terms" className="hover:text-[var(--obsidian-gold)] transition-colors duration-200">
-              {t('footer.terms')}
-            </Link>
-            <Link href="/cookies" className="hover:text-[var(--obsidian-gold)] transition-colors duration-200">
-              {t('footer.cookies')}
-            </Link>
           </div>
         </div>
       </div>

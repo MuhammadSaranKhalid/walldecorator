@@ -8,14 +8,13 @@ import { useTranslation } from 'react-i18next'
 import { useCartStore } from '@/store/cart.store'
 import { useWishlistStore } from '@/store/wishlist.store'
 import { useUIStore } from '@/store/ui.store'
-import { Search, ShoppingCart, Heart } from 'lucide-react'
+import { ShoppingCart, Heart } from 'lucide-react'
 import { LanguageSwitcher } from './language-switcher'
 import { CurrencySwitcher } from './currency-switcher'
 import { ThemeToggle } from './theme-toggle'
 
 export function ObsidianNavigation() {
   const [isClient, setIsClient] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
   const pathname = usePathname()
   const { t } = useTranslation('common')
 
@@ -82,20 +81,8 @@ export function ObsidianNavigation() {
         ))}
       </div>
 
-      {/* Right side - Search, Language, Wishlist, Cart, Mobile Menu */}
+      {/* Right side - Language, Wishlist, Cart, Mobile Menu */}
       <div className="flex items-center gap-1.5 sm:gap-2.5">
-        {/* Search Input - Desktop only */}
-        <div className="hidden md:flex items-center gap-2.5 bg-[var(--obsidian-surface)] border border-[var(--obsidian-border)] rounded-sm px-3.5 py-2">
-          <Search className="w-3.5 h-3.5 text-[var(--obsidian-text-dim)]" />
-          <input
-            type="text"
-            placeholder={t('nav.searchPlaceholder')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-transparent border-none outline-none text-[var(--obsidian-text)] font-[family-name:var(--font-dm-sans)] text-xs tracking-wide w-36 placeholder:text-[var(--obsidian-text-dim)]"
-          />
-        </div>
-
         {/* Theme Toggle */}
         <ThemeToggle />
 

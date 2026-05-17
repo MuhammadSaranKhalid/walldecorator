@@ -1,12 +1,10 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Tag, ChevronDown, ChevronUp, ShoppingBag } from 'lucide-react'
+import { ChevronDown, ChevronUp, ShoppingBag } from 'lucide-react'
 import type { CartItem } from '@/store/cart.store'
 import { OrderItem } from './order-item'
 import { Separator } from '@/components/ui/separator'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { formatPrice } from '@/lib/currency'
 import { useCurrencyStore } from '@/store/currency.store'
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '@/lib/constants'
@@ -17,8 +15,6 @@ type OrderSummaryProps = {
 
 export function OrderSummary({ items }: OrderSummaryProps) {
   const { currency, rates } = useCurrencyStore()
-  const [discountCode, setDiscountCode] = useState('')
-  const [showDiscountField, setShowDiscountField] = useState(false)
   const [isSummaryExpanded, setIsSummaryExpanded] = useState(false)
 
   const subtotal = useMemo(
@@ -35,11 +31,6 @@ export function OrderSummary({ items }: OrderSummaryProps) {
     () => subtotal + shippingCost,
     [subtotal, shippingCost]
   )
-
-  const handleApplyDiscount = () => {
-    // Placeholder for discount logic
-    console.log('Applying discount:', discountCode)
-  }
 
   return (
     <div className="bg-[var(--obsidian-surface)] lg:border border-[var(--obsidian-border)] overflow-hidden">
@@ -87,39 +78,7 @@ export function OrderSummary({ items }: OrderSummaryProps) {
 
         <Separator />
 
-        {/* Discount code */}
         <div className="p-6 space-y-3">
-          {!showDiscountField ? (
-            <button
-              type="button"
-              onClick={() => setShowDiscountField(true)}
-              className="flex items-center gap-2 text-sm text-[var(--obsidian-gold)] hover:text-brand-gold transition-colors"
-            >
-              <Tag className="h-4 w-4" />
-              <span>Add discount code</span>
-            </button>
-          ) : (
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                placeholder="Discount code"
-                value={discountCode}
-                onChange={(e) => setDiscountCode(e.target.value)}
-                className="flex-1"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleApplyDiscount}
-                disabled={!discountCode}
-              >
-                Apply
-              </Button>
-            </div>
-          )}
-
-          <Separator />
-
           {/* Price breakdown */}
           <div className="space-y-3">
             <div className="flex justify-between text-sm">

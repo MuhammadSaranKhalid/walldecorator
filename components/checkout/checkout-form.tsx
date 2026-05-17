@@ -80,7 +80,6 @@ export function CheckoutForm({ ipAddress, userAgent, initialCountry }: CheckoutF
           type: 'server',
           message: orderResult.error ?? 'Failed to place order',
         })
-        toast.error(orderResult.error ?? 'Failed to place order')
         return
       }
 
@@ -93,7 +92,6 @@ export function CheckoutForm({ ipAddress, userAgent, initialCountry }: CheckoutF
         type: 'server',
         message: 'An unexpected error occurred. Please try again.',
       })
-      toast.error('An unexpected error occurred. Please try again.')
     }
   }
 
@@ -209,10 +207,7 @@ export function CheckoutForm({ ipAddress, userAgent, initialCountry }: CheckoutF
                   </Button>
 
                   <div className="flex items-center justify-center gap-4 text-xs text-[var(--obsidian-text-muted)] pt-4">
-                    <div className="flex items-center gap-1">
-                      <Lock className="h-3 w-3" />
-                      <span>Secure Checkout</span>
-                    </div>
+                    <span>Cash on Delivery — no online payment required</span>
                   </div>
                 </div>
               </div>

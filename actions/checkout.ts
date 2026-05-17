@@ -90,8 +90,8 @@ export async function createOrder(
     return { success: false, error: 'Missing required fields' }
   }
 
-  if (input.phone && !isValidPhoneNumber(input.phone)) {
-    return { success: false, error: 'Please enter a valid phone number.' }
+  if (!input.phone || !isValidPhoneNumber(input.phone)) {
+    return { success: false, error: 'A valid phone number is required for delivery contact.' }
   }
 
   if (!input.shippingAddress.country) {

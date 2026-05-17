@@ -33,15 +33,14 @@ export const checkoutSchema = z
       .string()
       .min(2, 'Name must be at least 2 characters')
       .max(100, 'Name is too long'),
-    // Optional: if provided, must be a valid international phone number.
+    // Required for COD — the courier needs to reach the customer before delivery.
     phone: z
       .string()
+      .min(1, 'Phone number is required for delivery contact')
       .refine(
-        (v) => !v || isValidPhoneNumber(v),
+        (v) => isValidPhoneNumber(v),
         'Please enter a valid phone number for the selected country'
-      )
-      .optional()
-      .or(z.literal('')),
+      ),
 
     // Shipping Address
     shipping: addressSchema,

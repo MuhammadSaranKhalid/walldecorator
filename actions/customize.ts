@@ -2,6 +2,7 @@
 
 import { getAdminClient } from '@/lib/supabase/admin'
 import { CustomOrderSchema, type CustomOrderFormData } from '@/lib/validations/customize'
+import { sendCustomOrderNotification } from '@/lib/email/send-custom-order-notification'
 
 // ─── Direct client upload is used for images to bypass 1MB server limit ────
 
@@ -83,6 +84,19 @@ export async function submitCustomOrder(
             console.error('Custom order update error:', updateError)
             return { success: false, error: 'Failed to link image. Please try again.' }
         }
+
+        // Fire-and-forget admin notification — failure here must not break the
+        // submission, the request is already saved in the DB.
+        sendCustomOrderNotification({
+            customerName: data.customer_name.trim(),
+            customerEmail: data.customer_email.trim().toLowerCase(),
+            customerPhone: data.customer_phone?.trim() || null,
+            description: data.description?.trim() || null,
+            preferredMaterial: data.preferred_material || null,
+            preferredSize: data.preferred_size || null,
+            preferredThickness: data.preferred_thickness || null,
+            customOrderId,
+        }).catch((err) => console.error('[email] Unexpected error notifying admin of custom order', err))
 
         // Image processing webhook will automatically fire and create variants
         return { success: true }

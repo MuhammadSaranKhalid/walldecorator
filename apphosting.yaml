@@ -35,6 +35,10 @@ env:
     value: "orders@walldecorator.store"
     availability: [RUNTIME]
 
+  - variable: ADMIN_NOTIFICATION_EMAIL
+    value: "orders@walldecorator.store"
+    availability: [RUNTIME]
+
   # ---- Secrets (stored in Google Secret Manager — `secret:` is the name only) ----
   - variable: DATABASE_URL
     secret: DATABASE_URL
