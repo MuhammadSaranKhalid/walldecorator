@@ -354,15 +354,6 @@ const header: React.CSSProperties = {
     textAlign: "center",
 };
 
-const logoText: React.CSSProperties = {
-    color: BRAND_GOLD,
-    fontSize: "28px",
-    fontWeight: "800",
-    letterSpacing: "-0.5px",
-    margin: "0",
-    fontFamily: "'Manrope', Arial, sans-serif",
-};
-
 const tagline: React.CSSProperties = {
     color: "#999999",
     fontSize: "12px",
