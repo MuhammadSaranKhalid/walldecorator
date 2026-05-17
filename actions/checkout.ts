@@ -213,6 +213,7 @@ export async function createOrder(
       orderNumber: order.order_number,
       customerName: input.name,
       customerEmail: input.email,
+      customerPhone: input.phone,
       shippingAddress: input.shippingAddress,
       subtotal: Number(order.subtotal),
       shippingCost: Number(order.shipping_cost ?? 0),

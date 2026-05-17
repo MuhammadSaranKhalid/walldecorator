@@ -16,6 +16,7 @@ interface WebhookPayload {
     status: string;
     customer_email: string;
     customer_name: string;
+    customer_phone: string | null;
     shipping_address: {
       line1: string;
       line2?: string | null;
@@ -153,6 +154,7 @@ export async function POST(request: NextRequest) {
       OrderConfirmationEmail({
         orderNumber: order.order_number,
         customerName: order.customer_name,
+        customerPhone: order.customer_phone,
         orderDate,
         items: emailItems,
         subtotal: Number(order.subtotal),

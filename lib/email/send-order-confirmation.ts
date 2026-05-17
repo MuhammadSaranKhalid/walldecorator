@@ -13,6 +13,7 @@ interface SendOrderConfirmationParams {
   orderNumber: string
   customerName: string
   customerEmail: string
+  customerPhone?: string | null
   shippingAddress: AddressData
   subtotal: number
   shippingCost: number
@@ -51,6 +52,7 @@ export async function sendOrderConfirmationEmail(
     orderNumber,
     customerName,
     customerEmail,
+    customerPhone,
     shippingAddress,
     subtotal,
     shippingCost,
@@ -136,6 +138,7 @@ export async function sendOrderConfirmationEmail(
     OrderConfirmationEmail({
       orderNumber,
       customerName,
+      customerPhone,
       orderDate,
       items: emailItems,
       subtotal,

@@ -49,6 +49,7 @@ const FALLBACK_RATES: RatesMap = {
 interface OrderConfirmationEmailProps {
     orderNumber: string;
     customerName: string;
+    customerPhone?: string | null;
     orderDate: string;
     items: OrderItem[];
     subtotal: number;
@@ -66,6 +67,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 export const OrderConfirmationEmail = ({
     orderNumber = "ORD-123456",
     customerName = "John Doe",
+    customerPhone = null,
     orderDate = "December 3, 2024",
     items = [
         {
@@ -127,7 +129,6 @@ export const OrderConfirmationEmail = ({
                                 height={44}
                                 style={{ display: "inline-block", verticalAlign: "middle" }}
                             />
-                            <Text style={logoText}>Wall Decorator</Text>
                         </Link>
                         <Text style={tagline}>Art That Defines Your Space</Text>
                     </Section>
@@ -137,8 +138,8 @@ export const OrderConfirmationEmail = ({
                         <Text style={checkIcon}>✓</Text>
                         <Heading style={successHeading}>Order Confirmed!</Heading>
                         <Text style={successText}>
-                            Hi {customerName}, thank you for your order. We&apos;ve received your
-                            order and will notify you once it ships.
+                            Hi {customerName}, thank you for your order. We&apos;re preparing it for
+                            dispatch and our courier will call you to schedule delivery.
                         </Text>
                     </Section>
 
@@ -164,7 +165,12 @@ export const OrderConfirmationEmail = ({
                             <Text style={codNoticeLabel}>Payment Method</Text>
                             <Text style={codNoticeValue}>Cash on Delivery</Text>
                             <Text style={codNoticeBody}>
-                                Please have <strong>{formatPricePKR(total)}</strong> in cash ready when our courier arrives. The courier will call you before delivery.
+                                Please have <strong>{formatPricePKR(total)}</strong> in cash ready when our courier arrives.
+                                {customerPhone ? (
+                                    <> The courier will call <strong>{customerPhone}</strong> before delivery.</>
+                                ) : (
+                                    <> The courier will call you before delivery.</>
+                                )}
                                 {showPkrEquivalent && (
                                     <>
                                         <br />
@@ -261,6 +267,21 @@ export const OrderConfirmationEmail = ({
                         </Text>
                     </Section>
 
+                    {/* What's next */}
+                    <Section style={sectionPadding}>
+                        <Heading style={sectionTitle}>What&apos;s next</Heading>
+                        <Text style={whatsNextItem}>
+                            <strong>1.</strong> We&apos;re preparing your order and will hand it to our courier partner.
+                        </Text>
+                        <Text style={whatsNextItem}>
+                            <strong>2.</strong> The courier will call
+                            {customerPhone ? <> <strong>{customerPhone}</strong></> : <> you</>} to schedule delivery.
+                        </Text>
+                        <Text style={whatsNextItem}>
+                            <strong>3.</strong> Hand <strong>{formatPricePKR(total)}</strong> in cash to the courier on delivery.
+                        </Text>
+                    </Section>
+
                     {/* Track Order Button */}
                     {trackingUrl && (
                         <Section style={buttonSection}>
@@ -281,16 +302,16 @@ export const OrderConfirmationEmail = ({
                     <Section style={footer}>
                         <Hr style={footerDivider} />
                         <Link href={SITE_URL} style={{ textDecoration: "none" }}>
-                            <Text style={footerLogo}>WallDecorator</Text>
+                            <Text style={footerLogo}>Wall Decorator</Text>
                         </Link>
                         <Text style={footerText}>
                             If you have any questions about your order, please contact us at{" "}
-                            <Link href="mailto:support@walldecorator.store" style={footerLink}>
-                                support@walldecorator.store
+                            <Link href="mailto:orders@walldecorator.store" style={footerLink}>
+                                orders@walldecorator.store
                             </Link>
                         </Text>
                         <Text style={footerCopyright}>
-                            © {new Date().getFullYear()} WallDecorator. All rights reserved.
+                            © {new Date().getFullYear()} Wall Decorator. All rights reserved.
                         </Text>
                     </Section>
                 </Container>
@@ -420,6 +441,13 @@ const codNoticeBody: React.CSSProperties = {
     fontSize: "13px",
     lineHeight: "20px",
     margin: "0",
+};
+
+const whatsNextItem: React.CSSProperties = {
+    color: BRAND_TEXT,
+    fontSize: "13px",
+    lineHeight: "20px",
+    margin: "0 0 8px",
 };
 
 const orderLabel: React.CSSProperties = {
