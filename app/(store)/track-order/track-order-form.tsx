@@ -65,6 +65,11 @@ function OrderResult({ result }: { result: Extract<TrackOrderResult, { found: tr
   const currentStepIndex = getStepIndex(result.status)
   const isCancelled = result.status === 'cancelled'
 
+  const paymentLabel =
+    result.payment_status === 'paid'
+      ? 'Cash collected on delivery'
+      : 'Cash on Delivery — collected on arrival'
+
   const formatDate = (iso: string | null) => {
     if (!iso) return null
     return new Date(iso).toLocaleDateString('en-PK', {
@@ -185,6 +190,10 @@ function OrderResult({ result }: { result: Extract<TrackOrderResult, { found: tr
           <div className="flex justify-between text-sm font-bold text-foreground pt-2 border-t border-border">
             <span>Total</span>
             <span>{formatPrice(Number(result.total_amount), currency, rates)}</span>
+          </div>
+          <div className="flex justify-between text-xs text-muted-foreground pt-1">
+            <span>Payment</span>
+            <span>{paymentLabel}</span>
           </div>
         </div>
       </div>

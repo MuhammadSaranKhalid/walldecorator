@@ -156,6 +156,17 @@ export const OrderConfirmationEmail = ({
                         </Section>
                     </Section>
 
+                    {/* Cash on Delivery Notice */}
+                    <Section style={{ padding: "16px 40px 0" }}>
+                        <Section style={codNoticeCard}>
+                            <Text style={codNoticeLabel}>Payment Method</Text>
+                            <Text style={codNoticeValue}>Cash on Delivery</Text>
+                            <Text style={codNoticeBody}>
+                                Please have <strong>{formatPrice(total)}</strong> ready in cash when your courier arrives. Our team will call you to confirm the delivery window.
+                            </Text>
+                        </Section>
+                    </Section>
+
                     {/* Order Items */}
                     <Section style={sectionPadding}>
                         <Heading style={sectionTitle}>Order Items</Heading>
@@ -369,6 +380,36 @@ const orderInfoCardInner: React.CSSProperties = {
     backgroundColor: BRAND_GOLD_LIGHT,
     borderRadius: "10px",
     border: `1px solid ${BRAND_BORDER}`,
+};
+
+const codNoticeCard: React.CSSProperties = {
+    padding: "16px 20px",
+    backgroundColor: "#FFFFFF",
+    borderRadius: "10px",
+    border: `1px solid ${BRAND_GOLD}`,
+};
+
+const codNoticeLabel: React.CSSProperties = {
+    color: BRAND_GOLD,
+    fontSize: "11px",
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: "1px",
+    margin: "0 0 4px",
+};
+
+const codNoticeValue: React.CSSProperties = {
+    color: BRAND_DARK,
+    fontSize: "16px",
+    fontWeight: "700",
+    margin: "0 0 8px",
+};
+
+const codNoticeBody: React.CSSProperties = {
+    color: BRAND_TEXT,
+    fontSize: "13px",
+    lineHeight: "20px",
+    margin: "0",
 };
 
 const orderLabel: React.CSSProperties = {
