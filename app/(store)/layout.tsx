@@ -6,7 +6,7 @@ import { AnnouncementBar } from '@/components/obsidian/announcement-bar'
 import { MobileMenu } from '@/components/obsidian/mobile-menu'
 import { ObsidianFooter } from '@/components/obsidian/footer'
 import { ToastContainer } from '@/components/obsidian/toast-container'
-// import { WhatsAppButton } from '@/components/obsidian/whatsapp-button'
+import { WhatsAppButton } from '@/components/obsidian/whatsapp-button'
 
 
 export const metadata: Metadata = {
@@ -31,7 +31,7 @@ export default function RootLayout({
             <ObsidianCartDrawer />
             <WishlistDrawer />
             <ToastContainer />
-            {/* <WhatsAppButton /> */}
+            <WhatsAppButton />
         </div>
     );
 }
