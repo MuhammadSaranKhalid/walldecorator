@@ -85,7 +85,11 @@ export function CheckoutForm({ ipAddress, userAgent, initialCountry }: CheckoutF
 
       clearCart()
       toast.success('Order placed successfully!')
-      router.push(`/checkout/confirmation/${orderResult.orderId}`)
+      // Replace (not push) so back-navigation from the confirmation page
+      // skips the checkout entry entirely and returns the customer to where
+      // they were before checkout (PDP, products list, etc.) rather than
+      // dropping them on an empty checkout form.
+      router.replace(`/checkout/confirmation/${orderResult.orderId}`)
     } catch (err) {
       console.error('Checkout error:', err)
       methods.setError('root.serverError', {
