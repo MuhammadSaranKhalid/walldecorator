@@ -3,7 +3,8 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Heart, ArrowLeft, Eye } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Heart, ArrowLeft, Eye, Zap } from 'lucide-react'
 import { getStorageUrl } from '@/lib/supabase/storage'
 import { useCartStore } from '@/store/cart.store'
 import { useWishlistStore } from '@/store/wishlist.store'
@@ -85,6 +86,7 @@ export function ObsidianProductDetailPage({ product }: ObsidianProductDetailPage
     : null
 
   // ── Stores ────────────────────────────────────────────────────────────────
+  const router = useRouter()
   const { addItem: addToCart, openCart } = useCartStore()
   const { toggleItem: toggleWishlist, isInWishlist } = useWishlistStore()
   const { showSuccess } = useToastStore()
@@ -93,11 +95,11 @@ export function ObsidianProductDetailPage({ product }: ObsidianProductDetailPage
   const isWishlisted = isInWishlist(currentVariant?.id ?? product.id)
   const [showWallViewer, setShowWallViewer] = useState(false)
 
-  const handleAddToCart = () => {
-    if (!currentVariant || !isInStock) return
+  const buildCartItem = () => {
+    if (!currentVariant) return null
     const materialDisplay = attribute_display_names[selectedMaterial] ?? selectedMaterial
     const sizeDisplay = attribute_display_names[selectedSize] ?? selectedSize
-    addToCart({
+    return {
       variantId: currentVariant.id,
       productName: product.name,
       variantDescription: `${materialDisplay} · ${sizeDisplay}`,
@@ -105,9 +107,27 @@ export function ObsidianProductDetailPage({ product }: ObsidianProductDetailPage
       price: currentVariant.price,
       quantity: 1,
       image: cartImage,
-    })
+    }
+  }
+
+  const handleAddToCart = () => {
+    if (!isInStock) return
+    const item = buildCartItem()
+    if (!item) return
+    addToCart(item)
     openCart()
     showSuccess('Added to Cart', product.name)
+  }
+
+  const handleBuyNow = () => {
+    if (!isInStock) return
+    const item = buildCartItem()
+    if (!item) return
+    // Add to cart so /checkout has it; navigate before any subscriber to
+    // items.length can race the redirect (see feedback memory). We do not
+    // openCart here — Buy Now is the "skip the drawer" path.
+    router.push('/checkout')
+    addToCart(item)
   }
 
   const handleToggleWishlist = () => {
@@ -361,14 +381,30 @@ export function ObsidianProductDetailPage({ product }: ObsidianProductDetailPage
             </button>
           )}
 
+          {/* Buy Now — primary CTA. Skips the cart drawer and takes the
+              customer straight to /checkout. Any existing cart items go with
+              them. */}
+          <button
+            onClick={handleBuyNow}
+            disabled={!isInStock}
+            className={`w-full mb-2.5 flex items-center justify-center gap-2 border-none px-7 py-4.5 cursor-pointer font-[family-name:var(--font-dm-sans)] text-[11px] tracking-[3px] uppercase font-medium transition-all duration-250 ${
+              isInStock
+                ? 'bg-[var(--obsidian-gold)] text-[var(--obsidian-bg)] hover:bg-[var(--obsidian-gold-light)]'
+                : 'bg-[var(--obsidian-surface2)] text-[var(--obsidian-text-dim)] cursor-not-allowed'
+            }`}
+          >
+            <Zap className="w-4 h-4" />
+            {isInStock ? 'Buy Now' : 'Out of Stock'}
+          </button>
+
           <div className="flex gap-2.5 mb-6">
             <button
               onClick={handleAddToCart}
               disabled={!isInStock}
-              className={`flex-1 border-none px-7 py-4.5 cursor-pointer font-[family-name:var(--font-dm-sans)] text-[11px] tracking-[3px] uppercase font-medium transition-all duration-250 ${
+              className={`flex-1 bg-transparent border px-7 py-4.5 cursor-pointer font-[family-name:var(--font-dm-sans)] text-[11px] tracking-[3px] uppercase font-medium transition-all duration-250 ${
                 isInStock
-                  ? 'bg-[var(--obsidian-gold)] text-[var(--obsidian-bg)] hover:bg-[var(--obsidian-gold-light)]'
-                  : 'bg-[var(--obsidian-surface2)] text-[var(--obsidian-text-dim)] cursor-not-allowed'
+                  ? 'border-[var(--obsidian-gold)] text-[var(--obsidian-gold)] hover:bg-[var(--obsidian-gold)] hover:text-[var(--obsidian-bg)]'
+                  : 'border-[var(--obsidian-border)] text-[var(--obsidian-text-dim)] cursor-not-allowed'
               }`}
             >
               {isInStock ? 'Add to Cart' : 'Out of Stock'}
