@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 // Configured via NEXT_PUBLIC_WHATSAPP_NUMBER (digits only, no '+').
-const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '923289276406'
+const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '923289279013'
 const WHATSAPP_MESSAGE = 'Hi! I have a question about your wall art.'
 
 export function WhatsAppButton() {

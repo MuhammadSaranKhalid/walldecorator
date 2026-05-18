@@ -31,10 +31,10 @@ env:
     value: "sb_publishable_tXKlG5Dlk0Pk10u_-_edwQ_Pn6VC79w"
     availability: [BUILD, RUNTIME]
 
-  # WhatsApp floating-button number — digits only, no '+' (e.g. "923289276406"
-  # for Pakistan +92 328 9276406).
+  # WhatsApp floating-button number — digits only, no '+' (e.g. "923289279013"
+  # for Pakistan +92 328 9279013).
   - variable: NEXT_PUBLIC_WHATSAPP_NUMBER
-    value: "923289276406"
+    value: "923289279013"
     availability: [BUILD, RUNTIME]
 
   - variable: RESEND_FROM_EMAIL
